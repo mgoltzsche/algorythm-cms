@@ -38,7 +38,6 @@ public class XmlContentRenderer implements IContentRenderer {
 			final Schema schema = createSchema(staticSchemaDir + "article.xsd", staticSchemaDir + "markup.xsd");
 			final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			//parserFactory.setValidating(true); REQUIRED FOR DTD VALIDATION ONLY
-			parserFactory.setXIncludeAware(true);
 			parserFactory.setNamespaceAware(true);
 			parserFactory.setSchema(schema);
 			final SAXParser parser = parserFactory.newSAXParser();
