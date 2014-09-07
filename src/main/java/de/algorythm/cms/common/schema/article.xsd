@@ -3,7 +3,7 @@
 	targetNamespace="http://www.algorythm.de/cms/Article"
 	xmlns:m="http://www.algorythm.de/cms/Markup"
 	elementFormDefault="qualified">
-	<xs:import namespace="http://www.algorythm.de/cms/Markup" schemaLocation="algorythm-markup.xsd"/>
+	<xs:import namespace="http://www.algorythm.de/cms/Markup" schemaLocation="markup.xsd"/>
 	<xs:element name="article">
 		<xs:complexType>
 			<xs:sequence>

@@ -34,15 +34,17 @@ public class XmlContentRenderer implements IContentRenderer {
 			throws RendererException {
 		try {
 			final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			final Schema schema = createSchema("/xsd/algorythm-article.xsd", "/xsd/algorythm-markup.xsd");
+			final String staticSchemaDir = "/de/algorythm/cms/common/schema/";
+			final Schema schema = createSchema(staticSchemaDir + "article.xsd", staticSchemaDir + "markup.xsd");
 			final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			//parserFactory.setValidating(true); REQUIRED FOR DTD VALIDATION ONLY
+			parserFactory.setXIncludeAware(true);
 			parserFactory.setNamespaceAware(true);
 			parserFactory.setSchema(schema);
 			final SAXParser parser = parserFactory.newSAXParser();
 			final XMLReader reader = parser.getXMLReader();
 			reader.setErrorHandler(XmlParserErrorHandler.INSTANCE);
-			final Source xsltSource = new StreamSource(new StringReader(transformation));
+			final Source xsltSource = loadXslSource();
 			final Source source = new SAXSource(reader, new InputSource(new StringReader(content)));
 			final Transformer transformer = transformerFactory.newTransformer(xsltSource);
 			final ContentHandler handler = new XmlToStringHandler();
@@ -54,6 +56,13 @@ public class XmlContentRenderer implements IContentRenderer {
 		} catch (Exception e) {
 			throw new RendererException(e);
 		}
+	}
+	
+	private Source loadXslSource() throws URISyntaxException {
+		final File file = new File(getClass().getResource("/de/algorythm/cms/common/transform/html/article.xsl").toURI());
+		final Source xslSource = new StreamSource(file);
+		
+		return xslSource;
 	}
 	
 	private Schema createSchema(final String... xsdFilePathes) throws URISyntaxException, SAXException {
