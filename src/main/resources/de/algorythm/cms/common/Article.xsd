@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://cms.algorythm.de/common/Article"
+	xmlns:m="http://cms.algorythm.de/common/Markup"
+	targetNamespace="http://cms.algorythm.de/common/Article"
+	elementFormDefault="qualified">
+	<!--<xsd:include schemaLocation="Markup.xsd" />-->
+	<xsd:import namespace="http://cms.algorythm.de/common/Markup" schemaLocation="Markup.xsd" />
+	
+	<xsd:element name="article">
+        <xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="title" type="xsd:string" minOccurs="0" />
+				<xsd:element name="content" type="m:Markup" />
+			</xsd:sequence>
+		</xsd:complexType>
+    </xsd:element>
+</xsd:schema>

@@ -1,8 +1,9 @@
 package de.algorythm.cms.common.renderer.impl;
 
 import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import de.algorythm.cms.common.renderer.impl.xslt.XmlContentRenderer;
@@ -12,8 +13,16 @@ public class TestXmlContentRenderer {
 	@Test
 	public void testXmlContentRenderer() throws Exception {
 		XmlContentRenderer testee = new XmlContentRenderer();
-		String xslt = FileUtils.readFileToString(new File(getClass().getResource("/de/algorythm/cms/common/transform/html/article.xsl").toURI()), "UTF-8");
-		String xmlData = "<t:article xmlns:t=\"http://www.algorythm.de/cms/Article\" xmlns=\"http://www.algorythm.de/cms/Markup\"><t:title>Testtitel</t:title><t:content>Testinhalt <b>fett</b></t:content></t:article>";
-		System.out.println(testee.render(xmlData, xslt));
+		
+		System.out.println(testee.render(jarFile("/test-content/test-content.xml")));
+	}
+	
+	private File jarFile(final String filePath) throws URISyntaxException {
+		final URL fileUrl = getClass().getResource(filePath);
+		
+		if (fileUrl == null)
+			throw new IllegalStateException("Missing test file: " + filePath);
+		
+		return new File(fileUrl.toURI());
 	}
 }
