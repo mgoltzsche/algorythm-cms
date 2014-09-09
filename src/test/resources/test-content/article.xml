@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/Article" title="Testtitel">
+	<p xmlns="http://cms.algorythm.de/common/Markup">
+		Testinhalt
+		<b>fett</b>
+		<p>asdf</p>
+	</p>
+</article>

@@ -11,10 +11,17 @@ import de.algorythm.cms.common.renderer.impl.xslt.XmlContentRenderer;
 public class TestXmlContentRenderer {
 
 	@Test
+	public void testPageRenderer() throws Exception {
+		XmlContentRenderer testee = new XmlContentRenderer();
+		
+		System.out.println(testee.render(jarFile("/test-content/page.xml")));
+	}
+	
+	@Test
 	public void testXmlContentRenderer() throws Exception {
 		XmlContentRenderer testee = new XmlContentRenderer();
 		
-		System.out.println(testee.render(jarFile("/test-content/test-content.xml")));
+		System.out.println(testee.render(jarFile("/test-content/article.xml")));
 	}
 	
 	private File jarFile(final String filePath) throws URISyntaxException {

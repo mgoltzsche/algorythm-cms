@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.inject.Singleton;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
@@ -33,11 +34,11 @@ public class XmlContentRenderer implements IContentRenderer {
 	public String render(final File contentFile) throws RendererException {
 		try {
 			final String staticSchemaDir = "/de/algorythm/cms/common/";
-			final Schema schema = createSchema(staticSchemaDir + "Article.xsd", staticSchemaDir + "Markup.xsd");
+			final Schema schema = createSchema(staticSchemaDir + "Article.xsd");
 			final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			//parserFactory.setValidating(true); REQUIRED FOR DTD VALIDATION ONLY
 			parserFactory.setNamespaceAware(true);
-			parserFactory.setSchema(schema);
+			parserFactory.setSchema(schema); // REQUIRED FOR VALIDATION ONLY
 			final SAXParser parser = parserFactory.newSAXParser();
 			final XMLReader reader = parser.getXMLReader();
 //			final Source source = new StreamSource(contentFile);
@@ -86,7 +87,7 @@ public class XmlContentRenderer implements IContentRenderer {
 		for (int i = hostSegments.length - 1; i >=0; i--)
 			sb.append(File.separator).append(hostSegments[i]);
 		
-		for (int i = 0; i < pathSegments.length - 1; i++)
+		for (int i = 1; i < pathSegments.length - 1; i++)
 			sb.append(File.separator).append(pathSegments[i]);
 		
 		sb.append(File.separator).append("transform").append(File.separator)
@@ -120,8 +121,7 @@ public class XmlContentRenderer implements IContentRenderer {
 	}
 	
 	private Schema createSchema(final String... xsdFilePathes) throws URISyntaxException, SAXException {
-		final String schemaNs = "http://www.w3.org/2001/XMLSchema";
-		final SchemaFactory schemaFactory = SchemaFactory.newInstance(schemaNs);
+		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		final Source[] sources = new Source[xsdFilePathes.length];
 		
 		for (int i = 0; i < xsdFilePathes.length; i++) {

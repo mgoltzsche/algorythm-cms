@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://cms.algorythm.de/common/Page"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	targetNamespace="http://cms.algorythm.de/common/Page"
+	elementFormDefault="qualified">
+
+	<xsd:element name="page">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="content" minOccurs="1" maxOccurs="unbounded" />
+			</xsd:sequence>
+			<xsd:attribute name="title" type="xsd:token" />
+			<xsd:attribute name="navTitle" type="xsd:token" use="optional" />
+			<xsd:attribute name="template" type="xsd:token" use="optional" />
+			<xsd:attribute name="inMenu" type="xsd:boolean" default="true" />
+			<xsd:attribute name="subNav" type="xsd:boolean" default="true" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:complexType name="ContentType" />
+	<xsd:element name="content" abstract="true" type="ContentType" />
+	<xsd:element name="include" substitutionGroup="content">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="ContentType">
+					<xsd:attribute name="href" type="xsd:anyURI" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<page xmlns="http://cms.algorythm.de/common/Page"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	title="My test page">
+	<article xmlns="http://cms.algorythm.de/common/Article" title="Testtitel">
+		<p xmlns="http://cms.algorythm.de/common/Markup">
+			Testinhalt
+			<b>fett</b>
+			<p>asdf</p>
+		</p>
+	</article>
+	<!--<xi:include href="article.xml" parse="xml" />-->
+</page>
