@@ -6,15 +6,15 @@
 	exclude-result-prefixes="p">
 	<xsl:include href="../include-view-html.xsl" />
 
-	<xsl:template match="/">
+	<xsl:template match="p:page">
 		<div>
-			<xsl:if test="/p:page/@subNav='true'">
+			<xsl:if test="current()/@subNav='true'">
 				<nav id="secondary-nav"></nav>
 			</xsl:if>
 			<main>
-				<h3>
-					<xsl:value-of select="/p:page/@title" />
-				</h3>
+				<h2>
+					<xsl:value-of select="current()/@title" />
+				</h2>
 				<xsl:apply-imports />
 			</main>
 		</div>

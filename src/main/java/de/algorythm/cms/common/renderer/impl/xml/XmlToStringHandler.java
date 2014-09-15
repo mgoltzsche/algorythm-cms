@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.renderer.impl.xslt;
+package de.algorythm.cms.common.renderer.impl.xml;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;

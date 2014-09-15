@@ -6,21 +6,20 @@ import java.net.URL;
 
 import org.junit.Test;
 
-import de.algorythm.cms.common.renderer.impl.xslt.XmlContentRenderer;
+import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
+import de.algorythm.cms.common.renderer.impl.xml.XmlContentRenderer;
 
 public class TestXmlContentRenderer {
 
+	static private XmlContentRenderer testee = new XmlContentRenderer(new XmlReaderFactory());
+
 	@Test
 	public void testPageRenderer() throws Exception {
-		XmlContentRenderer testee = new XmlContentRenderer();
-		
 		System.out.println(testee.render(jarFile("/test-content/page.xml")));
 	}
 	
 	@Test
-	public void testXmlContentRenderer() throws Exception {
-		XmlContentRenderer testee = new XmlContentRenderer();
-		
+	public void testContentRenderer() throws Exception {
 		System.out.println(testee.render(jarFile("/test-content/article.xml")));
 	}
 	

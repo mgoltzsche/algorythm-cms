@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns="http://cms.algorythm.de/common/Markup"
+	xmlns:t="http://cms.algorythm.de/common/Types"
 	targetNamespace="http://cms.algorythm.de/common/Markup"
 	elementFormDefault="qualified">
-	<xsd:group name="MarkupGroup">
-		<xsd:all>
+	<xsd:import namespace="http://cms.algorythm.de/common/Types" schemaLocation="Types.xsd" />
+	
+	<xsd:complexType name="Markup" mixed="true">
+		<xsd:complexContent>
+			<xsd:extension base="t:ContentType">
+				<xsd:choice maxOccurs="unbounded">
 			<xsd:element name="p" type="Markup" minOccurs="0" />
 			<xsd:element name="b" type="Markup" minOccurs="0" />
 			<xsd:element name="i" type="Markup" minOccurs="0" />
@@ -16,10 +21,8 @@
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
-		</xsd:all>
-	</xsd:group>
-	
-	<xsd:complexType name="Markup" mixed="true">
-		<xsd:group ref="MarkupGroup" />
+		</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 </xsd:schema>

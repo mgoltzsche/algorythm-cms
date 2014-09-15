@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.renderer.impl.xslt;
+package de.algorythm.cms.common.renderer.impl.xml;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,15 +13,15 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class TransformationDelegator implements ContentHandler {
+public class TransformerDelegator implements ContentHandler {
 
 	static private interface IStartElementHandler {
-		void handleStartElement(TransformationDelegator h, String uri) throws SAXException;
+		void handleStartElement(TransformerDelegator h, String uri) throws SAXException;
 	}
 	
 	static private final IStartElementHandler FIRST_ELEMENT_HANDLER = new IStartElementHandler() {
 		@Override
-		public void handleStartElement(final TransformationDelegator h, final String uri) throws SAXException {
+		public void handleStartElement(final TransformerDelegator h, final String uri) throws SAXException {
 			TransformerHandler transformer = h.renderer.loadTransformer(uri);
 			
 			transformer.setResult(h.result);
@@ -37,19 +37,19 @@ public class TransformationDelegator implements ContentHandler {
 	
 	static private final IStartElementHandler ELEMENT_HANDLER = new IStartElementHandler() {
 		@Override
-		public void handleStartElement(final TransformationDelegator h, final String uri) throws SAXException {
+		public void handleStartElement(final TransformerDelegator h, final String uri) throws SAXException {
 		}
 	};
 
 	static private final DefaultHandler DEFAULT_HANDLER = new DefaultHandler();
-	
+
 	private final XmlContentRenderer renderer;
 	private final Result result;
 	private final Map<String, String> prefixMapping = new LinkedHashMap<String, String>();
 	private ContentHandler transformer = DEFAULT_HANDLER;
 	private IStartElementHandler startElementHandler = FIRST_ELEMENT_HANDLER;
 	
-	public TransformationDelegator(final XmlContentRenderer renderer, final Result result) {
+	public TransformerDelegator(final XmlContentRenderer renderer, final Result result) {
 		this.renderer = renderer;
 		this.result = result;
 	}

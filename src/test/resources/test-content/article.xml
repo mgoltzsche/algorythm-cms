@@ -4,6 +4,7 @@
 	<p xmlns="http://cms.algorythm.de/common/Markup">
 		Testinhalt
 		<b>fett</b>
+		<b>fett2</b>
 		<p>asdf</p>
 	</p>
 </article>

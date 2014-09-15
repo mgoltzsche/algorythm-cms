@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://cms.algorythm.de/common/Site"
+	targetNamespace="http://cms.algorythm.de/common/Site"
+	elementFormDefault="qualified">
+	
+	<xsd:element name="site">
+		<xsd:complexType>
+			<xsd:attribute name="title" type="xsd:token" use="optional" />
+			<xsd:attribute name="description" type="xsd:token" use="optional" />
+			<xsd:attribute name="default-language" type="xsd:language" use="optional" />
+			<xsd:attribute name="default-template" type="xsd:anyURI" use="optional" />
+			<xsd:attribute name="context-path" type="xsd:token" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

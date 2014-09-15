@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.renderer.impl.xslt;
+package de.algorythm.cms.common.renderer.impl.xml;
 
 import java.io.File;
 import java.io.StringWriter;
@@ -7,59 +7,73 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.inject.Singleton;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import de.algorythm.cms.common.impl.xml.contentHandler.IncludingContentHandler;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.RendererException;
 
 @Singleton
 public class XmlContentRenderer implements IContentRenderer {
 
+	private final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
+	private final IXmlReaderFactory readerFactory;
+	
+	public XmlContentRenderer(final IXmlReaderFactory readerFactory) {
+		this.readerFactory = readerFactory;
+	}
+	
 	@Override
 	public String render(final File contentFile) throws RendererException {
 		try {
-			final String staticSchemaDir = "/de/algorythm/cms/common/";
-			final Schema schema = createSchema(staticSchemaDir + "Article.xsd");
-			final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-			//parserFactory.setValidating(true); REQUIRED FOR DTD VALIDATION ONLY
-			parserFactory.setNamespaceAware(true);
-			parserFactory.setSchema(schema); // REQUIRED FOR VALIDATION ONLY
-			final SAXParser parser = parserFactory.newSAXParser();
-			final XMLReader reader = parser.getXMLReader();
-//			final Source source = new StreamSource(contentFile);
 			final StringWriter writer = new StringWriter();
-			final TransformationDelegator transformerDelegator = new TransformationDelegator(this, new StreamResult(writer));
+			//final TransformerDelegator transformerDelegator = new TransformerDelegator(this, new StreamResult(writer));
+			final XMLReader reader = readerFactory.createReader();
+			final TransformerHandler transformer = createTransformer();
+			transformer.setResult(new StreamResult(writer));
+			final IncludingContentHandler handler = new IncludingContentHandler(readerFactory, transformer);
 			
-			reader.setErrorHandler(XmlParserErrorHandler.INSTANCE);
-			reader.setContentHandler(transformerDelegator);
+			reader.setErrorHandler(handler);
+			reader.setContentHandler(handler);
 			reader.parse(contentFile.getAbsolutePath());
 			
 			return writer.toString();
+		} catch (TransformerConfigurationException e) {
+			throw new RendererException("Invalid transformer configuration", e);
 		} catch (Exception e) {
-			throw new RendererException(e);
+			throw new RendererException(e.getMessage(), e);
 		}
+	}
+	
+	private TransformerHandler createTransformer() throws TransformerConfigurationException {
+		final String xslUri = "/de/algorythm/cms/common/tpl/include-view-html.xsl";
+		final URL url = getClass().getResource(xslUri);
+		
+		if (url == null)
+			throw new IllegalStateException("Missing XLS template: " + xslUri);
+		
+		final Templates tpls = transformerFactory.newTemplates(new StreamSource(url.toString()));
+		final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler(tpls);
+		final Transformer transformer = transformerHandler.getTransformer();
+		transformer.setErrorListener(XslErrorListener.INSTANCE);
+		
+		return transformerHandler;
 	}
 	
 	public TransformerHandler loadTransformer(final String uri) throws SAXException {
 		final File xslFile = deriveXslFile(uri, "html");
 		
 		try {
-			final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
 			final Templates tpls = transformerFactory.newTemplates(new StreamSource(xslFile));
 			final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler(tpls);
 			final Transformer transformer = transformerHandler.getTransformer();
@@ -90,7 +104,7 @@ public class XmlContentRenderer implements IContentRenderer {
 		for (int i = 1; i < pathSegments.length - 1; i++)
 			sb.append(File.separator).append(pathSegments[i]);
 		
-		sb.append(File.separator).append("transform").append(File.separator)
+		sb.append(File.separator).append("tpl").append(File.separator)
 			.append(outputFormat).append(File.separator)
 			.append(pathSegments[pathSegments.length - 1]).append(".xsl");
 		
@@ -118,24 +132,5 @@ public class XmlContentRenderer implements IContentRenderer {
 			throw new SAXException("Cannot read XSL template " + xslFile.getAbsolutePath() + " due to file system restrictions");
 		
 		return xslFile;
-	}
-	
-	private Schema createSchema(final String... xsdFilePathes) throws URISyntaxException, SAXException {
-		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		final Source[] sources = new Source[xsdFilePathes.length];
-		
-		for (int i = 0; i < xsdFilePathes.length; i++) {
-			final String xsdPath = xsdFilePathes[i];
-			final URL xsdUrl = getClass().getResource(xsdPath);
-			
-			if (xsdUrl == null)
-				throw new IllegalStateException("Missing XSD file " + xsdPath);
-			
-			sources[i] = new StreamSource(new File(xsdUrl.toURI()));
-		}
-		
-		final Schema schema = schemaFactory.newSchema(sources);
-		
-		return schema;
 	}
 }

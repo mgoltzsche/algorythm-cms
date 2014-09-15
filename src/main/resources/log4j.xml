@@ -10,12 +10,12 @@
         </layout>
     </appender>
 
-    <logger name="de.algorythm.evaluation.javafx">
-        <level value="DEBUG"/>
+    <logger name="de.algorythm.cms">
+        <level value="TRACE"/>
     </logger>
 
     <root>
-        <priority value ="WARN" />
+        <priority value ="TRACE" />
         <appender-ref ref="console" />
     </root>
 

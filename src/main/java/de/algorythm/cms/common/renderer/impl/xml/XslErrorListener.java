@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.renderer.impl.xslt;
+package de.algorythm.cms.common.renderer.impl.xml;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerException;

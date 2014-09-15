@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://cms.algorythm.de/common/Types"
+	targetNamespace="http://cms.algorythm.de/common/Types"
+	elementFormDefault="qualified">
+	
+	<xsd:complexType name="ContentType" />
+	
+	<xsd:element name="abstract-content" abstract="true" type="ContentType" />
+	
+	<xsd:element name="include" substitutionGroup="abstract-content">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="ContentType">
+					<xsd:attribute name="href" type="xsd:anyURI" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

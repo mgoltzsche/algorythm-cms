@@ -7,11 +7,11 @@
 	<xsl:output method="xml" version="1.0" omit-xml-declaration="yes" indent="yes" />
 	<xsl:import href="Markup.xsl" />
 	
-	<xsl:template match="/">
+	<xsl:template match="a:article">
 		<article>
-			<xsl:if test="/a:article/@title">
+			<xsl:if test="current()/@title">
 				<h3>
-					<xsl:value-of select="/a:article/@title" />
+					<xsl:value-of select="current()/@title" />
 				</h3>
 			</xsl:if>
 			<xsl:apply-imports />
