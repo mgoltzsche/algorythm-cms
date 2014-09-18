@@ -12,7 +12,7 @@ public class Site extends AbstractPageContainer implements ISite {
 	private Locale defaultLocale;
 
 	public Site(final XmlResourceDao dao, final String name, final String title, final Locale defaultLocale, final String contextPath) {
-		super(dao, "", name);
+		super(dao, name, "", name);
 		this.title = title;
 		this.defaultLocale = defaultLocale;
 		this.contextPath = contextPath;

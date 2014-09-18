@@ -1,28 +1,24 @@
 package de.algorythm.cms.common.model.entity.impl;
 
-import java.util.List;
-
 import de.algorythm.cms.common.model.dao.impl.xml.XmlResourceDao;
 import de.algorythm.cms.common.model.entity.IPage;
 
 public class Page extends AbstractPageContainer implements IPage {
 
-	private String title;
-	private String navigationTitle;
-	private boolean inNavigation;
-	private List<IPage> pages;
+	private final String title;
+	private final String navigationTitle;
+	private final boolean inNavigation;
 
-	public Page(final XmlResourceDao dao, final String parentPath, final String name) {
-		super(dao, parentPath, name);
+	public Page(final XmlResourceDao dao, final String site, final String parentPath, final String name, final String title, String navTitle, final boolean inNavigation) {
+		super(dao, site, parentPath + '/' + name, name);
+		this.title = title;
+		this.navigationTitle = navTitle;
+		this.inNavigation = inNavigation;
 	}
 
 	@Override
 	public String getTitle() {
 		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
 	}
 
 	@Override
@@ -35,11 +31,6 @@ public class Page extends AbstractPageContainer implements IPage {
 		return inNavigation;
 	}
 
-	@Override
-	public List<IPage> getPages() {
-		return pages;
-	}
-	
 	@Override
 	public String toString() {
 		return "Page [" + getPath() + "]";

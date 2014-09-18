@@ -15,7 +15,7 @@ import org.xml.sax.XMLReader;
 
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 
-public class IncludingContentHandler implements ContentHandler, ErrorHandler {
+public class IncludingHandler implements ContentHandler, ErrorHandler {
 
 	static private final String NAMESPACE = "http://cms.algorythm.de/common/Types";
 	static private final String INCLUDE = "include";
@@ -25,7 +25,7 @@ public class IncludingContentHandler implements ContentHandler, ErrorHandler {
 	private final ContentHandler delegator;
 	private final Stack<Locator> locators = new Stack<Locator>();
 	
-	public IncludingContentHandler(final IXmlReaderFactory readerFactory, final ContentHandler delegator) {
+	public IncludingHandler(final IXmlReaderFactory readerFactory, final ContentHandler delegator) {
 		this.readerFactory = readerFactory;
 		this.delegator = delegator;
 	}

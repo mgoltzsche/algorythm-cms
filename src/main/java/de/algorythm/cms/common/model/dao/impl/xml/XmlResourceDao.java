@@ -9,22 +9,25 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.xml.stream.StreamFilter;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 import de.algorythm.cms.common.Configuration;
 import de.algorythm.cms.common.LocaleResolver;
+import de.algorythm.cms.common.impl.xml.InformationCompleteException;
 import de.algorythm.cms.common.impl.xml.Constants;
+import de.algorythm.cms.common.impl.xml.contentHandler.IncludingHandler;
+import de.algorythm.cms.common.impl.xml.contentHandler.PageInfoHandler;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
-import de.algorythm.cms.common.model.entity.impl.Page;
 import de.algorythm.cms.common.model.entity.impl.Site;
+import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 import de.algorythm.cms.common.util.FilePathUtil;
 
 public class XmlResourceDao {
@@ -33,13 +36,15 @@ public class XmlResourceDao {
 	
 	private final Locale defaultLocale;
 	private final File repositoryDirectory;
-	private final XMLInputFactory readerFactory = XMLInputFactory.newInstance();
+	private final XMLInputFactory staxReaderFactory = XMLInputFactory.newInstance();
+	private final IXmlReaderFactory saxReaderFactory;
 	private final LocaleResolver locales;
 	
-	public XmlResourceDao(final Configuration cfg, final LocaleResolver locales) {
+	public XmlResourceDao(final Configuration cfg, final LocaleResolver locales, final IXmlReaderFactory readerFactory) {
 		repositoryDirectory = cfg.repository;
 		defaultLocale = cfg.defaultLanguage;
 		this.locales = locales;
+		this.saxReaderFactory = readerFactory;
 	}
 	
 	public List<ISite> getSites() {
@@ -78,17 +83,23 @@ public class XmlResourceDao {
 		return sites;
 	}
 	
-	public List<IPage> loadPages(String path) {
-		path = FilePathUtil.toSystemSpecificPath(path);
-		final File directory = new File(repositoryDirectory, path);
+	public List<IPage> loadPages(String site, String path) throws SAXException {
+		final String relativeDir = FilePathUtil.toSystemSpecificPath(site + "/pages" + path);
+		final File directory = new File(repositoryDirectory, relativeDir);
 		
 		if (!directory.exists())
-			throw new IllegalStateException(path + " does not exist");
+			throw new IllegalStateException(relativeDir + " does not exist");
 		
 		if (!directory.isDirectory())
-			throw new IllegalStateException(path + " is not a directory");
+			throw new IllegalStateException(relativeDir + " is not a directory");
 		
 		final LinkedList<IPage> pages = new LinkedList<IPage>();
+		final PageInfoHandler pageInfo = new PageInfoHandler();
+		final IncludingHandler handler = new IncludingHandler(saxReaderFactory, pageInfo);
+		final XMLReader reader = saxReaderFactory.createReader();
+		
+		reader.setContentHandler(handler);
+		reader.setErrorHandler(handler);
 		
 		for (File subDirectory : directory.listFiles()) {
 			if (subDirectory.isDirectory()) {
@@ -96,12 +107,14 @@ public class XmlResourceDao {
 				
 				if (xmlFile.exists() && xmlFile.isFile()) {
 					try {
-						final Map<String, String> attr = readRootTag(xmlFile, Constants.Namespace.PAGE, Constants.Tag.PAGE);
-						
-						pages.add(new Page(this, path, subDirectory.getName()));
+						reader.parse(xmlFile.getAbsolutePath());
+					} catch(InformationCompleteException e) {
 					} catch(Exception e) {
 						log.error("Cannot read " + xmlFile, e);
+						continue;
 					}
+					
+					pages.add(pageInfo.createPageInfo(this, site, path, subDirectory.getName()));
 				}
 			}
 		}
@@ -109,13 +122,9 @@ public class XmlResourceDao {
 		return pages;
 	}
 	
-	/*private IPage loadPage(final File xmlFile) {
-		readRootTag(xmlFile, )
-	}*/
-	
 	private Map<String, String> readRootTag(final File xmlFile, final String expectedNamespace, final String expectedTag) throws XMLStreamException, IOException {
 		try (final FileReader xmlFileReader = new FileReader(xmlFile)) {
-			final XMLStreamReader reader = readerFactory.createXMLStreamReader(xmlFileReader);
+			final XMLStreamReader reader = staxReaderFactory.createXMLStreamReader(xmlFileReader);
 			
 			try {
 				while (reader.next() != XMLStreamReader.START_ELEMENT) {}

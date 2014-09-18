@@ -19,7 +19,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import de.algorythm.cms.common.impl.xml.contentHandler.IncludingContentHandler;
+import de.algorythm.cms.common.impl.xml.contentHandler.IncludingHandler;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.RendererException;
 
@@ -41,7 +41,7 @@ public class XmlContentRenderer implements IContentRenderer {
 			final XMLReader reader = readerFactory.createReader();
 			final TransformerHandler transformer = createTransformer();
 			transformer.setResult(new StreamResult(writer));
-			final IncludingContentHandler handler = new IncludingContentHandler(readerFactory, transformer);
+			final IncludingHandler handler = new IncludingHandler(readerFactory, transformer);
 			
 			reader.setErrorHandler(handler);
 			reader.setContentHandler(handler);

@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import de.algorythm.cms.common.Configuration;
 import de.algorythm.cms.common.LocaleResolver;
+import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
 import de.algorythm.cms.common.model.entity.impl.Site;
@@ -22,7 +23,8 @@ public class TestXmlResourceDao {
 	public void testXmlResourceDao() throws IOException {
 		Configuration cfg = new Configuration();
 		LocaleResolver locales = new LocaleResolver();
-		XmlResourceDao testee = new XmlResourceDao(cfg, locales);
+		XmlReaderFactory readerFactory = new XmlReaderFactory();
+		XmlResourceDao testee = new XmlResourceDao(cfg, locales, readerFactory);
 		List<ISite> sites = testee.getSites();
 		
 		assertEquals("site count", 3, sites.size());
@@ -47,8 +49,12 @@ public class TestXmlResourceDao {
 		}
 		
 		for (ISite site : sites) {
-			for (IPage page : site.getPages())
-				System.out.println(page);
+			for (IPage page1 : site.getPages()) {
+				System.out.println(page1);
+				
+				for (IPage page2 : page1.getPages())
+					System.out.println("  " + page2);
+			}
 		}
 	}
 }
