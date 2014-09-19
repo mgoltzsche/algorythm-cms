@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/Types"
-	targetNamespace="http://cms.algorythm.de/common/Types"
+	xmlns="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
 	
 	<xsd:complexType name="ContentType" />
@@ -17,4 +17,25 @@
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
+	
+	<xsd:complexType name="Markup" mixed="true">
+		<xsd:complexContent>
+			<xsd:extension base="ContentType">
+				<xsd:choice maxOccurs="unbounded">
+					<!--<xsd:element ref="include" />-->
+					<xsd:element name="p" type="Markup" minOccurs="0" />
+					<xsd:element name="b" type="Markup" minOccurs="0" />
+					<xsd:element name="i" type="Markup" minOccurs="0" />
+					<xsd:element name="u" type="Markup" minOccurs="0" />
+					<xsd:element name="ul" minOccurs="0">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="li" type="Markup" maxOccurs="unbounded" />
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 </xsd:schema>

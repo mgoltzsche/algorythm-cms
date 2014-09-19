@@ -18,7 +18,7 @@ public class PageInfoHandler extends DefaultHandler {
 
 	public Page createPageInfo(final XmlResourceDao dao, final String site, final String parentPath, final String name) throws SAXException {
 		if (!validPage)
-			throw new SAXException("Invalid page XML. Expected namespace " + Namespace.PAGE);
+			throw new SAXException("Invalid page XML. Expected namespace " + Namespace.CMS);
 		
 		if (title == null || title.isEmpty())
 			title = name;
@@ -39,7 +39,7 @@ public class PageInfoHandler extends DefaultHandler {
 	@Override
 	public void startElement(final String uri, final String localName,
 			final String qName, final Attributes atts) throws SAXException {
-		if (Namespace.PAGE.equals(uri) && Tag.PAGE.equals(localName)) {
+		if (Namespace.CMS.equals(uri) && Tag.PAGE.equals(localName)) {
 			validPage = true;
 			title = atts.getValue("title");
 			navTitle = atts.getValue("nav-title");

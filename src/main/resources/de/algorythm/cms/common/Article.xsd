@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/Article"
-	xmlns:m="http://cms.algorythm.de/common/Markup"
-	xmlns:t="http://cms.algorythm.de/common/Types"
+	xmlns="http://cms.algorythm.de/common/CMS"
 	targetNamespace="http://cms.algorythm.de/common/Article"
 	elementFormDefault="qualified">
 	<!--<xsd:include schemaLocation="Markup.xsd" /> -->
-	<xsd:import namespace="http://cms.algorythm.de/common/Markup" schemaLocation="Markup.xsd" />
-	<xsd:import namespace="http://cms.algorythm.de/common/Types" schemaLocation="Types.xsd" />
+	<xsd:import namespace="http://cms.algorythm.de/common/CMS" schemaLocation="Types.xsd" />
 
-	<xsd:element name="article" substitutionGroup="t:abstract-content">
+	<xsd:element name="article" substitutionGroup="abstract-content">
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:extension base="m:Markup">
+				<xsd:extension base="Markup">
 					<xsd:attribute name="title" type="xsd:string" use="optional" />
 					<xsd:attribute name="template" type="xsd:anyURI" use="optional" />
 				</xsd:extension>

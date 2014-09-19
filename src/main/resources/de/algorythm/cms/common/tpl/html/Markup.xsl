@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:m="http://cms.algorythm.de/common/Markup"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="m">
+	exclude-result-prefixes="c">
 
-	<xsl:template match="m:p">
+	<xsl:template match="c:p">
 		<p>
 			<xsl:apply-templates />
 		</p>
 	</xsl:template>
 	
-	<xsl:template match="m:b">
+	<xsl:template match="c:b">
 		<b>
 			<xsl:apply-templates />
 		</b>
 	</xsl:template>
 	
-	<xsl:template match="m:i">
+	<xsl:template match="c:i">
 		<i>
 			<xsl:apply-templates />
 		</i>

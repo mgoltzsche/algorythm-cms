@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<page xmlns="http://cms.algorythm.de/common/Page"
-	xmlns:t="http://cms.algorythm.de/common/Types"
+<page xmlns="http://cms.algorythm.de/common/CMS"
+	xmlns:a="http://cms.algorythm.de/common/Article"
 	title="My test page">
-	<t:include href="article.xml" />
-	<article xmlns="http://cms.algorythm.de/common/Article">
-		<p xmlns="http://cms.algorythm.de/common/Markup">
+	<include href="article.xml" />
+	<a:article>
+		<p>
 			Testinhalt
 			<b>fett</b>
 			<p>asdf</p>
 		</p>
-	</article>
-	<article xmlns="http://cms.algorythm.de/common/Article" title="Testtitel">
-		<p xmlns="http://cms.algorythm.de/common/Markup">
+	</a:article>
+	<a:article title="Testtitel">
+		<p>
 			Testinhalt
 			<b>fett</b>
 			<p>asdf</p>
 		</p>
-	</article>
+	</a:article>
 </page>

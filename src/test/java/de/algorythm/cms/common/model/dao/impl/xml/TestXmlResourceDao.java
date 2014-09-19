@@ -49,11 +49,12 @@ public class TestXmlResourceDao {
 		}
 		
 		for (ISite site : sites) {
+			System.out.println(site);
 			for (IPage page1 : site.getPages()) {
-				System.out.println(page1);
+				System.out.println("  " + page1);
 				
 				for (IPage page2 : page1.getPages())
-					System.out.println("  " + page2);
+					System.out.println("    " + page2);
 			}
 		}
 	}

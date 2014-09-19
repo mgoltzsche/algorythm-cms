@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/Page"
-	xmlns:t="http://cms.algorythm.de/common/Types"
-	targetNamespace="http://cms.algorythm.de/common/Page"
+	xmlns="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
-	<xsd:import namespace="http://cms.algorythm.de/common/Types" schemaLocation="Types.xsd"/>
+	<xsd:include schemaLocation="Types.xsd"/>
 	
 	<xsd:element name="page">
 		<xsd:complexType>
 			<xsd:choice minOccurs="1" maxOccurs="unbounded">
-				<xsd:element ref="t:abstract-content" />
+				<xsd:element ref="abstract-content" />
 			</xsd:choice>
 			<xsd:attribute name="title" type="xsd:token" />
 			<xsd:attribute name="nav-title" type="xsd:token" use="optional" />

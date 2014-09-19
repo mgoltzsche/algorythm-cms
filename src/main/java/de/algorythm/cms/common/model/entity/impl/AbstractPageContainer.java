@@ -38,7 +38,7 @@ public class AbstractPageContainer implements IPageContainer {
 			try {
 				pages = dao.loadPages(site, path);
 			} catch(SAXException e) {
-				throw new IllegalStateException("Cannot load pages of " + path);
+				throw new IllegalStateException("Cannot load pages of " + path, e);
 			}
 		}
 		
@@ -47,6 +47,6 @@ public class AbstractPageContainer implements IPageContainer {
 	
 	@Override
 	public int compareTo(final IPageContainer o) {
-		return o.getName().compareTo(name);
+		return name.compareTo(o.getName());
 	}
 }

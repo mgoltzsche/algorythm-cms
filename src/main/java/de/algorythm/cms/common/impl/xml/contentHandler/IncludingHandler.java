@@ -17,7 +17,7 @@ import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 
 public class IncludingHandler implements ContentHandler, ErrorHandler {
 
-	static private final String NAMESPACE = "http://cms.algorythm.de/common/Types";
+	static private final String NAMESPACE = "http://cms.algorythm.de/common/CMS";
 	static private final String INCLUDE = "include";
 	static private final String HREF = "href";
 	

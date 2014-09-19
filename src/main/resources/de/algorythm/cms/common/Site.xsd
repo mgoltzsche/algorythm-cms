@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/Site"
-	targetNamespace="http://cms.algorythm.de/common/Site"
+	xmlns="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
 	
 	<xsd:element name="site">

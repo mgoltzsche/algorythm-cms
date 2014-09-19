@@ -4,7 +4,7 @@ public class Constants {
 
 	static public interface Namespace { 
 		static public final String SITE = "http://cms.algorythm.de/common/Site";
-		static public final String PAGE = "http://cms.algorythm.de/common/Page";
+		static public final String CMS = "http://cms.algorythm.de/common/CMS";
 	}
 	
 	static public interface Tag {
