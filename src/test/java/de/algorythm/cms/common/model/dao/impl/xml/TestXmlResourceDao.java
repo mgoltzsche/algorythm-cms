@@ -2,7 +2,6 @@ package de.algorythm.cms.common.model.dao.impl.xml;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -15,12 +14,12 @@ import de.algorythm.cms.common.LocaleResolver;
 import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
-import de.algorythm.cms.common.model.entity.impl.Site;
+import de.algorythm.cms.common.model.entity.impl.SiteInfo;
 
 public class TestXmlResourceDao {
 
 	@Test
-	public void testXmlResourceDao() throws IOException {
+	public void testXmlResourceDao() throws Exception {
 		Configuration cfg = new Configuration();
 		LocaleResolver locales = new LocaleResolver();
 		XmlReaderFactory readerFactory = new XmlReaderFactory();
@@ -30,9 +29,9 @@ public class TestXmlResourceDao {
 		assertEquals("site count", 3, sites.size());
 		
 		ISite[] expectedSites = new ISite[] {
-				new Site(null, "example1.org", "Test site", Locale.ENGLISH, "/site1"),
-				new Site(null, "example2.de", "Testseite", Locale.GERMAN, "/site2"),
-				new Site(null, "example3.com", "example3.com", cfg.defaultLanguage, ""),
+				createSite("example1.org", "My test site", Locale.ENGLISH, "/site1"),
+				createSite("example2.de", "Testseite", Locale.GERMAN, "/site2"),
+				createSite("example3.com", "example3.com", cfg.defaultLanguage, "/"),
 		};
 		
 		Arrays.sort(expectedSites);
@@ -50,12 +49,25 @@ public class TestXmlResourceDao {
 		
 		for (ISite site : sites) {
 			System.out.println(site);
-			for (IPage page1 : site.getPages()) {
-				System.out.println("  " + page1);
+			
+			final IPage startPage = site.getStartPage();
+			
+			if (startPage != null) {
+				System.out.println("  " + startPage + " (" + startPage.getTitle() + ", " + startPage.getNavigationTitle() + ")");
 				
-				for (IPage page2 : page1.getPages())
-					System.out.println("    " + page2);
+				for (IPage page : startPage.getPages())
+					System.out.println("    " + page);
 			}
 		}
+	}
+	
+	private ISite createSite(String name, String title, Locale locale, String contextPath) {
+		final SiteInfo siteInfo = new SiteInfo(name);
+		
+		siteInfo.setTitle(title);
+		siteInfo.setDefaultLocale(locale);
+		siteInfo.setContextPath(contextPath);
+		
+		return siteInfo;
 	}
 }

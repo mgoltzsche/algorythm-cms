@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/CMS"
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
 	targetNamespace="http://cms.algorythm.de/common/Article"
 	elementFormDefault="qualified">
 	<!--<xsd:include schemaLocation="Markup.xsd" /> -->
-	<xsd:import namespace="http://cms.algorythm.de/common/CMS" schemaLocation="Types.xsd" />
+	<import namespace="http://cms.algorythm.de/common/CMS" schemaLocation="Types.xsd" />
 
-	<xsd:element name="article" substitutionGroup="abstract-content">
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="Markup">
-					<xsd:attribute name="title" type="xsd:string" use="optional" />
-					<xsd:attribute name="template" type="xsd:anyURI" use="optional" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
-</xsd:schema>
+	<element name="article" substitutionGroup="c:abstract-content">
+        <complexType>
+			<complexContent>
+				<extension base="c:Markup">
+					<attribute name="title" type="string" use="optional" />
+					<attribute name="template" type="anyURI" use="optional" />
+				</extension>
+			</complexContent>
+		</complexType>
+    </element>
+</schema>

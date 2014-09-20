@@ -1,17 +1,10 @@
 package de.algorythm.cms.common.model.dao.impl.xml;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +14,13 @@ import org.xml.sax.XMLReader;
 import de.algorythm.cms.common.Configuration;
 import de.algorythm.cms.common.LocaleResolver;
 import de.algorythm.cms.common.impl.xml.InformationCompleteException;
-import de.algorythm.cms.common.impl.xml.Constants;
 import de.algorythm.cms.common.impl.xml.contentHandler.IncludingHandler;
 import de.algorythm.cms.common.impl.xml.contentHandler.PageInfoHandler;
+import de.algorythm.cms.common.impl.xml.contentHandler.SiteInfoHandler;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
-import de.algorythm.cms.common.model.entity.impl.Site;
+import de.algorythm.cms.common.model.entity.impl.PageInfo;
+import de.algorythm.cms.common.model.entity.impl.SiteInfo;
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 import de.algorythm.cms.common.util.FilePathUtil;
 
@@ -36,7 +30,6 @@ public class XmlResourceDao {
 	
 	private final Locale defaultLocale;
 	private final File repositoryDirectory;
-	private final XMLInputFactory staxReaderFactory = XMLInputFactory.newInstance();
 	private final IXmlReaderFactory saxReaderFactory;
 	private final LocaleResolver locales;
 	
@@ -47,44 +40,56 @@ public class XmlResourceDao {
 		this.saxReaderFactory = readerFactory;
 	}
 	
-	public List<ISite> getSites() {
-		final List<ISite> sites = new LinkedList<ISite>();
+	public List<ISite> getSites() throws SAXException {
 		final File[] rootFiles = repositoryDirectory.listFiles();
+		final ArrayList<ISite> sites = new ArrayList<ISite>(rootFiles.length);
+		final IncludingHandler inclHandler = new IncludingHandler(saxReaderFactory);
+		final SiteInfoHandler siteInfoHandler = new SiteInfoHandler(locales, defaultLocale);
+		final PageInfoHandler pageInfoHandler = new PageInfoHandler();
+		final XMLReader reader = saxReaderFactory.createReader();
+		
+		reader.setContentHandler(inclHandler);
+		reader.setErrorHandler(inclHandler);
 		
 		for (File siteDir : rootFiles) {
 			if (siteDir.isDirectory()) {
 				final String siteName = siteDir.getName();
-				final File siteXmlFile = new File(siteDir, "site.xml");
-				final String title;
-				final Locale defaultLocale;
-				final String contextPath;
+				final SiteInfo site = new SiteInfo(siteName);
+				final PageInfo page = new PageInfo("/", siteName);
+				final File startPageXmlFile = new File(siteDir, "/pages/page.xml");
 				
-				if (siteXmlFile.isFile()) {
+				siteInfoHandler.setSite(site);
+				siteInfoHandler.setPage(page);
+				
+				if (startPageXmlFile.isFile()) {
+					inclHandler.setDelegator(siteInfoHandler);
+					
 					try {
-						final Map<String, String> attr = readRootTag(siteXmlFile, Constants.Namespace.SITE, Constants.Tag.SITE);
-						final String localeStr = attr.get("default-language");
-						defaultLocale = localeStr == null ? this.defaultLocale : locales.getLocale(localeStr);
-						title = attr.get("title");
-						contextPath = attr.get("context-path");
+						reader.parse(startPageXmlFile.getAbsolutePath());
+					} catch (InformationCompleteException e) {
 					} catch (Exception e) {
-						log.error("Cannot read " + siteXmlFile, e);
+						log.error("Cannot read start page " + startPageXmlFile, e);
 						continue;
 					}
-				} else {
-					title = siteName;
-					contextPath = "";
-					defaultLocale = this.defaultLocale;
+					
+					site.setStartPage(page);
+					sites.add(site);
+					inclHandler.setDelegator(pageInfoHandler);
+					loadPages(site, page, reader, pageInfoHandler);
 				}
-				
-				sites.add(new Site(this, siteName, title, defaultLocale, contextPath));
 			}
 		}
+		
+		sites.trimToSize();
+		Collections.sort(sites);
 		
 		return sites;
 	}
 	
-	public List<IPage> loadPages(String site, String path) throws SAXException {
-		final String relativeDir = FilePathUtil.toSystemSpecificPath(site + "/pages" + path);
+	private void loadPages(final ISite site, final IPage parent, final XMLReader reader, final PageInfoHandler pageInfoHandler) {
+		final List<IPage> pages = parent.getPages();
+		final String path = parent.getPath();
+		final String relativeDir = FilePathUtil.toSystemSpecificPath(site.getName() + "/pages" + path);
 		final File directory = new File(repositoryDirectory, relativeDir);
 		
 		if (!directory.exists())
@@ -93,20 +98,18 @@ public class XmlResourceDao {
 		if (!directory.isDirectory())
 			throw new IllegalStateException(relativeDir + " is not a directory");
 		
-		final LinkedList<IPage> pages = new LinkedList<IPage>();
-		final PageInfoHandler pageInfo = new PageInfoHandler();
-		final IncludingHandler handler = new IncludingHandler(saxReaderFactory, pageInfo);
-		final XMLReader reader = saxReaderFactory.createReader();
+		pages.clear();
 		
-		reader.setContentHandler(handler);
-		reader.setErrorHandler(handler);
-		
-		for (File subDirectory : directory.listFiles()) {
-			if (subDirectory.isDirectory()) {
-				final File xmlFile = new File(subDirectory, "page.xml");
+		for (File subDir : directory.listFiles()) {
+			if (subDir.isDirectory()) {
+				final String subDirName = subDir.getName();
+				final File xmlFile = new File(subDir, "page.xml");
 				
 				if (xmlFile.exists() && xmlFile.isFile()) {
+					final PageInfo pageInfo = new PageInfo(path + subDirName + '/', subDirName);
+					
 					try {
+						pageInfoHandler.setPage(pageInfo);
 						reader.parse(xmlFile.getAbsolutePath());
 					} catch(InformationCompleteException e) {
 					} catch(Exception e) {
@@ -114,41 +117,9 @@ public class XmlResourceDao {
 						continue;
 					}
 					
-					pages.add(pageInfo.createPageInfo(this, site, path, subDirectory.getName()));
+					pages.add(pageInfo);
+					loadPages(site, pageInfo, reader, pageInfoHandler); // Call recursively
 				}
-			}
-		}
-		
-		return pages;
-	}
-	
-	private Map<String, String> readRootTag(final File xmlFile, final String expectedNamespace, final String expectedTag) throws XMLStreamException, IOException {
-		try (final FileReader xmlFileReader = new FileReader(xmlFile)) {
-			final XMLStreamReader reader = staxReaderFactory.createXMLStreamReader(xmlFileReader);
-			
-			try {
-				while (reader.next() != XMLStreamReader.START_ELEMENT) {}
-				
-				final String namespace = reader.getNamespaceURI();
-				final String localName = reader.getLocalName();
-				final Map<String, String> attr = new HashMap<String, String>();
-				
-				if (!expectedNamespace.equals(namespace))
-					throw new XMLStreamException("Unexpected namespace '" + namespace + "'. Expected '" + Constants.Namespace.SITE + '\'');
-				
-				if (!expectedTag.equals(localName))
-					throw new XMLStreamException("Unexpected root tag '" + localName + "'. Expected '" + Constants.Tag.SITE + '\'');
-				
-				for (int i = 0; i < reader.getAttributeCount(); i++) {
-					final String attrName = reader.getAttributeLocalName(i);
-					final String attrValue = reader.getAttributeValue(i);
-					
-					attr.put(attrName, attrValue);
-				}
-				
-				return attr;
-			} finally {
-				reader.close();
 			}
 		}
 	}

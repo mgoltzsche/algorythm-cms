@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/CMS"
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
 	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
 	
-	<xsd:complexType name="ContentType" />
+	<complexType name="ContentType" />
 	
-	<xsd:element name="abstract-content" abstract="true" type="ContentType" />
+	<element name="abstract-content" abstract="true" type="c:ContentType" />
 	
-	<xsd:element name="include" substitutionGroup="abstract-content">
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="ContentType">
-					<xsd:attribute name="href" type="xsd:anyURI" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
+	<element name="include" substitutionGroup="c:abstract-content">
+		<complexType>
+			<complexContent>
+				<extension base="c:ContentType">
+					<attribute name="href" type="anyURI" />
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
 	
-	<xsd:complexType name="Markup" mixed="true">
-		<xsd:complexContent>
-			<xsd:extension base="ContentType">
-				<xsd:choice maxOccurs="unbounded">
-					<!--<xsd:element ref="include" />-->
-					<xsd:element name="p" type="Markup" minOccurs="0" />
-					<xsd:element name="b" type="Markup" minOccurs="0" />
-					<xsd:element name="i" type="Markup" minOccurs="0" />
-					<xsd:element name="u" type="Markup" minOccurs="0" />
-					<xsd:element name="ul" minOccurs="0">
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="li" type="Markup" maxOccurs="unbounded" />
-							</xsd:sequence>
-						</xsd:complexType>
-					</xsd:element>
-				</xsd:choice>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-</xsd:schema>
+	<complexType name="Markup" mixed="true">
+		<complexContent>
+			<extension base="c:ContentType">
+				<choice maxOccurs="unbounded">
+					<!--<element ref="include" />-->
+					<element name="p" type="c:Markup" minOccurs="0" />
+					<element name="b" type="c:Markup" minOccurs="0" />
+					<element name="i" type="c:Markup" minOccurs="0" />
+					<element name="u" type="c:Markup" minOccurs="0" />
+					<element name="ul" minOccurs="0">
+						<complexType>
+							<sequence>
+								<element name="li" type="c:Markup" maxOccurs="unbounded" />
+							</sequence>
+						</complexType>
+					</element>
+				</choice>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

@@ -13,35 +13,38 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
+import de.algorythm.cms.common.impl.xml.Constants.Attribute;
+import de.algorythm.cms.common.impl.xml.Constants.Namespace;
+import de.algorythm.cms.common.impl.xml.Constants.Tag;
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 
 public class IncludingHandler implements ContentHandler, ErrorHandler {
 
-	static private final String NAMESPACE = "http://cms.algorythm.de/common/CMS";
-	static private final String INCLUDE = "include";
-	static private final String HREF = "href";
-	
 	private final IXmlReaderFactory readerFactory;
-	private final ContentHandler delegator;
+	private ContentHandler delegator;
 	private final Stack<Locator> locators = new Stack<Locator>();
 	
-	public IncludingHandler(final IXmlReaderFactory readerFactory, final ContentHandler delegator) {
+	public IncludingHandler(final IXmlReaderFactory readerFactory) {
 		this.readerFactory = readerFactory;
-		this.delegator = delegator;
+	}
+	
+	public void setDelegator(final ContentHandler handler) {
+		locators.clear();
+		this.delegator = handler;
 	}
 	
 	private boolean isInclude(final String uri, final String localName) {
-		return NAMESPACE.equals(uri) && INCLUDE.equals(localName);
+		return Namespace.CMS.equals(uri) && Tag.INCLUDE.equals(localName);
 	}
 	
 	@Override
 	public void startElement(final String uri, final String localName,
 			final String qName, final Attributes atts) throws SAXException {
 		if (isInclude(uri, localName)) {
-			final String ref = atts.getValue(HREF);
+			final String ref = atts.getValue(Attribute.HREF);
 			
 			if (ref == null)
-				throw new SAXException("Attribute '" + HREF + "' of " + NAMESPACE + ':' + INCLUDE + " must be set");
+				throw new SAXException("Attribute '" + Attribute.HREF + "' of " + Namespace.CMS + ':' + Tag.INCLUDE + " must be set");
 			
 			final String refLocation = locators.peek().getSystemId();
 			final URI locationUri;
@@ -56,6 +59,7 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 			final XMLReader reader = readerFactory.createReader();
 			
 			reader.setContentHandler(this);
+			reader.setErrorHandler(this);
 			
 			try {
 				reader.parse(absoluteRef);
@@ -120,8 +124,9 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 	public void setDocumentLocator(final Locator locator) {
 		locators.push(locator);
 		
-		if (locators.size() == 1)
+		if (locators.size() == 1) {
 			delegator.setDocumentLocator(locator);
+		}
 	}
 
 	@Override

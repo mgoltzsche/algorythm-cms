@@ -37,9 +37,35 @@
 				<version>2.5.1</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<source>1.8</source>
-					<target>1.8</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>schemagen</id>
+						<goals>
+							<goal>schemagen</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}/schemas</outputDirectory>
+							<transformSchemas>
+								<transformSchema>
+									<uri>http://cms.algorythm.de/common/Pages</uri>
+									<toFile>Pages.xsd</toFile>
+								</transformSchema>
+							</transformSchemas>
+							<includes>
+								<include>de/algorythm/cms/common/model/entity/impl/PageInfo.java</include>
+							</includes>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 		<testResources>

@@ -1,8 +1,13 @@
 package de.algorythm.cms.common.model.entity;
 
-public interface IPage extends IPageContainer {
+import java.util.List;
 
+public interface IPage {
+
+	String getName();
+	String getPath();
 	String getTitle();
 	String getNavigationTitle();
+	List<IPage> getPages();
 	boolean isInNavigation();
 }

@@ -41,8 +41,9 @@ public class XmlContentRenderer implements IContentRenderer {
 			final XMLReader reader = readerFactory.createReader();
 			final TransformerHandler transformer = createTransformer();
 			transformer.setResult(new StreamResult(writer));
-			final IncludingHandler handler = new IncludingHandler(readerFactory, transformer);
+			final IncludingHandler handler = new IncludingHandler(readerFactory);
 			
+			handler.setDelegator(transformer);
 			reader.setErrorHandler(handler);
 			reader.setContentHandler(handler);
 			reader.parse(contentFile.getAbsolutePath());

@@ -3,19 +3,21 @@
 <page xmlns="http://cms.algorythm.de/common/CMS"
 	xmlns:a="http://cms.algorythm.de/common/Article"
 	title="My test page">
-	<include href="article.xml" />
-	<a:article>
-		<p>
-			Testinhalt
-			<b>fett</b>
-			<p>asdf</p>
-		</p>
-	</a:article>
-	<a:article title="Testtitel">
-		<p>
-			Testinhalt
-			<b>fett</b>
-			<p>asdf</p>
-		</p>
-	</a:article>
+	<flow-layout>
+		<include href="article.xml" />
+		<a:article>
+			<p>
+				Testinhalt
+				<b>fett</b>
+				<p>asdf</p>
+			</p>
+		</a:article>
+		<a:article title="Testtitel">
+			<p>
+				Testinhalt
+				<b>fett</b>
+				<p>asdf</p>
+			</p>
+		</a:article>
+	</flow-layout>
 </page>

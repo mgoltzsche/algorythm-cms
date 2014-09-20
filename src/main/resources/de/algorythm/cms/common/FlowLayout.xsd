@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	<include schemaLocation="Types.xsd" />
+
+	<element name="flow-layout" substitutionGroup="c:abstract-content">
+		<complexType>
+			<complexContent>
+				<extension base="c:ContentType">
+					<choice maxOccurs="unbounded">
+						<element ref="c:abstract-content" />
+					</choice>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+</schema>

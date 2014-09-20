@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/CMS"
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
 	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
-	<xsd:include schemaLocation="Types.xsd"/>
-	
-	<xsd:element name="page">
-		<xsd:complexType>
-			<xsd:choice minOccurs="1" maxOccurs="unbounded">
-				<xsd:element ref="abstract-content" />
-			</xsd:choice>
-			<xsd:attribute name="title" type="xsd:token" />
-			<xsd:attribute name="nav-title" type="xsd:token" use="optional" />
-			<xsd:attribute name="template" type="xsd:token" use="optional" />
-			<xsd:attribute name="in-menu" type="xsd:boolean" default="true" />
-		</xsd:complexType>
-	</xsd:element>
-</xsd:schema>
+	<include schemaLocation="Types.xsd" />
+
+	<complexType name="Page">
+		<all minOccurs="0">
+			<element ref="c:abstract-content" />
+		</all>
+		<attribute name="title" type="token" />
+		<attribute name="nav-title" type="token" use="optional" />
+		<attribute name="template" type="token" use="optional" />
+		<attribute name="in-menu" type="boolean" default="true" />
+	</complexType>
+
+	<element name="page" type="c:Page" />
+</schema>

@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns="http://cms.algorythm.de/common/CMS"
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
 	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
-	
-	<xsd:element name="site">
-		<xsd:complexType>
-			<xsd:attribute name="title" type="xsd:token" use="optional" />
-			<xsd:attribute name="description" type="xsd:token" use="optional" />
-			<xsd:attribute name="default-language" type="xsd:language" use="optional" />
-			<xsd:attribute name="default-template" type="xsd:anyURI" use="optional" />
-			<xsd:attribute name="context-path" type="xsd:token" use="optional" />
-		</xsd:complexType>
-	</xsd:element>
-</xsd:schema>
+	<include schemaLocation="Page.xsd" />
+
+	<element name="site">
+		<complexType>
+			<complexContent>
+				<extension base="c:Page">
+					<attribute name="site-title" type="token" use="optional" />
+					<attribute name="description" type="token" use="optional" />
+					<attribute name="default-language" type="language" use="optional" />
+					<attribute name="default-template" type="anyURI" use="optional" />
+					<attribute name="context-path" type="token" use="optional" />
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+</schema>
