@@ -1,10 +1,13 @@
-package de.algorythm.cms.common.model.dao.impl.xml;
+package de.algorythm.cms.common.model.index.impl;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,29 +24,36 @@ import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
 import de.algorythm.cms.common.model.entity.impl.SiteInfo;
+import de.algorythm.cms.common.model.index.ISiteIndex;
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
+import de.algorythm.cms.common.resources.IResourceUriResolver;
+import de.algorythm.cms.common.resources.impl.ContentUriResolver;
 import de.algorythm.cms.common.util.FilePathUtil;
 
-public class XmlResourceDao {
+@Singleton
+public class XmlSiteIndex implements ISiteIndex {
 
-	static private final Logger log = LoggerFactory.getLogger(XmlResourceDao.class);
+	static private final Logger log = LoggerFactory.getLogger(XmlSiteIndex.class);
 	
 	private final Locale defaultLocale;
 	private final File repositoryDirectory;
 	private final IXmlReaderFactory saxReaderFactory;
 	private final LocaleResolver locales;
+	private final IResourceUriResolver contentUriResolver;
 	
-	public XmlResourceDao(final Configuration cfg, final LocaleResolver locales, final IXmlReaderFactory readerFactory) {
+	@Inject
+	public XmlSiteIndex(final Configuration cfg, final LocaleResolver locales, final IXmlReaderFactory readerFactory) {
 		repositoryDirectory = cfg.repository;
 		defaultLocale = cfg.defaultLanguage;
 		this.locales = locales;
 		this.saxReaderFactory = readerFactory;
+		this.contentUriResolver = new ContentUriResolver(cfg);
 	}
 	
 	public List<ISite> getSites() throws SAXException {
 		final File[] rootFiles = repositoryDirectory.listFiles();
 		final ArrayList<ISite> sites = new ArrayList<ISite>(rootFiles.length);
-		final IncludingHandler inclHandler = new IncludingHandler(saxReaderFactory);
+		final IncludingHandler inclHandler = new IncludingHandler(saxReaderFactory, contentUriResolver);
 		final SiteInfoHandler siteInfoHandler = new SiteInfoHandler(locales, defaultLocale);
 		final PageInfoHandler pageInfoHandler = new PageInfoHandler();
 		final XMLReader reader = saxReaderFactory.createReader();

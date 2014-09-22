@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
+@Singleton
 public class LocaleResolver {
 
 	private Map<String, Locale> locales = new HashMap<String, Locale>();

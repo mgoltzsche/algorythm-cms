@@ -15,6 +15,7 @@ import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
 import de.algorythm.cms.common.model.entity.impl.SiteInfo;
+import de.algorythm.cms.common.model.index.impl.XmlSiteIndex;
 
 public class TestXmlResourceDao {
 
@@ -23,7 +24,7 @@ public class TestXmlResourceDao {
 		Configuration cfg = new Configuration();
 		LocaleResolver locales = new LocaleResolver();
 		XmlReaderFactory readerFactory = new XmlReaderFactory();
-		XmlResourceDao testee = new XmlResourceDao(cfg, locales, readerFactory);
+		XmlSiteIndex testee = new XmlSiteIndex(cfg, locales, readerFactory);
 		List<ISite> sites = testee.getSites();
 		
 		assertEquals("site count", 3, sites.size());

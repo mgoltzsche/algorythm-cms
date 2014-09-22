@@ -17,15 +17,18 @@ import de.algorythm.cms.common.impl.xml.Constants.Attribute;
 import de.algorythm.cms.common.impl.xml.Constants.Namespace;
 import de.algorythm.cms.common.impl.xml.Constants.Tag;
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
+import de.algorythm.cms.common.resources.IResourceUriResolver;
 
 public class IncludingHandler implements ContentHandler, ErrorHandler {
 
 	private final IXmlReaderFactory readerFactory;
 	private ContentHandler delegator;
 	private final Stack<Locator> locators = new Stack<Locator>();
+	private final IResourceUriResolver contentUriResolver;
 	
-	public IncludingHandler(final IXmlReaderFactory readerFactory) {
+	public IncludingHandler(final IXmlReaderFactory readerFactory, final IResourceUriResolver contentUriResolver) {
 		this.readerFactory = readerFactory;
+		this.contentUriResolver = contentUriResolver;
 	}
 	
 	public void setDelegator(final ContentHandler handler) {
@@ -46,28 +49,29 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 			if (ref == null)
 				throw new SAXException("Attribute '" + Attribute.HREF + "' of " + Namespace.CMS + ':' + Tag.INCLUDE + " must be set");
 			
-			final String refLocation = locators.peek().getSystemId();
-			final URI locationUri;
-			
-			try {
-				locationUri = new URI(refLocation);
-			} catch (URISyntaxException e) {
-				throw new SAXException("Unsupported document location URI: " + refLocation);
-			}
-			
-			final String absoluteRef = locationUri.resolve(ref).toString();
+			final Locator locator = locators.peek();
+			final String systemId = locator.getSystemId();
+			final URI refSystemUri = contentUriResolver.toSystemUri(toUri(systemId), toUri(ref));
 			final XMLReader reader = readerFactory.createReader();
 			
 			reader.setContentHandler(this);
 			reader.setErrorHandler(this);
 			
 			try {
-				reader.parse(absoluteRef);
+				reader.parse(refSystemUri.toString());
 			} catch (IOException e) {
-				throw new SAXException("Cannot read " + absoluteRef);
+				throw new SAXException("Cannot include " + refSystemUri + " into " + systemId, e);
 			}
 		} else
 			delegator.startElement(uri, localName, qName, atts);
+	}
+	
+	private URI toUri(final String uri) throws SAXException {
+		try {
+			return new URI(uri);
+		} catch (URISyntaxException e) {
+			throw new SAXException("Invalid URI: " + uri, e);
+		}
 	}
 
 	@Override

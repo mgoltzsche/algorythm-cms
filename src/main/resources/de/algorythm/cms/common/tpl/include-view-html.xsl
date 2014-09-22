@@ -3,4 +3,5 @@
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:import href="html/Theme.xsl" />
 	<xsl:import href="html/Article.xsl" />
+	<xsl:import href="html/Menu.xsl" />
 </xsl:stylesheet>

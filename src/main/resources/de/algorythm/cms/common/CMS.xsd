@@ -6,4 +6,5 @@
 	<include schemaLocation="Page.xsd" />
 	<include schemaLocation="Site.xsd" />
 	<include schemaLocation="FlowLayout.xsd" />
+	<include schemaLocation="Pages.xsd" />
 </schema>

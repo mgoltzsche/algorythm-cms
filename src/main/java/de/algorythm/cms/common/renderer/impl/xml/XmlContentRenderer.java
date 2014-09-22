@@ -1,16 +1,19 @@
 package de.algorythm.cms.common.renderer.impl.xml;
 
 import java.io.File;
-import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.transform.Result;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
@@ -19,36 +22,53 @@ import javax.xml.transform.stream.StreamSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import de.algorythm.cms.common.Configuration;
+import de.algorythm.cms.common.impl.xml.contentHandler.ContentSplittingHandler;
 import de.algorythm.cms.common.impl.xml.contentHandler.IncludingHandler;
+import de.algorythm.cms.common.model.entity.IPage;
+import de.algorythm.cms.common.model.entity.ISite;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.RendererException;
+import de.algorythm.cms.common.resources.IResourceUriResolver;
+import de.algorythm.cms.common.resources.impl.ContentUriResolver;
 
 @Singleton
 public class XmlContentRenderer implements IContentRenderer {
 
+	private final File repositoryDirectory;
 	private final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
 	private final IXmlReaderFactory readerFactory;
+	private final IResourceUriResolver contentUriResolver;
 	
-	public XmlContentRenderer(final IXmlReaderFactory readerFactory) {
+	@Inject
+	public XmlContentRenderer(final Configuration cfg, final IXmlReaderFactory readerFactory) {
+		this.repositoryDirectory = cfg.repository;
 		this.readerFactory = readerFactory;
+		this.contentUriResolver = new ContentUriResolver(cfg);
 	}
 	
 	@Override
-	public String render(final File contentFile) throws RendererException {
+	public void render(final ISite site, final IPage page, final Writer writer) throws RendererException {
+		final String siteName = site.getName();
+		final String pagePath = page.getPath();
+		
+		render(new File(repositoryDirectory.getAbsolutePath() + File.separator + siteName + File.separator + "pages" + pagePath.replaceAll("/", File.separator) + File.separator + "page.xml"), writer);
+	}
+	
+	@Override
+	public void render(final File contentFile, final Writer writer) throws RendererException {
 		try {
-			final StringWriter writer = new StringWriter();
 			//final TransformerDelegator transformerDelegator = new TransformerDelegator(this, new StreamResult(writer));
 			final XMLReader reader = readerFactory.createReader();
+			final IncludingHandler handler = new IncludingHandler(readerFactory, contentUriResolver);
 			final TransformerHandler transformer = createTransformer();
-			transformer.setResult(new StreamResult(writer));
-			final IncludingHandler handler = new IncludingHandler(readerFactory);
 			
+			transformer.setResult(new StreamResult(writer));
+			//transformer.setResult(new SAXResult(new ContentSplittingHandler(delegator1, delegator2)));
 			handler.setDelegator(transformer);
 			reader.setErrorHandler(handler);
 			reader.setContentHandler(handler);
 			reader.parse(contentFile.getAbsolutePath());
-			
-			return writer.toString();
 		} catch (TransformerConfigurationException e) {
 			throw new RendererException("Invalid transformer configuration", e);
 		} catch (Exception e) {
@@ -61,11 +81,12 @@ public class XmlContentRenderer implements IContentRenderer {
 		final URL url = getClass().getResource(xslUri);
 		
 		if (url == null)
-			throw new IllegalStateException("Missing XLS template: " + xslUri);
+			throw new IllegalStateException("Missing XSL template: " + xslUri);
 		
 		final Templates tpls = transformerFactory.newTemplates(new StreamSource(url.toString()));
 		final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler(tpls);
 		final Transformer transformer = transformerHandler.getTransformer();
+		transformer.setParameter("repositoryDirectory", repositoryDirectory);
 		transformer.setErrorListener(XslErrorListener.INSTANCE);
 		
 		return transformerHandler;
@@ -113,14 +134,14 @@ public class XmlContentRenderer implements IContentRenderer {
 		final URL fileUrl = getClass().getResource(fileName);
 		
 		if (fileUrl == null)
-			throw new SAXException("Missing XLS template: " + fileName);
+			throw new SAXException("Missing XSL template: " + fileName);
 		
 		final File xslFile;
 		
 		try {
 			xslFile = new File(fileUrl.toURI());
 		} catch (URISyntaxException e) {
-			throw new SAXException("Invalid XLS template URI: " + fileUrl, e);
+			throw new SAXException("Invalid XSL template URI: " + fileUrl, e);
 		}
 		
 		if (!xslFile.exists())

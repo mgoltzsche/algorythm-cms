@@ -6,8 +6,11 @@ import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
 
+import javax.inject.Singleton;
+
 import de.algorythm.cms.common.util.FilePathUtil;
 
+@Singleton
 public class Configuration {
 
 	static private final LocaleResolver localeResolver = new LocaleResolver();
@@ -23,14 +26,18 @@ public class Configuration {
 	public final File repository;
 	public final Locale defaultLanguage;
 	
-	public Configuration() throws IOException {
+	public Configuration() {
 		this(getPropertiesStream());
 	}
 	
-	public Configuration(final InputStream propertiesStream) throws IOException {
+	public Configuration(final InputStream propertiesStream) {
 		final Properties properties = new Properties();
 		
-		properties.load(propertiesStream);
+		try {
+			properties.load(propertiesStream);
+		} catch (IOException e) {
+			throw new RuntimeException("Cannot read properties", e);
+		}
 		
 		final String repositoryStr = properties.getProperty("repository");
 		final String defaultLangStr = properties.getProperty("defaultLanguage");

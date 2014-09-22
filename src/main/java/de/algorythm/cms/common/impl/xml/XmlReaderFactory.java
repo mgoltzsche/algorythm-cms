@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import javax.inject.Singleton;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -18,6 +19,7 @@ import org.xml.sax.XMLReader;
 
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 
+@Singleton
 public class XmlReaderFactory implements IXmlReaderFactory {
 
 	private final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
