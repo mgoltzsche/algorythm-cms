@@ -1,0 +1,21 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	<element name="site">
+		<complexType>
+			
+		</complexType>
+	</element>
+	
+	<element name="page">
+		<complexType>
+			<choice minOccurs="0">
+				<element ref="page" />
+			</choice>
+			<attribute name="path" type="anyUri" />
+			<attribute name="title" type="token" />
+		</complexType>
+	</element>
+	<complexType name="Page"></complexType>
+</schema>

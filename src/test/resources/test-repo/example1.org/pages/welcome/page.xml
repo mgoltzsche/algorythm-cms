@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<page xmlns="http://cms.algorythm.de/common/CMS"
+	xmlns:a="http://cms.algorythm.de/common/Article"
+	title="My test page">
+	<include href="article.xml" />
+</page>

@@ -21,7 +21,7 @@ public class TestXmlContentRenderer {
 		testee = new XmlContentRenderer(new Configuration(), new XmlReaderFactory());
 	}
 	
-	@Test
+/*	@Test
 	public void testPageRenderer() throws Exception {
 		final StringWriter writer = new StringWriter();
 		
@@ -35,7 +35,7 @@ public class TestXmlContentRenderer {
 		
 		testee.render(jarFile("/test-content/article.xml"), writer);
 		System.out.println(writer.toString());
-	}
+	}*/
 	
 	private File jarFile(final String filePath) throws URISyntaxException {
 		final URL fileUrl = getClass().getResource(filePath);

@@ -11,4 +11,8 @@ public class RendererException extends Exception {
 	public RendererException(final String msg, final Exception e) {
 		super(msg, e);
 	}
+	
+	public RendererException(final String msg) {
+		super(msg);
+	}
 }

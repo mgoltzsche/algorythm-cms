@@ -4,13 +4,12 @@
 	xmlns:p="http://cms.algorythm.de/common/Pages"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="p">
-	<xsl:output method="xml" version="1.0" omit-xml-declaration="yes" indent="yes" />
 	
 	<xsl:template name="menu" match="p:page">
 		<xsl:param name="path" />
 		<xsl:if test="current()/@in-navigation='true'">
 			<li>
-				<a href="{current()/@path}"><xsl:value-of select="current()/@title" /></a>
+				<a href="{$relativeBaseUrl}{current()/@path}index.html"><xsl:value-of select="current()/@title" /></a>
 				<xsl:if test="current()/*">
 					<ul>
 						<xsl:apply-templates select="current()/*" />

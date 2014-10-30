@@ -95,7 +95,7 @@ public class PageInfoHandler extends DefaultHandler {
 			throw new InformationCompleteException();
 		}
 	}
-	
+
 	@Override
 	public void endDocument() throws SAXException {
 		finishedParsing();

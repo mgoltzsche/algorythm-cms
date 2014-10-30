@@ -27,12 +27,12 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 	private final IResourceUriResolver contentUriResolver;
 	
 	public IncludingHandler(final IXmlReaderFactory readerFactory, final IResourceUriResolver contentUriResolver) {
-		this.readerFactory = readerFactory;
-		this.contentUriResolver = contentUriResolver;
+		this(readerFactory, contentUriResolver, null);
 	}
 	
-	public void setDelegator(final ContentHandler handler) {
-		locators.clear();
+	public IncludingHandler(final IXmlReaderFactory readerFactory, final IResourceUriResolver contentUriResolver, final ContentHandler handler) {
+		this.readerFactory = readerFactory;
+		this.contentUriResolver = contentUriResolver;
 		this.delegator = handler;
 	}
 	
@@ -40,6 +40,11 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 		return Namespace.CMS.equals(uri) && Tag.INCLUDE.equals(localName);
 	}
 	
+	public void setDelegator(final ContentHandler delegator) {
+		this.delegator = delegator;
+		locators.clear();
+	}
+
 	@Override
 	public void startElement(final String uri, final String localName,
 			final String qName, final Attributes atts) throws SAXException {
@@ -140,16 +145,19 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 	
 	@Override
 	public void error(final SAXParseException e) throws SAXException {
+		locators.clear();
 		throw e;
 	}
 
 	@Override
 	public void fatalError(final SAXParseException e) throws SAXException {
+		locators.clear();
 		throw e;
 	}
 
 	@Override
 	public void warning(final SAXParseException e) throws SAXException {
+		locators.clear();
 		throw e;
 	}
 }

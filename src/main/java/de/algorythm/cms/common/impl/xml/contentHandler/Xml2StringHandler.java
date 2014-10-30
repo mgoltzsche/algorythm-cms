@@ -1,18 +1,37 @@
-package de.algorythm.cms.common.renderer.impl.xml;
+package de.algorythm.cms.common.impl.xml.contentHandler;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-public class XmlToStringHandler implements ContentHandler {
+public class Xml2StringHandler implements ContentHandler {
 
 	private final StringBuilder content = new StringBuilder();
+	private final LinkedList<String> prefixMappings = new LinkedList<String>();
 
 	@Override
 	public void startElement(final String uri, final String localName,
 			final String qName, final Attributes atts) throws SAXException {
-		content.append('<').append(qName).append('>');
+		content.append('<').append(qName);
+		
+		for (int i = 0; i < atts.getLength(); i++) {
+			content.append(' ').append(atts.getQName(i))
+				.append("=\"").append(StringEscapeUtils.escapeXml(atts.getValue(i))).append('"');
+		}
+		
+		final Iterator<String> prefixIter = prefixMappings.iterator();
+		
+		while (prefixIter.hasNext()) {
+			content.append(prefixIter.next());
+			prefixIter.remove();
+		}
+		
+		content.append('>');
 	}
 
 	@Override
@@ -36,8 +55,12 @@ public class XmlToStringHandler implements ContentHandler {
 	}
 
 	@Override
-	public void startPrefixMapping(final String prefix, final String uri)
+	public void startPrefixMapping(String prefix, final String uri)
 			throws SAXException {
+		if (!prefix.isEmpty())
+			prefix = ':' + prefix;
+		
+		prefixMappings.add(" xmlns" + prefix + "=\"" + uri + "\"");
 	}
 
 	@Override

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<page xmlns="http://cms.algorythm.de/common/CMS"
+	xmlns:a="http://cms.algorythm.de/common/Article">
+	<a:article title="Testarticle 2">
+		<p>
+			Testinhalt
+			<b>fett</b>
+			<p>asdf</p>
+		</p>
+	</a:article>
+</page>

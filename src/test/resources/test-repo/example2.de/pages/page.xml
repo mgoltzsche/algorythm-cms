@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<site xmlns="http://cms.algorythm.de/common/CMS"
+	xmlns:a="http://cms.algorythm.de/common/Article"
+	site-title="Testseite"
+	default-language="de"
+	default-template="http://cms.algorythm.de/common/theme/default-theme"
+	context-path="/site2"
+	title="Willkommen">
+	<flow-layout>
+		<a:article>
+			<p>
+				Testinhalt
+				<b>fett</b>
+				<p>asdf</p>
+			</p>
+		</a:article>
+		<include href="/example1.org/article.xml" />
+		<a:article title="Testtitel">
+			<p>
+				Testinhalt
+				<b>fett</b>
+				<p>asdf</p>
+			</p>
+		</a:article>
+	</flow-layout>
+</site>

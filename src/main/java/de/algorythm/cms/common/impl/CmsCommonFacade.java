@@ -1,7 +1,6 @@
 package de.algorythm.cms.common.impl;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import org.xml.sax.SAXException;
 import de.algorythm.cms.common.Configuration;
 import de.algorythm.cms.common.ICmsCommonFacade;
 import de.algorythm.cms.common.generator.PagesXmlGenerator;
-import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
 import de.algorythm.cms.common.model.index.ISiteIndex;
 import de.algorythm.cms.common.renderer.IContentRenderer;
@@ -58,46 +56,23 @@ public class CmsCommonFacade implements ICmsCommonFacade {
 
 	@Override
 	public void generateSite(final ISite site) {
-		final String siteName = site.getName();
-		final String generatedDirStr = repositoryDirectory.getAbsolutePath() + File.separator + siteName + File.separator + "generated";
-		final File generatedDir = new File(generatedDirStr);
+		final File siteDirectory = new File(repositoryDirectory, site.getName());
+		final File outputDirectory = new File(siteDirectory, "generated");
 		
-		if (generatedDir.exists()) {
+		if (outputDirectory.exists()) {
 			try {
-				FileUtils.deleteDirectory(generatedDir);
+				FileUtils.deleteDirectory(outputDirectory);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		
-		generatedDir.mkdirs();
-		
-		new File(generatedDir, "html").mkdir();
-		
-		generatePages(site, site.getStartPage(), generatedDirStr);
-	}
-	
-	private void generatePages(final ISite site, final IPage page, final String generatedDir) {
-		final String path = page.getPath();
-		final File directory = new File(generatedDir + File.separator + "html" + File.separator + path.replaceAll("/", File.separator));
-		final File htmlFile = new File(directory, "index.html");
-		final FileWriter writer;
-		
-		directory.mkdir();
+		outputDirectory.mkdirs();
 		
 		try {
-			writer = new FileWriter(htmlFile);
-		} catch (IOException e) {
-			throw new RuntimeException("Cannot create file writer for " + htmlFile, e);
-		}
-		
-		try {
-			renderer.render(site, page, writer);
+			renderer.render(site, outputDirectory);
 		} catch (RendererException e) {
 			throw new RuntimeException("Cannot render page", e);
 		}
-		
-		for (IPage child : page.getPages())
-			generatePages(site, child, generatedDir);
 	}
 }

@@ -4,7 +4,6 @@
 	xmlns:a="http://cms.algorythm.de/common/Article"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="a">
-	<xsl:output method="xml" version="1.0" omit-xml-declaration="yes" indent="yes" />
 	<xsl:import href="Markup.xsl" />
 	
 	<xsl:template match="a:article">
