@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a:article xmlns:a="http://cms.algorythm.de/common/Article"
+		xmlns="http://cms.algorythm.de/common/CMS"
+		title="Testtitel">
+	<p>
+		STATISCHER VORLAGENINHALT
+		<b>fett!!!</b>
+	</p>
+	<p><customizable placeholder="name">Standardvorlageninhalt 1</customizable></p>
+	<p><customizable placeholder="description">
+		<customize href="/home/max/development/java/algorythm-cms/target/test-classes/test-repo/example1.org/contents/template.xml">
+			<replace placeholder="name">inner <b>name</b></replace>
+			<replace placeholder="description">inner description</replace>
+		</customize>
+	</customizable></p>
+	<p>Statischer Vorlageninhalt</p>
+</a:article>

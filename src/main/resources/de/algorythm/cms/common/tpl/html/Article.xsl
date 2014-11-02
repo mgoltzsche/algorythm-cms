@@ -4,16 +4,14 @@
 	xmlns:a="http://cms.algorythm.de/common/Article"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="a">
-	<xsl:import href="Markup.xsl" />
-	
 	<xsl:template match="a:article">
 		<article>
-			<xsl:if test="current()/@title">
+			<xsl:if test="@title">
 				<h3>
-					<xsl:value-of select="current()/@title" />
+					<xsl:value-of select="@title" />
 				</h3>
 			</xsl:if>
-			<xsl:apply-imports />
+			<xsl:apply-templates />
 		</article>
 	</xsl:template>
 </xsl:stylesheet>

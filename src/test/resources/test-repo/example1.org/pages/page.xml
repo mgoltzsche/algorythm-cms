@@ -24,5 +24,11 @@
 				<p>asdf</p>
 			</p>
 		</a:article>
+		<a:article>
+			Testinhaltsdfgsdf
+		</a:article>
+		<customize href="/home/max/development/java/algorythm-cms/target/test-classes/test-repo/example1.org/contents/template.xml">
+			<replace placeholder="name">Custom <b>Name</b></replace>
+		</customize>
 	</flow-layout>
 </site>

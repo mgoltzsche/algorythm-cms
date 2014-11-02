@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	<include schemaLocation="Types.xsd" />
+
+	<element name="customizable" substitutionGroup="c:abstract-content">
+        <complexType mixed="true">
+			<complexContent>
+				<extension base="c:ContentType">
+					<sequence minOccurs="0" maxOccurs="unbounded">
+						<element ref="c:abstract-content" />
+					</sequence>
+					<attribute name="placeholder" type="token" use="required" />
+				</extension>
+			</complexContent>
+		</complexType>
+    </element>
+    
+    <element name="customize" substitutionGroup="c:abstract-content">
+        <complexType>
+			<complexContent>
+				<extension base="c:ContentType">
+					<sequence minOccurs="0" maxOccurs="unbounded">
+						<element name="replace">
+							<complexType mixed="true">
+								<complexContent>
+									<extension base="c:Markup">
+										<sequence minOccurs="0" maxOccurs="unbounded">
+											<element ref="c:abstract-content" />
+										</sequence>
+										<attribute name="placeholder" type="token" use="required" />
+									</extension>
+								</complexContent>
+							</complexType>
+						</element>
+					</sequence>
+					<attribute name="href" type="anyURI" use="required" />
+				</extension>
+			</complexContent>
+		</complexType>
+    </element>
+</schema>

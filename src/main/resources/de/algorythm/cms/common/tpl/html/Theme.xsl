@@ -5,6 +5,7 @@
 	xmlns:p="http://cms.algorythm.de/common/Pages"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="c p">
+	<xsl:strip-space elements="*"/>
 	<xsl:param name="outputDirectory" />
 	<xsl:param name="pagesFile" />
 	<xsl:param name="relativeBaseUrl" />

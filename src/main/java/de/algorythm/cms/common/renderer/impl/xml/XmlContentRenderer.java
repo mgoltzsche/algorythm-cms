@@ -15,10 +15,13 @@ import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
@@ -154,14 +157,14 @@ public class XmlContentRenderer implements IContentRenderer {
 				+ File.separator + "page.xml");
 
 		// Render page
-		render(pageFile, pagesFile, outputDirectory, relativeBaseUrl, currentResourceDirectoryName);
+		render(pageFile, siteDirectory, pagesFile, outputDirectory, relativeBaseUrl, currentResourceDirectoryName);
 
 		// Render sub pages
 		for (IPage child : page.getPages())
 			render(site, child, new File(outputDirectory, child.getName()), currentResourceDirectoryName);
 	}
 
-	private void render(final File contentFile, final File pagesFile,
+	private void render(final File contentFile, final File baseDirectory, final File pagesFile,
 			final File outputDirectory, final String relativeBaseUrl,
 			final String currentResourceDirectoryName) throws RendererException {
 		try {
@@ -177,6 +180,14 @@ public class XmlContentRenderer implements IContentRenderer {
 			final IncludingHandler handler = new IncludingHandler(readerFactory, contentUriResolver);
 			final TransformerHandler transformerHandler = createTransformer();
 			final Transformer transformer = transformerHandler.getTransformer();
+			//transformerHandler.setSystemId(baseDirectory + "/main");
+			transformer.setURIResolver(new URIResolver() {
+				@Override
+				public Source resolve(String href, String base) throws TransformerException {
+					System.out.println(href);
+					return new StreamSource(new File(href));
+				}
+			});
 			// final FileWriter writer = new FileWriter(new
 			// File(outputDirectory, "index.html"));
 			final StreamResult result = new StreamResult(new File(outputDirectory, "index.html"));
