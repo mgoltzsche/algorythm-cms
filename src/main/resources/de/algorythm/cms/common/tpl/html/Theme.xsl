@@ -41,7 +41,7 @@
 						<a href="#/" class="pure-menu-heading">Site Title</a>
 					
 						<ul>
-							<xsl:apply-templates select="document($pagesFile)/p:page/*"/>
+							<xsl:apply-templates select="document('/pages.xml')/p:page/*"/>
 						</ul>
 					</nav>
 					<xsl:if test="current()/@subNav='true'">

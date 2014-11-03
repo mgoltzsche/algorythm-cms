@@ -7,6 +7,7 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.REPOSITORY_D
 import static de.algorythm.cms.common.ParameterNameConstants.Render.RESOURCE_DIRECTORY;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,6 +16,7 @@ import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
@@ -22,12 +24,14 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -40,6 +44,7 @@ import de.algorythm.cms.common.model.entity.ISite;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.RendererException;
 import de.algorythm.cms.common.resources.IResourceUriResolver;
+import de.algorythm.cms.common.resources.impl.CmsURIResolver;
 import de.algorythm.cms.common.resources.impl.ContentUriResolver;
 
 @Singleton
@@ -164,48 +169,33 @@ public class XmlContentRenderer implements IContentRenderer {
 			render(site, child, new File(outputDirectory, child.getName()), currentResourceDirectoryName);
 	}
 
-	private void render(final File contentFile, final File baseDirectory, final File pagesFile,
+	private void render(final File contentFile, final File rootDirectory, final File pagesFile,
 			final File outputDirectory, final String relativeBaseUrl,
 			final String currentResourceDirectoryName) throws RendererException {
 		try {
-			// final TransformerDelegator transformerDelegator = new
-			// TransformerDelegator(this, new StreamResult(writer));
 			final XMLReader reader = readerFactory.createReader();
-			// final Xml2StringHandler fullOutput = new Xml2StringHandler();
-			// final Xml2StringHandler partialOutput = new Xml2StringHandler();
-			// final SplittingHandler splittingHandler = new
-			// SplittingHandler(fullOutput, partialOutput);
-			// final SplittingHandlerSwitchingHandler switchHandler = new
-			// SplittingHandlerSwitchingHandler(splittingHandler);
-			final IncludingHandler handler = new IncludingHandler(readerFactory, contentUriResolver);
-			final TransformerHandler transformerHandler = createTransformer();
-			final Transformer transformer = transformerHandler.getTransformer();
-			//transformerHandler.setSystemId(baseDirectory + "/main");
-			transformer.setURIResolver(new URIResolver() {
-				@Override
-				public Source resolve(String href, String base) throws TransformerException {
-					System.out.println(href);
-					return new StreamSource(new File(href));
-				}
-			});
-			// final FileWriter writer = new FileWriter(new
-			// File(outputDirectory, "index.html"));
-			final StreamResult result = new StreamResult(new File(outputDirectory, "index.html"));
+			final Transformer transformer = createTransformer();
+			
+			transformer.setURIResolver(new CmsURIResolver(rootDirectory.toURI()));
 			transformer.setParameter(REPOSITORY_DIRECTORY, repositoryDirectory.toString());
 			transformer.setParameter(OUTPUT_DIRECTORY, outputDirectory.toString());
 			transformer.setParameter(PAGES_XML, pagesFile.toString());
 			transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
 			transformer.setParameter(RESOURCE_DIRECTORY, relativeBaseUrl + "/r/" + currentResourceDirectoryName);
-			// transformerHandler.setSystemId(contentFile.toString());
-			// result.setSystemId(contentFile);
-			transformerHandler.setResult(result);
-			// transformer.setResult(new SAXResult(splittingHandler));
-			handler.setDelegator(transformerHandler);
-			reader.setContentHandler(handler);
-			reader.setErrorHandler(handler);
-			reader.parse(contentFile.getAbsolutePath());
-			// System.out.println("#######################");
-			// System.out.println(partialOutput);
+			transformer.setErrorListener(XslErrorListener.INSTANCE);
+			final FileReader contentFileReader = new FileReader(contentFile);
+			
+			try {
+				final InputSource source = new InputSource(contentFile.getAbsolutePath());
+				final StreamResult result = new StreamResult(new File(outputDirectory, "index.html"));
+				
+				transformer.transform(new SAXSource(reader, source), result);
+			} finally {
+				contentFileReader.close();
+			}
+//			reader.setContentHandler(handler);
+//			reader.setErrorHandler(handler);
+//			reader.parse(contentFile.getAbsolutePath());
 		} catch (TransformerConfigurationException e) {
 			throw new RendererException("Invalid transformer configuration", e);
 		} catch (Exception e) {
@@ -213,20 +203,21 @@ public class XmlContentRenderer implements IContentRenderer {
 		}
 	}
 
-	private TransformerHandler createTransformer()
+	private Transformer createTransformer()
 			throws TransformerConfigurationException {
-		final String xslUri = "/de/algorythm/cms/common/tpl/include-view-html.xsl";
+		String xslUri = "/de/algorythm/cms/common/tpl/include-view-html.xsl";
 		final URL url = getClass().getResource(xslUri);
 
 		if (url == null)
 			throw new IllegalStateException("Missing XSL template: " + xslUri);
 
-		final Templates tpls = transformerFactory.newTemplates(new StreamSource(url.toString()));
-		final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler(tpls);
-		final Transformer transformer = transformerHandler.getTransformer();
+		final StreamSource xslSource = new StreamSource(url.toString());
+		final Templates tpls = transformerFactory.newTemplates(xslSource);
+		final Transformer transformer = tpls.newTransformer();
+		
 		transformer.setErrorListener(XslErrorListener.INSTANCE);
-
-		return transformerHandler;
+		
+		return transformer;
 	}
 
 	public TransformerHandler loadTransformer(final String uri)

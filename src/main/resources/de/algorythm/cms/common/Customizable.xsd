@@ -4,22 +4,9 @@
 	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
 	<include schemaLocation="Types.xsd" />
-
-	<element name="customizable" substitutionGroup="c:abstract-content">
-        <complexType mixed="true">
-			<complexContent>
-				<extension base="c:ContentType">
-					<sequence minOccurs="0" maxOccurs="unbounded">
-						<element ref="c:abstract-content" />
-					</sequence>
-					<attribute name="placeholder" type="token" use="required" />
-				</extension>
-			</complexContent>
-		</complexType>
-    </element>
     
-    <element name="customize" substitutionGroup="c:abstract-content">
-        <complexType>
+	<element name="include" substitutionGroup="c:abstract-content">
+		<complexType>
 			<complexContent>
 				<extension base="c:ContentType">
 					<sequence minOccurs="0" maxOccurs="unbounded">
@@ -40,5 +27,18 @@
 				</extension>
 			</complexContent>
 		</complexType>
-    </element>
+	</element>
+
+	<element name="customizable" substitutionGroup="c:abstract-content">
+		<complexType mixed="true">
+			<complexContent>
+				<extension base="c:ContentType">
+					<sequence minOccurs="0" maxOccurs="unbounded">
+						<element ref="c:abstract-content" />
+					</sequence>
+					<attribute name="placeholder" type="token" use="required" />
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
 </schema>

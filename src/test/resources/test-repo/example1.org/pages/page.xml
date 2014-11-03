@@ -9,26 +9,25 @@
 	title="Welcome"
 	nav-title="Welcome nav">
 	<flow-layout>
-		<include href="article.xml" />
+		<include href="/contents/article.xml" />
 		<a:article>
 			<p>
-				Testinhalt
+				Testinhalt 1
 				<b>fett</b>
 				<p>asdf</p>
 			</p>
 		</a:article>
 		<a:article title="Testtitel">
 			<p>
-				Testinhalt
+				Testinhalt 2
 				<b>fett</b>
-				<p>asdf</p>
 			</p>
 		</a:article>
 		<a:article>
 			Testinhaltsdfgsdf
 		</a:article>
-		<customize href="/home/max/development/java/algorythm-cms/target/test-classes/test-repo/example1.org/contents/template.xml">
+		<include href="/contents/template.xml">
 			<replace placeholder="name">Custom <b>Name</b></replace>
-		</customize>
+		</include>
 	</flow-layout>
 </site>

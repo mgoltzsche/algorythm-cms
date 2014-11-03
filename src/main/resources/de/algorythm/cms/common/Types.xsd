@@ -8,7 +8,7 @@
 	
 	<element name="abstract-content" abstract="true" type="c:ContentType" />
 	
-	<element name="include" substitutionGroup="c:abstract-content">
+	<!--<element name="include" substitutionGroup="c:abstract-content">
 		<complexType>
 			<complexContent>
 				<extension base="c:ContentType">
@@ -16,7 +16,7 @@
 				</extension>
 			</complexContent>
 		</complexType>
-	</element>
+	</element>-->
 	
 	<complexType name="Markup" mixed="true">
 		<complexContent>

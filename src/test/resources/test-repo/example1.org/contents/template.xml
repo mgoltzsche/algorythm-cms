@@ -8,10 +8,10 @@
 	</p>
 	<p><customizable placeholder="name">Standardvorlageninhalt 1</customizable></p>
 	<p><customizable placeholder="description">
-		<customize href="/home/max/development/java/algorythm-cms/target/test-classes/test-repo/example1.org/contents/template.xml">
+		<include href="template.xml">
 			<replace placeholder="name">inner <b>name</b></replace>
 			<replace placeholder="description">inner description</replace>
-		</customize>
+		</include>
 	</customizable></p>
 	<p>Statischer Vorlageninhalt</p>
 </a:article>
