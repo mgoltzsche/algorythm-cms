@@ -2,6 +2,7 @@ package de.algorythm.cms.common.impl.xml.contentHandler;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.algorythm.cms.common.impl.xml.Constants.Namespace;
@@ -110,5 +111,20 @@ public class PageInfoHandler extends DefaultHandler {
 		
 		if (navTitle == null || navTitle.trim().isEmpty())
 			pageInfo.setNavigationTitle(pageInfo.getTitle());
+	}
+	
+	@Override
+	public void error(final SAXParseException e) throws SAXException {
+		throw e;
+	}
+
+	@Override
+	public void fatalError(final SAXParseException e) throws SAXException {
+		throw e;
+	}
+
+	@Override
+	public void warning(final SAXParseException e) throws SAXException {
+		throw e;
 	}
 }

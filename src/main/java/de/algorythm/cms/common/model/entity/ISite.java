@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.model.entity;
 
+import java.util.List;
 import java.util.Locale;
 
 public interface ISite extends Comparable<ISite> {
@@ -11,4 +12,5 @@ public interface ISite extends Comparable<ISite> {
 	Locale getDefaultLocale();
 	String getDefaultTemplate();
 	IPage getStartPage();
+	List<IDependency> getDependencies();
 }

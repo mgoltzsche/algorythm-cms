@@ -1,0 +1,8 @@
+<site xmlns="http://cms.algorythm.de/common/Site"
+		title="My example site 1"
+		default-locale="en"
+		default-template="http://cms.algorythm.de/common/theme/default-theme"
+		context-path="/site1">
+	<dependency href="asdf" />
+	<dependency href="asdfasd" />
+</site>

@@ -8,7 +8,6 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.FileUtils;
-import org.xml.sax.SAXException;
 
 import de.algorythm.cms.common.Configuration;
 import de.algorythm.cms.common.ICmsCommonFacade;
@@ -40,7 +39,7 @@ public class CmsCommonFacade implements ICmsCommonFacade {
 	public List<ISite> listSites() {
 		try {
 			return siteIndex.getSites();
-		} catch (SAXException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

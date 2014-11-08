@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<site xmlns="http://cms.algorythm.de/common/CMS"
+<page xmlns="http://cms.algorythm.de/common/CMS"
 	xmlns:a="http://cms.algorythm.de/common/Article">
 	<flow-layout>
 		<a:article>
@@ -19,4 +19,4 @@
 		</a:article>
 		<include href="/example1.org/article.xml" />
 	</flow-layout>
-</site>
+</page>

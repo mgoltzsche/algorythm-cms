@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<site xmlns="http://cms.algorythm.de/common/CMS"
+<page xmlns="http://cms.algorythm.de/common/CMS"
 	xmlns:a="http://cms.algorythm.de/common/Article"
-	site-title="Testseite"
-	default-language="de"
-	default-template="http://cms.algorythm.de/common/theme/default-theme"
-	context-path="/site2"
 	title="Willkommen">
 	<flow-layout>
 		<a:article>
@@ -24,4 +20,4 @@
 			</p>
 		</a:article>
 	</flow-layout>
-</site>
+</page>

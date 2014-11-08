@@ -30,7 +30,7 @@ public class TestXmlResourceDao {
 		assertEquals("site count", 3, sites.size());
 		
 		ISite[] expectedSites = new ISite[] {
-				createSite("example1.org", "My test site", Locale.ENGLISH, "/site1"),
+				createSite("example1.org", "My example site 1", Locale.ENGLISH, "/site1"),
 				createSite("example2.de", "Testseite", Locale.GERMAN, "/site2"),
 				createSite("example3.com", "example3.com", cfg.defaultLanguage, "/"),
 		};
@@ -42,10 +42,14 @@ public class TestXmlResourceDao {
 			ISite expectedSite = expectedSites[i];
 			ISite site = sites.get(i);
 			
-			assertEquals("site name", expectedSite.getName(), site.getName());
-			assertEquals("site title", expectedSite.getTitle(), site.getTitle());
-			assertEquals("site context path", expectedSite.getContextPath(), site.getContextPath());
-			assertEquals("site default locale", expectedSite.getDefaultLocale(), site.getDefaultLocale());
+			try {
+				assertEquals("site name", expectedSite.getName(), site.getName());
+				assertEquals("site title", expectedSite.getTitle(), site.getTitle());
+				assertEquals("site context path", expectedSite.getContextPath(), site.getContextPath());
+				assertEquals("site default locale", expectedSite.getDefaultLocale(), site.getDefaultLocale());
+			} catch(AssertionError e) {
+				throw new AssertionError(expectedSite.getName() + " - " + e.getMessage());
+			}
 		}
 		
 		for (ISite site : sites) {
@@ -63,8 +67,9 @@ public class TestXmlResourceDao {
 	}
 	
 	private ISite createSite(String name, String title, Locale locale, String contextPath) {
-		final SiteInfo siteInfo = new SiteInfo(name);
+		final SiteInfo siteInfo = new SiteInfo();
 		
+		siteInfo.setName(name);
 		siteInfo.setTitle(title);
 		siteInfo.setDefaultLocale(locale);
 		siteInfo.setContextPath(contextPath);
