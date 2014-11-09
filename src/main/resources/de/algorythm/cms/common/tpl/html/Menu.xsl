@@ -9,7 +9,7 @@
 		<xsl:param name="path" />
 		<xsl:if test="current()/@in-navigation='true'">
 			<li>
-				<a href="{$relativeBaseUrl}{current()/@path}index.html"><xsl:value-of select="current()/@title" /></a>
+				<a href="{$relativeBaseUrl}{current()/@path}/index.html"><xsl:value-of select="current()/@title" /></a>
 				<xsl:if test="current()/*">
 					<ul>
 						<xsl:apply-templates select="current()/*" />

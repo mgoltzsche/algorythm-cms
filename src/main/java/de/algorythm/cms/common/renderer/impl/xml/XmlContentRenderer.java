@@ -7,7 +7,6 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.REPOSITORY_D
 import static de.algorythm.cms.common.ParameterNameConstants.Render.RESOURCE_DIRECTORY;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -16,14 +15,10 @@ import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
@@ -38,14 +33,11 @@ import org.xml.sax.XMLReader;
 import com.vaadin.sass.internal.ScssStylesheet;
 
 import de.algorythm.cms.common.Configuration;
-import de.algorythm.cms.common.impl.xml.contentHandler.IncludingHandler;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.ISite;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.RendererException;
-import de.algorythm.cms.common.resources.IResourceUriResolver;
 import de.algorythm.cms.common.resources.impl.CmsURIResolver;
-import de.algorythm.cms.common.resources.impl.ContentUriResolver;
 
 @Singleton
 public class XmlContentRenderer implements IContentRenderer {
@@ -57,14 +49,13 @@ public class XmlContentRenderer implements IContentRenderer {
 	private final File repositoryDirectory;
 	private final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) TransformerFactory.newInstance();
 	private final IXmlReaderFactory readerFactory;
-	private final IResourceUriResolver contentUriResolver;
 
 	@Inject
 	public XmlContentRenderer(final Configuration cfg,
 			final IXmlReaderFactory readerFactory) {
+		transformerFactory.setErrorListener(XslErrorListener.INSTANCE);
 		this.repositoryDirectory = cfg.repository;
 		this.readerFactory = readerFactory;
-		this.contentUriResolver = new ContentUriResolver(cfg);
 	}
 
 	@Override
@@ -183,16 +174,12 @@ public class XmlContentRenderer implements IContentRenderer {
 			transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
 			transformer.setParameter(RESOURCE_DIRECTORY, relativeBaseUrl + "/r/" + currentResourceDirectoryName);
 			transformer.setErrorListener(XslErrorListener.INSTANCE);
-			final FileReader contentFileReader = new FileReader(contentFile);
 			
-			try {
-				final InputSource source = new InputSource(contentFile.getAbsolutePath());
-				final StreamResult result = new StreamResult(new File(outputDirectory, "index.html"));
-				
-				transformer.transform(new SAXSource(reader, source), result);
-			} finally {
-				contentFileReader.close();
-			}
+			final InputSource source = new InputSource(contentFile.getAbsolutePath());
+			final StreamResult result = new StreamResult(new File(outputDirectory, "index.html"));
+			
+			transformer.transform(new SAXSource(reader, source), result);
+			
 //			reader.setContentHandler(handler);
 //			reader.setErrorHandler(handler);
 //			reader.parse(contentFile.getAbsolutePath());
@@ -214,8 +201,6 @@ public class XmlContentRenderer implements IContentRenderer {
 		final StreamSource xslSource = new StreamSource(url.toString());
 		final Templates tpls = transformerFactory.newTemplates(xslSource);
 		final Transformer transformer = tpls.newTransformer();
-		
-		transformer.setErrorListener(XslErrorListener.INSTANCE);
 		
 		return transformer;
 	}

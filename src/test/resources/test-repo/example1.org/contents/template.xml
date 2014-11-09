@@ -13,5 +13,6 @@
 			<replace placeholder="description">inner description</replace>
 		</include>
 	</customizable></p>
+	<customizable placeholder="content">DEFAULT CONTENT</customizable>
 	<p>Statischer Vorlageninhalt</p>
 </a:article>

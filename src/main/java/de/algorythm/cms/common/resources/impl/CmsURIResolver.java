@@ -23,19 +23,18 @@ public class CmsURIResolver implements URIResolver {
 		try {
 			if (href.charAt(0) == '/') { // Absolute
 				absoluteUri = new URI(rootUri + href).normalize();
-				
-				validateLocalUrl(absoluteUri);
+			} else if (href.matches("^\\w+:/.*")) {
+				final URI hrefUri = new URI(href);
+				absoluteUri = new URI(rootUri + hrefUri.getPath());
 			} else {
 				final URI baseUri = new URI(base.indexOf(0) == '/' ? "file:" + base : base);
-				System.out.println("### " + baseUri);
 				absoluteUri = baseUri.resolve(href).normalize();
-				
-				if (absoluteUri.getHost() == null)
-					validateLocalUrl(absoluteUri);
 			}
 		} catch(URISyntaxException e) {
 			throw new TransformerException("Unsupported URI syntax", e);
 		}
+		
+		validateLocalUrl(absoluteUri);
 		
 		return new StreamSource(absoluteUri.toString());
 	}

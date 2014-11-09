@@ -5,5 +5,5 @@
 	<xsl:import href="html/Theme.xsl" />
 	<xsl:import href="html/Article.xsl" />
 	<xsl:import href="html/Menu.xsl" />
-	<xsl:import href="Customizable.xsl" />
+	<xsl:import href="Include.xsl" />
 </xsl:stylesheet>

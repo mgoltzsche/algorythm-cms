@@ -24,6 +24,7 @@
 		</a:article>
 		<include href="/contents/template.xml">
 			<replace placeholder="name">Custom <b>Name</b></replace>
+			<replace placeholder="content">CUSTOM CONTENT</replace>
 		</include>
 	</flow-layout>
 </page>
