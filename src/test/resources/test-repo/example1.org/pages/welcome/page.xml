@@ -3,5 +3,11 @@
 <page xmlns="http://cms.algorythm.de/common/CMS"
 	xmlns:a="http://cms.algorythm.de/common/Article"
 	title="My test page">
-	<include href="/contents/article.xml" />
+	<flow-layout>
+		<nav />
+		<include href="/contents/article.xml" />
+		<grid columns="12">
+			<cell>Cell A</cell><cell span="10">Cell B</cell><cell>Cell C</cell>
+		</grid>
+	</flow-layout>
 </page>

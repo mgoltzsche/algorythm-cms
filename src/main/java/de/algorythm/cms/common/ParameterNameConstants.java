@@ -8,5 +8,6 @@ public class ParameterNameConstants {
 		static public final String OUTPUT_DIRECTORY = "outputDirectory";
 		static public final String RELATIVE_BASE_URL = "relativeBaseUrl";
 		static public final String RESOURCE_DIRECTORY = "resourceDirectory";
+		static public final String PAGE_PATH = "pagePath";
 	}
 }

@@ -4,27 +4,36 @@
 	xmlns:a="http://cms.algorythm.de/common/Article"
 	title="Welcome"
 	nav-title="Welcome nav">
-	<flow-layout>
-		<include href="/contents/article.xml" />
-		<a:article>
-			<p>
-				Testinhalt 1
-				<b>fett</b>
-				<p>asdf</p>
-			</p>
-		</a:article>
-		<a:article title="Testtitel">
-			<p>
-				Testinhalt 2
-				<b>fett</b>
-			</p>
-		</a:article>
-		<a:article>
-			Testinhaltsdfgsdf
-		</a:article>
-		<include href="/contents/template.xml">
-			<replace placeholder="name">Custom <b>Name</b></replace>
-			<replace placeholder="content">CUSTOM CONTENT</replace>
-		</include>
-	</flow-layout>
+	<grid columns="4">
+		<cell span="4">
+			<nav />
+		</cell>
+		<cell>
+			<include href="/contents/article.xml" />
+			<a:article>
+				<p>
+					Testinhalt 1
+					<b>fett</b>
+					<p>asdf</p>
+				</p>
+			</a:article>
+			<a:article>
+				Testinhaltsdfgsdf
+			</a:article>
+		</cell>
+		<cell span="2">
+			<include href="/contents/template.xml">
+				<replace placeholder="name">Custom <b>Name</b></replace>
+				<replace placeholder="content">CUSTOM CONTENT</replace>
+			</include>
+		</cell>
+		<cell>
+			<a:article title="Testtitel">
+				<p>
+					Testinhalt 2
+					<b>fett</b>
+				</p>
+			</a:article>
+		</cell>
+	</grid>
 </page>

@@ -6,13 +6,12 @@
 	exclude-result-prefixes="p">
 	
 	<xsl:template name="menu" match="p:page">
-		<xsl:param name="path" />
-		<xsl:if test="current()/@in-navigation='true'">
+		<xsl:if test="boolean(current()/@in-navigation)=true()">
 			<li>
 				<a href="{$relativeBaseUrl}{current()/@path}/index.html"><xsl:value-of select="current()/@title" /></a>
-				<xsl:if test="current()/*">
+				<xsl:if test="./*">
 					<ul>
-						<xsl:apply-templates select="current()/*" />
+						<xsl:apply-templates />
 					</ul>
 				</xsl:if>
 			</li>

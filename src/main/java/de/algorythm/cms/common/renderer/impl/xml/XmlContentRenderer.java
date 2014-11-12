@@ -2,6 +2,7 @@ package de.algorythm.cms.common.renderer.impl.xml;
 
 import static de.algorythm.cms.common.ParameterNameConstants.Render.OUTPUT_DIRECTORY;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGES_XML;
+import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_PATH;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.RELATIVE_BASE_URL;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.REPOSITORY_DIRECTORY;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.RESOURCE_DIRECTORY;
@@ -153,14 +154,14 @@ public class XmlContentRenderer implements IContentRenderer {
 				+ File.separator + "page.xml");
 
 		// Render page
-		render(pageFile, siteDirectory, pagesFile, outputDirectory, relativeBaseUrl, currentResourceDirectoryName);
+		render(pageFile, siteDirectory, pagePath, pagesFile, outputDirectory, relativeBaseUrl, currentResourceDirectoryName);
 
 		// Render sub pages
 		for (IPage child : page.getPages())
 			render(site, child, new File(outputDirectory, child.getName()), currentResourceDirectoryName);
 	}
 
-	private void render(final File contentFile, final File rootDirectory, final File pagesFile,
+	private void render(final File contentFile, final File rootDirectory, final String pagePath, final File pagesFile,
 			final File outputDirectory, final String relativeBaseUrl,
 			final String currentResourceDirectoryName) throws RendererException {
 		try {
@@ -173,6 +174,7 @@ public class XmlContentRenderer implements IContentRenderer {
 			transformer.setParameter(PAGES_XML, pagesFile.toString());
 			transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
 			transformer.setParameter(RESOURCE_DIRECTORY, relativeBaseUrl + "/r/" + currentResourceDirectoryName);
+			transformer.setParameter(PAGE_PATH, pagePath);
 			transformer.setErrorListener(XslErrorListener.INSTANCE);
 			
 			final InputSource source = new InputSource(contentFile.getAbsolutePath());

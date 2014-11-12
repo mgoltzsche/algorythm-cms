@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	<include schemaLocation="Types.xsd" />
+
+	<element name="grid" substitutionGroup="c:abstract-content">
+		<complexType>
+			<complexContent>
+				<extension base="c:ContentType">
+					<choice minOccurs="0" maxOccurs="unbounded">
+						<element name="cell">
+							<complexType mixed="true">
+								<choice minOccurs="0" maxOccurs="unbounded">
+									<element ref="c:abstract-content" />
+								</choice>
+								<attribute name="span" type="nonNegativeInteger" default="1" />
+							</complexType>
+						</element>
+					</choice>
+					<attribute name="columns" type="nonNegativeInteger" use="required" />
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+</schema>
