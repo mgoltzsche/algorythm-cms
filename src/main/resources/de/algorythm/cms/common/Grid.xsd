@@ -16,10 +16,18 @@
 									<element ref="c:abstract-content" />
 								</choice>
 								<attribute name="span" type="nonNegativeInteger" default="1" />
+								<attribute name="span-sm" type="nonNegativeInteger" />
+								<attribute name="span-md" type="nonNegativeInteger" />
+								<attribute name="span-lg" type="nonNegativeInteger" />
+								<attribute name="span-xl" type="nonNegativeInteger" />
 							</complexType>
 						</element>
 					</choice>
-					<attribute name="columns" type="nonNegativeInteger" use="required" />
+					<attribute name="columns" type="nonNegativeInteger" default="1" />
+					<attribute name="columns-sm" type="nonNegativeInteger" />
+					<attribute name="columns-md" type="nonNegativeInteger" />
+					<attribute name="columns-lg" type="nonNegativeInteger" />
+					<attribute name="columns-xl" type="nonNegativeInteger" />
 				</extension>
 			</complexContent>
 		</complexType>

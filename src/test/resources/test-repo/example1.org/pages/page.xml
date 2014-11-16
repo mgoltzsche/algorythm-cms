@@ -4,8 +4,8 @@
 	xmlns:a="http://cms.algorythm.de/common/Article"
 	title="Welcome"
 	nav-title="Welcome nav">
-	<grid columns="4">
-		<cell span="4">
+	<grid columns-sm="2" columns-md="3" columns-lg="4" columns-xl="5">
+		<cell span="5">
 			<nav />
 		</cell>
 		<cell>
@@ -21,7 +21,7 @@
 				Testinhaltsdfgsdf
 			</a:article>
 		</cell>
-		<cell span="2">
+		<cell>
 			<include href="/contents/template.xml">
 				<replace placeholder="name">Custom <b>Name</b></replace>
 				<replace placeholder="content">CUSTOM CONTENT</replace>
@@ -32,6 +32,24 @@
 				<p>
 					Testinhalt 2
 					<b>fett</b>
+				</p>
+			</a:article>
+		</cell>
+		<cell>
+			<a:article title="Testartikel embedded">
+				<p>
+					Testinhalt 3
+					<b>fett</b>
+				</p>
+				<p>
+					Noch'n Absatz
+				</p>
+			</a:article>
+		</cell>
+		<cell>
+			<a:article title="Noch'n Artikel">
+				<p>
+					Noch'n Absatz
 				</p>
 			</a:article>
 		</cell>
