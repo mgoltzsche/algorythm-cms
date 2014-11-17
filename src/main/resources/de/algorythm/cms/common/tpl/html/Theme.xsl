@@ -39,9 +39,10 @@
 				<div id="container">
 					<nav class="pure-menu pure-menu-open pure-menu-horizontal">
 						<a href="#/" class="pure-menu-heading">Site Title</a>
-					
 						<ul>
-							<xsl:apply-templates select="document('/pages.xml')/p:page/*"/>
+							<xsl:apply-templates select="document('/pages.xml')/p:page/*">
+								<xsl:with-param name="maxDepth" select="1" />
+							</xsl:apply-templates>
 						</ul>
 					</nav>
 					<xsl:if test="current()/@subNav='true'">

@@ -4,7 +4,7 @@
 	xmlns:a="http://cms.algorythm.de/common/Article"
 	title="My test page">
 	<flow-layout>
-		<nav />
+		<nav parent=".." />
 		<include href="/contents/article.xml" />
 		<grid columns="12">
 			<cell>Cell A</cell><cell span="10">Cell B</cell><cell>Cell C</cell>

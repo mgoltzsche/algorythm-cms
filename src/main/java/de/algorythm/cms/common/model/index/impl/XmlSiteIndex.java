@@ -95,7 +95,7 @@ public class XmlSiteIndex implements ISiteIndex {
 				site.setDefaultLocale(Locale.ENGLISH);
 			
 			if (site.getContextPath() == null)
-				site.setContextPath("/");
+				site.setContextPath("");
 			
 			site.setStartPage(loadPages(rootDirectory, "", siteName, reader, pageInfoHandler));
 			sites.add(site);

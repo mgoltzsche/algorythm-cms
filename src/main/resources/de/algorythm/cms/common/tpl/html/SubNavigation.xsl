@@ -7,9 +7,14 @@
 	<xsl:param name="pagePath" />
 	
 	<xsl:template match="c:nav">
+		<xsl:variable name="baseUri" select="concat('page:', $pagePath, '/')" />
+		<xsl:variable name="parent" select="if (ends-with(./@parent, '/')) then ./@parent else concat(./@parent, '/')" />
+		<xsl:variable name="parentPath" select="resolve-uri($parent, $baseUri)" />
 		<nav class="pure-menu pure-menu-open pure-menu-vertical">
 			<ul>
-				<xsl:apply-templates select="document('/pages.xml')//*[@path=$pagePath]/*"/>
+				<xsl:apply-templates select="document('/pages.xml')//*[concat('page:', @path, '/')=$parentPath]/*">
+					<xsl:with-param name="maxDepth" select="if (./@depth) then number(./@depth) else 0" />
+				</xsl:apply-templates>
 			</ul>
 		</nav>
 	</xsl:template>

@@ -9,7 +9,8 @@
 		<complexType>
 			<complexContent>
 				<extension base="c:ContentType">
-					<attribute name="depth" type="nonNegativeInteger"/>
+					<attribute name="parent" type="anyURI" default="." />
+					<attribute name="depth" type="nonNegativeInteger" default="1" />
 				</extension>
 			</complexContent>
 		</complexType>

@@ -6,12 +6,17 @@
 	exclude-result-prefixes="p">
 	
 	<xsl:template name="menu" match="p:page">
+		<xsl:param name="depth" select="1" />
+		<xsl:param name="maxDepth" select="0" />
 		<xsl:if test="boolean(current()/@in-navigation)=true()">
 			<li>
 				<a href="{$relativeBaseUrl}{current()/@path}/index.html"><xsl:value-of select="current()/@title" /></a>
-				<xsl:if test="./*">
+				<xsl:if test="./* and ($maxDepth lt 1 or $depth lt $maxDepth)">
 					<ul>
-						<xsl:apply-templates />
+						<xsl:apply-templates>
+							<xsl:with-param name="depth" select="$depth + 1" />
+							<xsl:with-param name="maxDepth" select="$maxDepth" />
+						</xsl:apply-templates>
 					</ul>
 				</xsl:if>
 			</li>
