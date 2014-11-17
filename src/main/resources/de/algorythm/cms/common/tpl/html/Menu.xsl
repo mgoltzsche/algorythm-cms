@@ -4,13 +4,14 @@
 	xmlns:p="http://cms.algorythm.de/common/Pages"
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="p">
+	<xsl:param name="pagePath" />
 	
-	<xsl:template name="menu" match="p:page">
+	<xsl:template match="p:page">
 		<xsl:param name="depth" select="1" />
-		<xsl:param name="maxDepth" select="0" />
+		<xsl:param name="maxDepth" select="0" /> 
 		<xsl:if test="boolean(current()/@in-navigation)=true()">
-			<li>
-				<a href="{$relativeBaseUrl}{current()/@path}/index.html"><xsl:value-of select="current()/@title" /></a>
+			<li class="{if (@path = $pagePath) then 'pure-menu-selected' else ''}">
+				<a href="{$relativeBaseUrl}{@path}/index.html"><xsl:value-of select="current()/@title" /></a>
 				<xsl:if test="./* and ($maxDepth lt 1 or $depth lt $maxDepth)">
 					<ul>
 						<xsl:apply-templates>

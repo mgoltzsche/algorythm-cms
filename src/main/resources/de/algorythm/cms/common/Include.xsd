@@ -14,9 +14,6 @@
 							<complexType mixed="true">
 								<complexContent>
 									<extension base="c:Markup">
-										<sequence minOccurs="0" maxOccurs="unbounded">
-											<element ref="c:abstract-content" />
-										</sequence>
 										<attribute name="placeholder" type="token" use="required" />
 									</extension>
 								</complexContent>

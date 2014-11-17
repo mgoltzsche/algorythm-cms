@@ -8,5 +8,4 @@
 	<xsl:import href="html/SubNavigation.xsl" />
 	<xsl:import href="html/Grid.xsl" />
 	<xsl:import href="Include.xsl" />
-	<xsl:import href="Math.xsl" />
 </xsl:stylesheet>

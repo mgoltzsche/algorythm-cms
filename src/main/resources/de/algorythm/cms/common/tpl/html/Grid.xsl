@@ -2,9 +2,8 @@
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:c="http://cms.algorythm.de/common/CMS"
-	xmlns:m="http://cms.algorythm.de/common/Math"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="c m">
+	exclude-result-prefixes="c">
 
 	<xsl:template match="c:grid">
 		<div class="pure-g">
@@ -34,38 +33,94 @@
 		<xsl:variable name="spanMd" select="if (./@span-md) then number(./@span-md) else $spanSm" />
 		<xsl:variable name="spanLg" select="if (./@span-lg) then number(./@span-lg) else $spanMd" />
 		<xsl:variable name="spanXl" select="if (./@span-xl) then number(./@span-xl) else $spanLg" />
-		<xsl:variable name="styleClasses">
-			pure-u-<xsl:call-template name="m:reduce-fraction">
+		<xsl:variable name="suffixSm">
+			<xsl:call-template name="c:reduce-grid-fraction">
+				<xsl:with-param name="numerator" select="$spanSm" />
+				<xsl:with-param name="denominator" select="$columnsSm" />
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="suffix">
+			<xsl:call-template name="c:reduce-grid-fraction">
 				<xsl:with-param name="numerator" select="$span" />
 				<xsl:with-param name="denominator" select="$columns" />
 			</xsl:call-template>
-			<xsl:if test="$spanSm != $span or $columnsSm != $columns">
-				pure-u-sm-<xsl:call-template name="m:reduce-fraction">
-					<xsl:with-param name="numerator" select="$spanSm" />
-					<xsl:with-param name="denominator" select="$columnsSm" />
-				</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="suffixMd">
+			<xsl:call-template name="c:reduce-grid-fraction">
+				<xsl:with-param name="numerator" select="$spanMd" />
+				<xsl:with-param name="denominator" select="$columnsMd" />
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="suffixLg">
+			<xsl:call-template name="c:reduce-grid-fraction">
+				<xsl:with-param name="numerator" select="$spanLg" />
+				<xsl:with-param name="denominator" select="$columnsLg" />
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="suffixXl">
+			<xsl:call-template name="c:reduce-grid-fraction">
+				<xsl:with-param name="numerator" select="$spanXl" />
+				<xsl:with-param name="denominator" select="$columnsXl" />
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:variable name="styleClasses">
+			pure-u-<xsl:value-of select="$suffix" />
+			<xsl:if test="$suffixSm != $suffix">
+				pure-u-sm-<xsl:value-of select="$suffixSm" />
 			</xsl:if>
-			<xsl:if test="$spanMd != $spanSm or $columnsMd != $columnsSm">
-				pure-u-md-<xsl:call-template name="m:reduce-fraction">
-					<xsl:with-param name="numerator" select="$spanMd" />
-					<xsl:with-param name="denominator" select="$columnsMd" />
-				</xsl:call-template>
+			<xsl:if test="$suffixMd != $suffixSm">
+				pure-u-md-<xsl:value-of select="$suffixMd" />
 			</xsl:if>
-			<xsl:if test="$spanLg != $spanMd or $columnsLg != $columnsMd">
-				pure-u-lg-<xsl:call-template name="m:reduce-fraction">
-					<xsl:with-param name="numerator" select="$spanLg" />
-					<xsl:with-param name="denominator" select="$columnsLg" />
-				</xsl:call-template>
+			<xsl:if test="$suffixLg != $suffixMd">
+				pure-u-lg-<xsl:value-of select="$suffixLg" />
 			</xsl:if>
-			<xsl:if test="$spanXl != $spanLg or $columnsXl != $columnsLg">
-				pure-u-xl-<xsl:call-template name="m:reduce-fraction">
-					<xsl:with-param name="numerator" select="$spanXl" />
-					<xsl:with-param name="denominator" select="$columnsXl" />
-				</xsl:call-template>
+			<xsl:if test="$suffixXl != $suffixLg">
+				pure-u-xl-<xsl:value-of select="$suffixXl" />
 			</xsl:if>
 		</xsl:variable>
 		<div class="{normalize-space($styleClasses)}">
 			<xsl:apply-templates />
 		</div>
+	</xsl:template>
+	
+	<xsl:template name="c:reduce-grid-fraction">
+		<xsl:param name="numerator" />
+		<xsl:param name="denominator" />
+		<xsl:call-template name="c:reduce-grid-fraction-by-value">
+			<xsl:with-param name="numerator" select="$numerator" />
+			<xsl:with-param name="denominator" select="$denominator" />
+			<xsl:with-param name="value" select="if ($numerator lt $denominator) then $numerator else $denominator" />
+		</xsl:call-template>
+	</xsl:template>
+	
+	<xsl:template name="c:reduce-grid-fraction-by-value">
+		<xsl:param name="numerator" />
+		<xsl:param name="denominator" />
+		<xsl:param name="value" />
+		<xsl:choose>
+			<xsl:when test="$value le 1">
+				<xsl:choose>
+					<xsl:when test="$numerator ge $denominator">
+						<xsl:value-of select="'1-1'" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="concat($numerator, '-', $denominator)" />
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="$numerator mod $value = 0 and $denominator mod $value = 0">
+				<xsl:call-template name="c:reduce-grid-fraction">
+					<xsl:with-param name="numerator" select="$numerator div $value" />
+					<xsl:with-param name="denominator" select="$denominator div $value" />
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="c:reduce-grid-fraction-by-value">
+					<xsl:with-param name="numerator" select="$numerator" />
+					<xsl:with-param name="denominator" select="$denominator" />
+					<xsl:with-param name="value" select="$value - 1" />
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 </xsl:stylesheet>

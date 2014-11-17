@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
 <page xmlns="http://cms.algorythm.de/common/CMS"
-	xmlns:a="http://cms.algorythm.de/common/Article">
+		xmlns:a="http://cms.algorythm.de/common/Article">
 	<a:article title="Testarticle 2">
+		<nav parent=".." />
 		<p>
 			Testinhalt
 			<b>fett</b>

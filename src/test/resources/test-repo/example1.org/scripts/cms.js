@@ -14,10 +14,6 @@ var normalizedUrl = function(url) {
 	return url.replace(urlThisRegex, "");
 };
 
-String.prototype.endsWith = function(str) {
-	return this.length >= str.length && this.substring(this.length - str.length, this.length) == str;
-};
-
 String.prototype.toAbsoluteUrl = function() {
 	if (absoluteUrlRegex.test(this))
 		return normalizedUrl(this);
@@ -66,25 +62,50 @@ angular.module('cms', ['ngRoute']).
 	});
 }]).
 directive('a', ['$location', function($location) {
-		return {
-			restrict: 'E',
-			link: function(scope, el, attrs) {
-				var url = attrs.href;
+	return {
+		restrict: 'E',
+		link: function(scope, el, attrs) {
+			var url = attrs.href;
+			
+			if (url.indexOf(cms.baseUrl) == 0 && url.indexOf('/index.html') == url.length - 11) {
+				// Rewrite internal URL to AJAX call
+				url = url.substring(cms.baseUrl.length, url.length - 11);
 				
-				if (url.indexOf(cms.baseUrl) == 0 && url.indexOf('/index.html') == url.length - 11) {
-					// Rewrite internal URL to AJAX call
-					url = url.substring(cms.baseUrl.length, url.length - 11);
-					
-					el.attr('href', '#' + url);
-				}
+				el.attr('href', '#' + url);
 			}
-		};
+		}
+	};
 }]).
 directive('cmsPageTitle', ['$rootScope', function($rootScope) {
-		return {
-			restrict: 'A',
-			link: function(scope, el, attrs) {
-				$rootScope.pageTitle = attrs.cmsPageTitle;
-			}
-		};
+	return {
+		restrict: 'A',
+		link: function(scope, el, attrs) {
+			$rootScope.pageTitle = attrs.cmsPageTitle;
+		}
+	};
+}]).
+directive('cmsMenu', ['$location', function($location) {
+	return {
+		restrict: 'A',
+		link: function(scope, el, attrs) {
+			var clazz = attrs.cmsMenu ? attrs.cmsMenu : 'selected';
+			
+			scope.$on('$locationChangeStart', function() {
+				var currentPath = $location.path();
+				var links = el.find('a');
+				
+				for (var i = 0; i < links.length; i++) {
+					var a = angular.element(links[i]);
+					var path = a.attr('href').substring(1);
+					var li = a.parent();
+					
+					if (path === currentPath || currentPath.indexOf(path + '/') == 0) {
+						li.addClass(clazz);
+					} else {
+						li.removeClass(clazz);
+					}
+				}
+			});
+		}
+	};
 }]);
