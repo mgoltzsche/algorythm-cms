@@ -1,29 +1,29 @@
 package de.algorythm.cms.common.model.dao.impl.xml;
 
+import java.io.File;
+
 import javax.xml.bind.JAXBContext;
 
 import org.junit.Test;
 
 import de.algorythm.cms.common.Configuration;
-import de.algorythm.cms.common.LocaleResolver;
 import de.algorythm.cms.common.generator.PagesXmlGenerator;
 import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
-import de.algorythm.cms.common.model.entity.ISite;
+import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
-import de.algorythm.cms.common.model.index.impl.XmlSiteIndex;
+import de.algorythm.cms.common.model.loader.impl.BundleLoader;
 
 public class TestPagesXmlGenerator {
 
 	@Test
 	public void testPagesXmlGenerator() throws Exception {
 		Configuration cfg = new Configuration();
-		LocaleResolver locales = new LocaleResolver();
 		XmlReaderFactory readerFactory = new XmlReaderFactory();
-		XmlSiteIndex pageInfoReader = new XmlSiteIndex(cfg, locales, readerFactory);
+		BundleLoader bundleLoader = new BundleLoader(cfg, readerFactory);
 		JAXBContext jaxbCtx = JAXBContext.newInstance(PageInfo.class);
 		PagesXmlGenerator testee = new PagesXmlGenerator(cfg, jaxbCtx);
 		
-		for (ISite site : pageInfoReader.getSites())
-			testee.generatePagesXml(site);
+		IBundle bundle = bundleLoader.getBundle(new File(getClass().getResource("/test-repo/example1.org/bundle.xml").toURI()));
+		testee.generatePagesXml(bundle, cfg.outputDirectory);
 	}
 }

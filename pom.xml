@@ -17,6 +17,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<repository.directory>${project.build.testOutputDirectory}/test-repo</repository.directory>
+		<output.directory>${project.build.testOutputDirectory}/test-output</output.directory>
 	</properties>
 
 	<build>
@@ -36,8 +37,8 @@
 				<version>2.5.1</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 				</configuration>
 			</plugin>
 			<plugin>

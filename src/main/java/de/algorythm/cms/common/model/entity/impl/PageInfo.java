@@ -3,8 +3,6 @@ package de.algorythm.cms.common.model.entity.impl;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,7 +11,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import de.algorythm.cms.common.model.entity.IPage;
 
 @XmlRootElement(name="page", namespace="http://cms.algorythm.de/common/Pages")
-@XmlAccessorType(XmlAccessType.FIELD)
 public class PageInfo implements IPage, Comparable<IPage> {
 	
 	@XmlAttribute(required = true)

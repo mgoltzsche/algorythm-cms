@@ -9,24 +9,23 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import de.algorythm.cms.common.Configuration;
-import de.algorythm.cms.common.model.entity.ISite;
+import de.algorythm.cms.common.model.entity.IBundle;
 
 @Singleton
 public class PagesXmlGenerator {
 
 	private final JAXBContext jaxbContext;
-	private final File repositoryDirectory;
 	
 	@Inject
 	public PagesXmlGenerator(final Configuration cfg, final JAXBContext jaxbContext) throws JAXBException {
 		this.jaxbContext = jaxbContext;
-		this.repositoryDirectory = cfg.repository;
 	}
 	
-	public void generatePagesXml(final ISite site) throws JAXBException {
+	public void generatePagesXml(final IBundle bundle, final File outputDirectory) throws JAXBException {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
 		
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		marshaller.marshal(site.getStartPage(), new File(new File(repositoryDirectory, site.getName()), "pages.xml"));
+		bundle.getStartPage().getName(); // Resolves proxy
+		marshaller.marshal(bundle.getStartPage(), new File(outputDirectory, "pages.xml"));
 	}
 }

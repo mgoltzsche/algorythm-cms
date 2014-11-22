@@ -9,11 +9,13 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import de.algorythm.cms.common.impl.CmsCommonFacade;
 import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
-import de.algorythm.cms.common.model.index.ISiteIndex;
-import de.algorythm.cms.common.model.index.impl.XmlSiteIndex;
+import de.algorythm.cms.common.model.loader.IBundleLoader;
+import de.algorythm.cms.common.model.loader.impl.BundleLoader;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 import de.algorythm.cms.common.renderer.impl.xml.XmlContentRenderer;
+import de.algorythm.cms.common.resources.IDependencyLoader;
+import de.algorythm.cms.common.resources.impl.ClasspathDependencyLoader;
 
 public class CmsCommonModule extends AbstractModule {
 
@@ -22,7 +24,8 @@ public class CmsCommonModule extends AbstractModule {
 		try {
 			bindICmsCommonFacade(bind(ICmsCommonFacade.class));
 			bindConfiguration(bind(Configuration.class));
-			bindISiteIndex(bind(ISiteIndex.class));
+			bindIBundleLoader(bind(IBundleLoader.class));
+			bindIDependencyLoader(bind(IDependencyLoader.class));
 			bindIXmlReaderFactory(bind(IXmlReaderFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
 			bindIContentRenderer(bind(IContentRenderer.class));
@@ -39,8 +42,12 @@ public class CmsCommonModule extends AbstractModule {
 		bind.toInstance(new Configuration());
 	}
 	
-	protected void bindISiteIndex(AnnotatedBindingBuilder<ISiteIndex> bind) {
-		bind.to(XmlSiteIndex.class);
+	protected void bindIBundleLoader(AnnotatedBindingBuilder<IBundleLoader> bind) {
+		bind.to(BundleLoader.class);
+	}
+	
+	protected void bindIDependencyLoader(AnnotatedBindingBuilder<IDependencyLoader> bind) {
+		bind.to(ClasspathDependencyLoader.class);
 	}
 	
 	protected void bindIXmlReaderFactory(AnnotatedBindingBuilder<IXmlReaderFactory> bind) {

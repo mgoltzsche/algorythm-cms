@@ -1,0 +1,9 @@
+<site xmlns="http://cms.algorythm.de/common/Site"
+		name="example.org"
+		title="My example site"
+		default-locale="en"
+		default-template="http://cms.algorythm.de/common/theme/default-theme"
+		context-path="/site1">
+	<param id="testparam" value="overwritten" />
+	<dependency name="common.cms.algorythm.de" />
+</site>

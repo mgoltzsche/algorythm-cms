@@ -2,76 +2,60 @@ package de.algorythm.cms.common.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.io.FileUtils;
-
-import de.algorythm.cms.common.Configuration;
 import de.algorythm.cms.common.ICmsCommonFacade;
 import de.algorythm.cms.common.generator.PagesXmlGenerator;
-import de.algorythm.cms.common.model.entity.ISite;
-import de.algorythm.cms.common.model.index.ISiteIndex;
+import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.RendererException;
+import de.algorythm.cms.common.resources.IDependencyLoader;
+import de.algorythm.cms.common.resources.impl.ResourceResolver;
 
 public class CmsCommonFacade implements ICmsCommonFacade {
 
-	private final File repositoryDirectory;
-	private final ISiteIndex siteIndex;
+	private final IDependencyLoader dependencyLoader;
+	private final IBundleLoader bundleLoader;
 	private final PagesXmlGenerator pagesXmlGenerator;
 	private final IContentRenderer renderer;
 	
 	@Inject
-	public CmsCommonFacade(final Configuration cfg, final ISiteIndex siteIndex, final PagesXmlGenerator pagesXmlGenerator, final IContentRenderer renderer) throws IOException {
-		if (!cfg.repository.isDirectory())
-			throw new IOException(cfg.repository + " is not a valid directory");
-		
-		this.repositoryDirectory = cfg.repository;
-		this.siteIndex = siteIndex;
+	public CmsCommonFacade(final IBundleLoader bundleLoader, final IDependencyLoader dependencyLoader, final PagesXmlGenerator pagesXmlGenerator, final IContentRenderer renderer) throws IOException {
+		this.dependencyLoader = dependencyLoader;
+		this.bundleLoader = bundleLoader;
 		this.pagesXmlGenerator = pagesXmlGenerator;
 		this.renderer = renderer;
 	}
 	
 	@Override
-	public List<ISite> listSites() {
+	public IBundle loadBundle(final File bundleXml) {
 		try {
-			return siteIndex.getSites();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	@Override
-	public void generatePagesXml(final ISite site) {
-		try {
-			pagesXmlGenerator.generatePagesXml(site);
+			return bundleLoader.getBundle(bundleXml);
 		} catch (JAXBException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Cannot load bundle in '" + bundleXml + "'. " + e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
-	public void generateSite(final ISite site) {
-		final File siteDirectory = new File(repositoryDirectory, site.getName());
-		final File outputDirectory = new File(siteDirectory, "generated");
-		
-		if (outputDirectory.exists()) {
-			try {
-				FileUtils.deleteDirectory(outputDirectory);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+	public void generatePagesXml(final IBundle bundle, final File outputDirectory) {
+		try {
+			pagesXmlGenerator.generatePagesXml(bundle, outputDirectory);
+		} catch (JAXBException e) {
+			throw new RuntimeException("Cannot generate page.xml of site '" + bundle.getName() + "'. " + e.getMessage(), e);
 		}
-		
-		outputDirectory.mkdirs();
+	}
+	
+	@Override
+	public void generateSite(final IBundle bundle, final File tmpDirectory, final File outputDirectory) {
+		final ResourceResolver resolver = new ResourceResolver(bundle, tmpDirectory, dependencyLoader);
 		
 		try {
-			renderer.render(site, outputDirectory);
+			renderer.render(resolver.getMergedBundle(), resolver, outputDirectory);
 		} catch (RendererException e) {
-			throw new RuntimeException("Cannot render page", e);
+			throw new RuntimeException("Cannot render site '" + bundle.getName() + "'. " + e.getMessage(), e);
 		}
 	}
 }

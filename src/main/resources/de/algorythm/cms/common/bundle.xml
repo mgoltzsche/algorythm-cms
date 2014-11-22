@@ -1,0 +1,11 @@
+<site xmlns="http://cms.algorythm.de/common/Site"
+		name="common.cms.algorythm.de"
+		title="My example site library"
+		default-locale="en"
+		default-template="http://cms.algorythm.de/common/theme/default-theme"
+		context-path="/site1">
+	<param id="testparam" value="asdf" />
+	<output id="html">
+		<task type="de.algorythm.cms.common.rendering.pipeline.impl.XsltRenderer" phase="GENERATE" />
+	</output>
+</site>

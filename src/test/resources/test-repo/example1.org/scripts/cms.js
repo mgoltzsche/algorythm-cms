@@ -10,8 +10,17 @@ var parentUrl = function(url) {
 };
 
 var normalizedUrl = function(url) {
-	url = url.replace(urlBackRegex, "");
-	return url.replace(urlThisRegex, "");
+	do {
+		lastUrl = url;
+		url = url.replace(urlBackRegex, ""); 
+	} while (url != lastUrl);
+	
+	do {
+		lastUrl = url;
+		url = url.replace(urlThisRegex, ""); 
+	} while (url != lastUrl);
+	
+	return url;
 };
 
 String.prototype.toAbsoluteUrl = function() {
@@ -25,7 +34,6 @@ if (cms.baseUrl != '.' || !startFileRegex.test(w.location.href)) {
 	var absBaseUrl = cms.baseUrl.toAbsoluteUrl();
 	var absUrl = w.location.href;
 	var anchor = parentUrl(absUrl.substring(absBaseUrl.length, absUrl.length));
-	alert(absBaseUrl + '/#' + anchor);
 	w.location.href = absBaseUrl + '/#' + anchor;
 }
 })(window);
@@ -71,7 +79,7 @@ directive('a', ['$location', function($location) {
 				// Rewrite internal URL to AJAX call
 				url = url.substring(cms.baseUrl.length, url.length - 11);
 				
-				el.attr('href', '#' + url);
+				el.attr('href', '#' + (url ? url : '/'));
 			}
 		}
 	};

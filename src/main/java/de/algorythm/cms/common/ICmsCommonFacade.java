@@ -1,12 +1,12 @@
 package de.algorythm.cms.common;
 
-import java.util.List;
+import java.io.File;
 
-import de.algorythm.cms.common.model.entity.ISite;
+import de.algorythm.cms.common.model.entity.IBundle;
 
 public interface ICmsCommonFacade {
 
-	List<ISite> listSites();
-	void generatePagesXml(ISite site);
-	void generateSite(ISite site);
+	IBundle loadBundle(File bundleXml);
+	void generatePagesXml(IBundle bundle, File outputDirectory);
+	void generateSite(IBundle bundle, File tmpDirectory, File outputDirectory);
 }

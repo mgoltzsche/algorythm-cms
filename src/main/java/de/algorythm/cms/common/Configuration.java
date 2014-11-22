@@ -8,8 +8,6 @@ import java.util.Properties;
 
 import javax.inject.Singleton;
 
-import de.algorythm.cms.common.util.FilePathUtil;
-
 @Singleton
 public class Configuration {
 
@@ -23,8 +21,8 @@ public class Configuration {
 		return stream;
 	}
 	
-	public final File repository;
 	public final Locale defaultLanguage;
+	public final File outputDirectory;
 	
 	public Configuration() {
 		this(getPropertiesStream());
@@ -39,20 +37,16 @@ public class Configuration {
 			throw new RuntimeException("Cannot read properties", e);
 		}
 		
-		final String repositoryStr = properties.getProperty("repository");
 		final String defaultLangStr = properties.getProperty("defaultLanguage");
+		final String outputDirectoryStr = properties.getProperty("output.directory");
 		
-		repository = new File(repositoryStr == null
-				? System.getProperty("user.home") + File.separator + "algorythm-cms"
-				: FilePathUtil.toSystemSpecificPath(repositoryStr));
+		if (outputDirectoryStr == null)
+			throw new IllegalStateException("outputDirectory property is not configured");
 		
-		if (repository.exists()) {
-			if (!repository.isDirectory())
-				throw new IllegalStateException("Given repository "
-						+ repository.getAbsolutePath() + " is not a directory");
-		} else {
-			repository.mkdirs();
-		}
+		outputDirectory = new File(outputDirectoryStr);
+		
+		if (outputDirectory.isFile())
+			throw new IllegalStateException("outputDirectory " + outputDirectory + " is an existing file");
 		
 		defaultLanguage = defaultLangStr == null
 				? Locale.ENGLISH

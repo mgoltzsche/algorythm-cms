@@ -26,7 +26,7 @@ public class XmlReaderFactory implements IXmlReaderFactory {
 	
 	public XmlReaderFactory() {
 		try {
-			final String staticSchemaDir = "/de/algorythm/cms/common/";
+			final String staticSchemaDir = "/de/algorythm/cms/common/types/";
 			final Schema schema = createSchema(/*staticSchemaDir + "xhtml1-strict.xsd", staticSchemaDir + "Page.xsd", staticSchemaDir + "Site.xsd", */staticSchemaDir + "CMS.xsd", staticSchemaDir + "Article.xsd");
 			//parserFactory.setValidating(true); REQUIRED FOR DTD VALIDATION ONLY
 			parserFactory.setNamespaceAware(true);
