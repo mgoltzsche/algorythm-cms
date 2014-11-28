@@ -1,8 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline;
 
-public interface IRenderingContext {
+public interface IRenderingContext extends IBundleRenderingContext {
 
-	void addJob(Runnable job);
-	String getProperty(String name);
-	void setProperty(String name, String value);
+	void execute(IRenderingJob job);
 }

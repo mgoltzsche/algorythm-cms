@@ -6,6 +6,8 @@
 		context-path="/site1">
 	<param id="testparam" value="asdf" />
 	<output id="html">
-		<task type="de.algorythm.cms.common.rendering.pipeline.impl.XsltRenderer" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.XsltRenderer" phase="GENERATE">
+			<param id="createChildren" value="2" />
+		</job>
 	</output>
 </site>

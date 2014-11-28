@@ -1,6 +1,8 @@
 package de.algorythm.cms.common.model.entity;
 
-public interface IRenderingPipelineTaskConfiguration {
+import java.util.List;
+
+public interface IRenderingJobConfiguration {
 
 	static public enum PipelinePhase {
 		GENERATE,
@@ -8,7 +10,9 @@ public interface IRenderingPipelineTaskConfiguration {
 		EXPORT;
 	}
 	
-	Class<?> getTaskType();
+	Class<?> getJobType();
 	PipelinePhase getPhase();
+	List<IParam> getParams();
 	boolean isEnabled();
+	IRenderingJobConfiguration copy();
 }

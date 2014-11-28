@@ -59,7 +59,7 @@ public class CmsCommonMain {
 	
 	public void generate(final File bundleXml, final File outputDirectory) throws IOException {
 		final IBundle bundle = facade.loadBundle(bundleXml);
-		final String tmpDirName = "algorythm-cms-" + new Date().getTime();
+		/*final String tmpDirName = "algorythm-cms-" + new Date().getTime();
 		final File tmpDirectory = new File(System.getProperty("java.io.tmpdir", null), tmpDirName);
 		
 		if (!tmpDirectory.mkdir())
@@ -69,9 +69,10 @@ public class CmsCommonMain {
 			FileUtils.deleteDirectory(outputDirectory);
 		
 		if (!outputDirectory.mkdirs())
-			throw new IOException("Cannot create output directory " + outputDirectory);
+			throw new IOException("Cannot create output directory " + outputDirectory);*/
 		
-		facade.generatePagesXml(bundle, tmpDirectory);
-		facade.generateSite(bundle, tmpDirectory, outputDirectory);
+		//facade.generatePagesXml(bundle, tmpDirectory);
+		//facade.generateSite(bundle, tmpDirectory, outputDirectory);
+		facade.render(bundle, outputDirectory);
 	}
 }

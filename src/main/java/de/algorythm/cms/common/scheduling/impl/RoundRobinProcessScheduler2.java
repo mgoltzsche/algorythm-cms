@@ -5,14 +5,18 @@ import java.util.LinkedList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.algorythm.cms.common.scheduling.IProcess;
 import de.algorythm.cms.common.scheduling.IProcessObserver;
+import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.BlockingRingBuffer.INode;
 
-public class RoundRobinProcessScheduler2 {
+@Singleton
+public class RoundRobinProcessScheduler2 implements IProcessScheduler {
 
 	static private final Logger log = LoggerFactory.getLogger(RoundRobinProcessScheduler2.class);
 	
@@ -89,7 +93,8 @@ public class RoundRobinProcessScheduler2 {
 		}
 	}
 	
-	public void addProcess(final IProcess process) {
+	@Override
+	public void execute(final IProcess process) {
 		processes.add(process);
 	}
 	

@@ -14,8 +14,12 @@ import de.algorythm.cms.common.model.loader.impl.BundleLoader;
 import de.algorythm.cms.common.renderer.IContentRenderer;
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 import de.algorythm.cms.common.renderer.impl.xml.XmlContentRenderer;
+import de.algorythm.cms.common.rendering.pipeline.IRenderer;
+import de.algorythm.cms.common.rendering.pipeline.impl.Renderer;
 import de.algorythm.cms.common.resources.IDependencyLoader;
 import de.algorythm.cms.common.resources.impl.ClasspathDependencyLoader;
+import de.algorythm.cms.common.scheduling.IProcessScheduler;
+import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler2;
 
 public class CmsCommonModule extends AbstractModule {
 
@@ -24,7 +28,9 @@ public class CmsCommonModule extends AbstractModule {
 		try {
 			bindICmsCommonFacade(bind(ICmsCommonFacade.class));
 			bindConfiguration(bind(Configuration.class));
+			bindIProcessScheduler(bind(IProcessScheduler.class));
 			bindIBundleLoader(bind(IBundleLoader.class));
+			bindIRenderer(bind(IRenderer.class));
 			bindIDependencyLoader(bind(IDependencyLoader.class));
 			bindIXmlReaderFactory(bind(IXmlReaderFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
@@ -42,8 +48,16 @@ public class CmsCommonModule extends AbstractModule {
 		bind.toInstance(new Configuration());
 	}
 	
+	protected void bindIProcessScheduler(AnnotatedBindingBuilder<IProcessScheduler> bind) {
+		bind.to(RoundRobinProcessScheduler2.class);
+	}
+	
 	protected void bindIBundleLoader(AnnotatedBindingBuilder<IBundleLoader> bind) {
 		bind.to(BundleLoader.class);
+	}
+	
+	protected void bindIRenderer(AnnotatedBindingBuilder<IRenderer> bind) {
+		bind.to(Renderer.class);
 	}
 	
 	protected void bindIDependencyLoader(AnnotatedBindingBuilder<IDependencyLoader> bind) {

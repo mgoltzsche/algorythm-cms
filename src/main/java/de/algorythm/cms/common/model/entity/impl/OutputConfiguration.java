@@ -7,9 +7,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.algorythm.cms.common.model.entity.IMainResourceConfiguration;
 import de.algorythm.cms.common.model.entity.IOutputConfiguration;
-import de.algorythm.cms.common.model.entity.IRenderingPipelineTaskConfiguration;
+import de.algorythm.cms.common.model.entity.IRenderingJobConfiguration;
 
 @XmlRootElement(name="output", namespace="http://cms.algorythm.de/common/Site")
 public class OutputConfiguration extends AbstractMergeable implements IOutputConfiguration {
@@ -18,10 +17,8 @@ public class OutputConfiguration extends AbstractMergeable implements IOutputCon
 	private String id;
 	@XmlAttribute
 	private boolean enabled = true;
-	@XmlElementRef(type = MainResourceConfiguration.class)
-	private Set<IMainResourceConfiguration> resources = new LinkedHashSet<IMainResourceConfiguration>();
-	@XmlElementRef(type = RenderingPipelineTaskConfiguration.class)
-	private Set<IRenderingPipelineTaskConfiguration> tasks = new LinkedHashSet<IRenderingPipelineTaskConfiguration>();
+	@XmlElementRef(type = RenderingJobConfiguration.class)
+	private Set<IRenderingJobConfiguration> jobs = new LinkedHashSet<IRenderingJobConfiguration>();
 
 	@Override
 	public String getId() {
@@ -42,31 +39,25 @@ public class OutputConfiguration extends AbstractMergeable implements IOutputCon
 	}
 
 	@Override
-	public Set<IMainResourceConfiguration> getResources() {
-		return resources;
-	}
-	
-	public void setResources(Set<IMainResourceConfiguration> resources) {
-		this.resources = resources;
+	public Set<IRenderingJobConfiguration> getJobs() {
+		return jobs;
 	}
 
-	@Override
-	public Set<IRenderingPipelineTaskConfiguration> getTasks() {
-		return tasks;
-	}
-
-	public void setTasks(Set<IRenderingPipelineTaskConfiguration> tasks) {
-		this.tasks = tasks;
+	public void setJobs(Set<IRenderingJobConfiguration> jobs) {
+		this.jobs = jobs;
 	}
 
 	@Override
 	public IOutputConfiguration copy() {
 		final OutputConfiguration r = new OutputConfiguration();
+		final Set<IRenderingJobConfiguration> jobs = new LinkedHashSet<IRenderingJobConfiguration>();
+		
+		for (IRenderingJobConfiguration job : this.jobs)
+			jobs.add(job.copy());
 		
 		r.setId(id);
 		r.setEnabled(enabled);
-		r.setResources(new LinkedHashSet<IMainResourceConfiguration>(resources));
-		r.setTasks(new LinkedHashSet<IRenderingPipelineTaskConfiguration>(tasks));
+		r.setJobs(jobs);
 		
 		return r;
 	}

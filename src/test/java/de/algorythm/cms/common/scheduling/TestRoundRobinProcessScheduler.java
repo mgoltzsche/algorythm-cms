@@ -33,7 +33,7 @@ public class TestRoundRobinProcessScheduler {
 		
 		for (int i = 0; i < processMocks.length; i++) {
 			processMocks[i] = new ProcessMock();
-			testee.addProcess(processMocks[i]);
+			testee.execute(processMocks[i]);
 		}
 		
 		Thread.sleep(100);

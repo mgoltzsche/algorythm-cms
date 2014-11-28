@@ -6,4 +6,9 @@
 		context-path="/site1">
 	<param id="testparam" value="overwritten" />
 	<dependency name="common.cms.algorythm.de" />
+	<output id="html">
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.XsltRenderer" phase="GENERATE">
+			<param id="createChildren" value="3" />
+		</job>
+	</output>
 </site>

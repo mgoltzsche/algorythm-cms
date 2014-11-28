@@ -25,10 +25,8 @@ import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
-import de.algorythm.cms.common.model.entity.impl.ProxyFactory;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
-import de.algorythm.cms.common.resources.IProxyResolver;
 
 @Singleton
 public class BundleLoader implements IBundleLoader {

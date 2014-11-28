@@ -1,12 +1,10 @@
-package de.algorythm.cms.common.model.entity.impl;
+package de.algorythm.cms.common.model.loader.impl;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import de.algorythm.cms.common.resources.IProxyResolver;
 
 public class ProxyFactory {
 

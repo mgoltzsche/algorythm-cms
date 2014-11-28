@@ -6,7 +6,6 @@ public interface IOutputConfiguration {
 
 	String getId();
 	boolean isEnabled();
-	Set<IMainResourceConfiguration> getResources();
-	Set<IRenderingPipelineTaskConfiguration> getTasks();
+	Set<IRenderingJobConfiguration> getJobs();
 	IOutputConfiguration copy();
 }

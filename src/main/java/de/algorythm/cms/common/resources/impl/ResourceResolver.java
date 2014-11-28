@@ -18,6 +18,7 @@ import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfiguration;
 import de.algorythm.cms.common.model.entity.IParam;
+import de.algorythm.cms.common.model.entity.IRenderingJobConfiguration;
 import de.algorythm.cms.common.resources.IDependencyLoader;
 import de.algorythm.cms.common.resources.IResourceResolver;
 
@@ -37,7 +38,7 @@ public class ResourceResolver implements IResourceResolver {
 		
 		flattenedBundles.add(bundle);
 		
-		final IBundle mergeTarget = bundle.copy();
+		mergedBundle = bundle.copy();
 		
 		do {
 			final Iterator<IBundle> iter = flattenedBundles.iterator();
@@ -45,7 +46,7 @@ public class ResourceResolver implements IResourceResolver {
 			iter.remove();
 			
 			rootPathSet.add(nextBundle.getLocation());
-			mergeBundle(nextBundle, mergeTarget);
+			mergeBundle(nextBundle, mergedBundle);
 			
 			for (IDependency bundleRef : nextBundle.getDependencies()) {
 				final String bName = bundleRef.getName();
@@ -61,7 +62,6 @@ public class ResourceResolver implements IResourceResolver {
 		} while (!flattenedBundles.isEmpty());
 		
 		rootPathes = Collections.unmodifiableCollection(rootPathSet);
-		mergedBundle = mergeTarget;
 	}
 	
 	public IBundle getMergedBundle() {
@@ -73,16 +73,32 @@ public class ResourceResolver implements IResourceResolver {
 		
 		for (IOutputConfiguration output : source.getOutput()) {
 			if (target.containsOutput(output)) { // Merge output cfg
-				final IOutputConfiguration existingOutput = target.getOutput(output.getId());
+				final IOutputConfiguration mergedOutput = target.getOutput(output.getId());
 				
-				existingOutput.getResources().addAll(output.getResources());
-				existingOutput.getTasks().addAll(output.getTasks());
+				mergeJobs(mergedOutput.getJobs(), output.getJobs());
 			} else { // Add new output cfg
 				target.addOutput(output.copy());
 			}
 		}
 		
 		mergedProperties.addAll(source.getParams());
+	}
+	
+	private void mergeJobs(final Set<IRenderingJobConfiguration> mergedJobs, final Set<IRenderingJobConfiguration> jobs) {
+		for (IRenderingJobConfiguration job : jobs) {
+			if (!mergedJobs.add(job)) {
+				IRenderingJobConfiguration mergeJob = null;
+				
+				for (IRenderingJobConfiguration mergedJob : mergedJobs) {
+					if (mergedJob.equals(job)) {
+						mergeJob = mergedJob;
+						break;
+					}
+				}
+				
+				mergeJob.getParams().addAll(job.getParams());
+			}
+		}
 	}
 	
 	@Override
