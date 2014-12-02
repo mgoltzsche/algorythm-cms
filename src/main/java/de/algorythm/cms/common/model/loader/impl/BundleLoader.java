@@ -12,13 +12,13 @@ import javax.inject.Singleton;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import de.algorythm.cms.common.Configuration;
 import de.algorythm.cms.common.impl.xml.InformationCompleteException;
 import de.algorythm.cms.common.impl.xml.contentHandler.PageInfoHandler;
 import de.algorythm.cms.common.model.entity.IBundle;
@@ -26,40 +26,17 @@ import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
-import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 
 @Singleton
 public class BundleLoader implements IBundleLoader {
-
-	private final IProxyResolver<Bundle, IPage> startPageProxyResolver = new IProxyResolver<Bundle, IPage>() {
-		@Override
-		public IPage resolveProxy(final Bundle context) {
-			final IPage startPage;
-			
-			try {
-				final XMLReader reader = saxReaderFactory.createReader();
-				final PageInfoHandler pageInfoHandler = new PageInfoHandler();
-				final URI rootUri = URI.create(context.getLocation() + "/pages");
-				
-				reader.setContentHandler(pageInfoHandler);
-				startPage = loadPages(rootUri, "", context.getName(), reader, pageInfoHandler);
-			} catch(Exception e) {
-				throw new RuntimeException("Cannot load start page of " + context.getName(), e);
-			}
-			
-			context.setStartPage(startPage);
-			
-			return startPage;
-		}
-	};
 	
-	private final IXmlReaderFactory saxReaderFactory;
+	private final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 	private final JAXBContext jaxbContext;
 	
 	@Inject
-	public BundleLoader(final Configuration cfg, final IXmlReaderFactory readerFactory) throws JAXBException {
-		this.saxReaderFactory = readerFactory;
-		this.jaxbContext = JAXBContext.newInstance(Bundle.class);
+	public BundleLoader(final JAXBContext jaxbContext) throws JAXBException {
+		this.jaxbContext = jaxbContext;
+		parserFactory.setNamespaceAware(true);
 	}
 	
 	@Override
@@ -70,7 +47,7 @@ public class BundleLoader implements IBundleLoader {
 		if (!bundleFile.isFile())
 			throw new IllegalArgumentException(bundleFile + " is a directory");
 		
-		final Bundle bundle = readSiteConfig(bundleFile);
+		final Bundle bundle = readBundle(bundleFile);
 		
 		bundle.setLocation(bundleFile.getParentFile().toURI());
 		
@@ -83,16 +60,32 @@ public class BundleLoader implements IBundleLoader {
 		if (bundle.getContextPath() == null)
 			bundle.setContextPath("");
 		
-		bundle.setStartPage(new ProxyFactory().createProxy(startPageProxyResolver, bundle, IPage.class));
-		
 		return bundle;
 	}
 	
-	private Bundle readSiteConfig(final File siteCfgFile) throws JAXBException {
+	private Bundle readBundle(final File siteCfgFile) throws JAXBException {
 		final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 		final Source source = new StreamSource(siteCfgFile.getAbsolutePath());
 		
 		return unmarshaller.unmarshal(source, Bundle.class).getValue();
+	}
+	
+	@Override
+	public IPage loadPages(final IBundle bundle) {
+		final IPage startPage;
+		
+		try {
+			final XMLReader reader = parserFactory.newSAXParser().getXMLReader();
+			final PageInfoHandler pageInfoHandler = new PageInfoHandler();
+			final URI rootUri = URI.create(bundle.getLocation() + "/pages");
+			
+			reader.setContentHandler(pageInfoHandler);
+			startPage = loadPages(rootUri, "", bundle.getName(), reader, pageInfoHandler);
+		} catch(Exception e) {
+			throw new RuntimeException("Cannot load start page of " + bundle.getName(), e);
+		}
+		
+		return startPage;
 	}
 	
 	private IPage loadPages(final URI rootUri, final String path, final String name, final XMLReader reader, final PageInfoHandler handler) throws IOException, SAXException {

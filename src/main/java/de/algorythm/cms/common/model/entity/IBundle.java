@@ -14,11 +14,10 @@ public interface IBundle extends Comparable<IBundle> {
 	Locale getDefaultLocale();
 	String getDefaultTemplate();
 	Set<IParam> getParams();
-	IPage getStartPage();
 	Set<IDependency> getDependencies();
-	Set<IOutputConfiguration> getOutput();
-	IOutputConfiguration getOutput(String id);
-	boolean containsOutput(IOutputConfiguration cfg);
-	boolean addOutput(IOutputConfiguration cfg);
+	Set<IOutputConfig> getOutput();
+	IOutputConfig getOutput(String id);
+	boolean containsOutput(IOutputConfig cfg);
+	boolean addOutput(IOutputConfig cfg);
 	IBundle copy();
 }

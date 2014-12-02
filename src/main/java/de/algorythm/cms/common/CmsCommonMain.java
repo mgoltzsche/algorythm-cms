@@ -2,11 +2,9 @@ package de.algorythm.cms.common;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +55,7 @@ public class CmsCommonMain {
 		Guice.createInjector(module).injectMembers(this);
 	}
 	
-	public void generate(final File bundleXml, final File outputDirectory) throws IOException {
+	public void generate(final File bundleXml, final File outputDirectory) throws IOException, InterruptedException {
 		final IBundle bundle = facade.loadBundle(bundleXml);
 		/*final String tmpDirName = "algorythm-cms-" + new Date().getTime();
 		final File tmpDirectory = new File(System.getProperty("java.io.tmpdir", null), tmpDirName);
@@ -73,6 +71,6 @@ public class CmsCommonMain {
 		
 		//facade.generatePagesXml(bundle, tmpDirectory);
 		//facade.generateSite(bundle, tmpDirectory, outputDirectory);
-		facade.render(bundle, outputDirectory);
+		facade.render(bundle, outputDirectory).sync();
 	}
 }

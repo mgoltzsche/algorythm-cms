@@ -38,7 +38,7 @@ import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.renderer.IContentRenderer;
-import de.algorythm.cms.common.renderer.RendererException;
+import de.algorythm.cms.common.renderer.RenderingException;
 import de.algorythm.cms.common.resources.IResourceResolver;
 import de.algorythm.cms.common.resources.impl.CmsInputURIResolver;
 import de.algorythm.cms.common.resources.impl.CmsOutputURIResolver;
@@ -61,41 +61,41 @@ public class XmlContentRenderer implements IContentRenderer {
 	}
 
 	@Override
-	public void render(final IBundle bundle, final IResourceResolver uriResolver, final File outputDirectory)
-			throws RendererException {
+	public void render(final IBundle bundle, final IPage startPage, final IResourceResolver uriResolver, final File outputDirectory)
+			throws RenderingException {
 		final String timestamp = String.valueOf(new Date().getTime());
 		System.out.println(bundle.getName() + "  " + timestamp);
 		File resOutputDirectory = new File(outputDirectory, "r");
 		resOutputDirectory = new File(resOutputDirectory, timestamp);
 
 		compileResources(bundle, resOutputDirectory);
-		render(bundle, bundle.getStartPage(), uriResolver, outputDirectory, timestamp);
+		render(bundle, startPage, uriResolver, outputDirectory, timestamp);
 	}
 
 	private void compileResources(final IBundle bundle, final File outputDirectory)
-			throws RendererException {
+			throws RenderingException {
 		final File siteDirectory = new File(bundle.getLocation());
 		final File cssDirectory = new File(siteDirectory, "css");
 		final File cssOutputDirectory = new File(outputDirectory, "css");
 
 		if (!siteDirectory.exists())
-			throw new RendererException("Site directory " + siteDirectory + " does not exist");
+			throw new RenderingException("Site directory " + siteDirectory + " does not exist");
 
 		if (cssDirectory.exists()) {
 			if (!cssDirectory.isDirectory())
-				throw new RendererException(cssDirectory + " is not a directory");
+				throw new RenderingException(cssDirectory + " is not a directory");
 
 			try {
 				compileSCSS(cssDirectory, cssOutputDirectory);
 			} catch (Exception e) {
-				throw new RendererException("Cannot compile SCSS", e);
+				throw new RenderingException("Cannot compile SCSS", e);
 			}
 		}
 		
 		try {
 			copyResources(bundle, outputDirectory);
 		} catch(IOException e) {
-			throw new RendererException("Cannot copy resources", e);
+			throw new RenderingException("Cannot copy resources", e);
 		}
 	}
 
@@ -147,13 +147,27 @@ public class XmlContentRenderer implements IContentRenderer {
 		}
 	}
 
-	private void render(final IBundle bundle, final IPage page, final IResourceResolver uriResolver,
+	public void renderPage(final IBundle bundle, final IPage page, final IResourceResolver uriResolver,
 			final File outputDirectory,
-			final String currentResourceDirectoryName) throws RendererException {
+			final String currentResourceDirectoryName) throws RenderingException {
 		outputDirectory.mkdirs();
 		
 		final File siteDirectory = new File(bundle.getLocation());
 		final File pageFile = new File(siteDirectory + File.separator
+				+ "pages" + page.getPath().replace('/', File.separatorChar)
+				+ File.separator + "page.xml");
+		
+		// Render page
+		render(pageFile, bundle, page, uriResolver, outputDirectory, currentResourceDirectoryName);
+	}
+	
+	private void render(final IBundle bundle, final IPage page, final IResourceResolver uriResolver,
+			final File outputDirectory,
+			final String currentResourceDirectoryName) throws RenderingException {
+		outputDirectory.mkdirs();
+		
+		final File directory = new File(bundle.getLocation());
+		final File pageFile = new File(directory + File.separator
 				+ "pages" + page.getPath().replace('/', File.separatorChar)
 				+ File.separator + "page.xml");
 		
@@ -166,8 +180,8 @@ public class XmlContentRenderer implements IContentRenderer {
 	}
 
 	private void render(final File contentFile, final IBundle bundle, final IPage page, final IResourceResolver uriResolver,
-			final File outputDirectory,	final String currentResourceDirectoryName) throws RendererException {
-		final String siteName = bundle.getName();
+			final File outputDirectory,	final String currentResourceDirectoryName) throws RenderingException {
+		final String name = bundle.getName();
 		final String pagePath = page.getPath();
 		final String relativeBaseUrl = relativeBaseUrl(pagePath);
 		final URI outputDirectoryUri = outputDirectory.toURI();
@@ -185,7 +199,7 @@ public class XmlContentRenderer implements IContentRenderer {
 			transformer.setURIResolver(contentUriResolver);
 			transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
 			transformer.setParameter(RESOURCE_DIRECTORY, relativeBaseUrl + "/r/" + currentResourceDirectoryName);
-			transformer.setParameter(SITE_NAME, siteName);
+			transformer.setParameter(SITE_NAME, name);
 			transformer.setParameter(PAGE_PATH, pagePath);
 			transformer.setParameter(PAGE_TITLE, page.getTitle());
 			
@@ -197,9 +211,9 @@ public class XmlContentRenderer implements IContentRenderer {
 			
 			transformer.transform(new SAXSource(reader, source), result);
 		} catch (TransformerConfigurationException e) {
-			throw new RendererException("Invalid transformer configuration", e);
+			throw new RenderingException("Invalid transformer configuration", e);
 		} catch (Exception e) {
-			throw new RendererException("Cannot render " + contentFile + ". " + e.getMessage(), e);
+			throw new RenderingException("Cannot render " + contentFile + ". " + e.getMessage(), e);
 		}
 	}
 

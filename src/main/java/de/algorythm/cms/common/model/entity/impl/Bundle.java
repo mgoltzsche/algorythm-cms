@@ -16,11 +16,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import de.algorythm.cms.common.impl.jaxb.adapter.LocaleXmlAdapter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
-import de.algorythm.cms.common.model.entity.IOutputConfiguration;
-import de.algorythm.cms.common.model.entity.IPage;
+import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 
-@XmlRootElement(name="site", namespace="http://cms.algorythm.de/common/Site")
+@XmlRootElement(name="bundle", namespace="http://cms.algorythm.de/common/Bundle")
 public class Bundle implements IBundle {
 
 	@XmlAttribute(required = true)
@@ -39,15 +38,13 @@ public class Bundle implements IBundle {
 	@XmlAttribute(name = "context-path")
 	private String contextPath;
 	@XmlElementRef(type = Param.class)
-	private Set<IParam> params = new LinkedHashSet<IParam>();
-	@XmlTransient
-	private IPage startPage;
+	private final Set<IParam> params = new LinkedHashSet<IParam>();
 	@XmlElementRef(type = Dependency.class)
-	private Set<IDependency> dependencies = new LinkedHashSet<IDependency>();
-	@XmlElementRef(type = OutputConfiguration.class)
-	private Set<IOutputConfiguration> outputConfiguration = new LinkedHashSet<IOutputConfiguration>();
+	private final Set<IDependency> dependencies = new LinkedHashSet<IDependency>();
+	@XmlElementRef(type = OutputConfig.class)
+	private final Set<IOutputConfig> output = new LinkedHashSet<IOutputConfig>();
 	@XmlTransient
-	private Map<String, IOutputConfiguration> outputConfigurationMap;
+	private Map<String, IOutputConfig> outputMap;
 	
 	@Override
 	public String getName() {
@@ -116,46 +113,24 @@ public class Bundle implements IBundle {
 		return params;
 	}
 
-	public void setParams(Set<IParam> params) {
-		this.params = params;
-	}
-
-	@Override
-	public IPage getStartPage() {
-		return startPage;
-	}
-
-	public void setStartPage(IPage startPage) {
-		this.startPage = startPage;
-	}
-
 	@Override
 	public Set<IDependency> getDependencies() {
 		return dependencies;
 	}
 
-	public void setDependencies(Set<IDependency> dependencies) {
-		this.dependencies = dependencies;
+	@Override
+	public Set<IOutputConfig> getOutput() {
+		return output;
 	}
 
 	@Override
-	public Set<IOutputConfiguration> getOutput() {
-		return outputConfiguration;
-	}
-
-	public void setOutputConfiguration(
-			Set<IOutputConfiguration> outputConfiguration) {
-		this.outputConfiguration = outputConfiguration;
-	}
-
-	@Override
-	public boolean containsOutput(final IOutputConfiguration cfg) {
-		return outputConfiguration.contains(cfg);
+	public boolean containsOutput(final IOutputConfig cfg) {
+		return output.contains(cfg);
 	}
 	
 	@Override
-	public boolean addOutput(final IOutputConfiguration cfg) {
-		final boolean r = outputConfiguration.add(cfg);
+	public boolean addOutput(final IOutputConfig cfg) {
+		final boolean r = output.add(cfg);
 		
 		getOutputMap().put(cfg.getId(), cfg);
 		
@@ -163,19 +138,19 @@ public class Bundle implements IBundle {
 	}
 	
 	@Override
-	public IOutputConfiguration getOutput(final String id) {
+	public IOutputConfig getOutput(final String id) {
 		return getOutputMap().get(id);
 	}
 
-	private Map<String, IOutputConfiguration> getOutputMap() {
-		if (outputConfigurationMap == null) {
-			outputConfigurationMap = new HashMap<String, IOutputConfiguration>();
+	private Map<String, IOutputConfig> getOutputMap() {
+		if (outputMap == null) {
+			outputMap = new HashMap<String, IOutputConfig>();
 			
-			for (IOutputConfiguration cfg : outputConfiguration)
-				outputConfigurationMap.put(cfg.getId(), cfg);
+			for (IOutputConfig cfg : output)
+				outputMap.put(cfg.getId(), cfg);
 		}
 		
-		return outputConfigurationMap;
+		return outputMap;
 	}
 
 	@Override
@@ -189,11 +164,11 @@ public class Bundle implements IBundle {
 		r.setDefaultLocale(defaultLocale);
 		r.setDefaultTemplate(defaultTemplate);
 		r.setContextPath(contextPath);
-		r.setStartPage(startPage);
-		r.setDependencies(new LinkedHashSet<IDependency>(dependencies));
+		r.dependencies.addAll(dependencies);
+		r.params.addAll(params);
 		
-		for (IOutputConfiguration output : outputConfiguration)
-			r.getOutput().add(output.copy());
+		for (IOutputConfig output : output)
+			r.output.add(output.copy());
 		
 		return r;
 	}

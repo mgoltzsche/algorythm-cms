@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import de.algorythm.cms.common.model.entity.IDependency;
 
-@XmlRootElement(name="dependency", namespace="http://cms.algorythm.de/common/Site")
+@XmlRootElement(name="dependency", namespace="http://cms.algorythm.de/common/Bundle")
 public class Dependency implements IDependency {
 
 	@XmlAttribute(name = "name", required = true)

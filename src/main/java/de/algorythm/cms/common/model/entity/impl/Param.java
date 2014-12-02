@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import de.algorythm.cms.common.model.entity.IParam;
 
-@XmlRootElement(name="param", namespace="http://cms.algorythm.de/common/Site")
+@XmlRootElement(name="param", namespace="http://cms.algorythm.de/common/Bundle")
 public class Param extends AbstractMergeable implements IParam {
 
 	@XmlAttribute(required = true)
@@ -34,5 +34,10 @@ public class Param extends AbstractMergeable implements IParam {
 	@Override
 	protected String getMergeableId() {
 		return id;
+	}
+
+	@Override
+	public String toString() {
+		return "Param [" + id + " => " + value + ']';
 	}
 }

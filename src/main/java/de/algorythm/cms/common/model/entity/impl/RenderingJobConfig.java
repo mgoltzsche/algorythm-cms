@@ -1,26 +1,25 @@
 package de.algorythm.cms.common.model.entity.impl;
 
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import de.algorythm.cms.common.model.entity.IParam;
-import de.algorythm.cms.common.model.entity.IRenderingJobConfiguration;
+import de.algorythm.cms.common.model.entity.IRenderingJobConfig;
 
-@XmlRootElement(name="job", namespace="http://cms.algorythm.de/common/Site")
-public class RenderingJobConfiguration extends AbstractMergeable implements IRenderingJobConfiguration {
+@XmlRootElement(name="job", namespace="http://cms.algorythm.de/common/Bundle")
+public class RenderingJobConfig extends AbstractMergeable implements IRenderingJobConfig {
 
 	@XmlAttribute(name = "type", required = true)
 	private Class<?> jobType;
 	@XmlAttribute(required = true)
-	private PipelinePhase phase;
+	private RenderingPhase phase;
 	@XmlAttribute
 	private boolean enabled = true;
 	@XmlElementRef(type = Param.class)
-	private List<IParam> params = new LinkedList<IParam>();
+	private LinkedList<IParam> params = new LinkedList<IParam>();
 
 	@Override
 	public Class<?> getJobType() {
@@ -32,11 +31,11 @@ public class RenderingJobConfiguration extends AbstractMergeable implements IRen
 	}
 
 	@Override
-	public PipelinePhase getPhase() {
+	public RenderingPhase getPhase() {
 		return phase;
 	}
 
-	public void setPhase(PipelinePhase phase) {
+	public void setPhase(RenderingPhase phase) {
 		this.phase = phase;
 	}
 
@@ -50,17 +49,17 @@ public class RenderingJobConfiguration extends AbstractMergeable implements IRen
 	}
 
 	@Override
-	public List<IParam> getParams() {
+	public LinkedList<IParam> getParams() {
 		return params;
 	}
 
-	public void setParams(List<IParam> params) {
+	public void setParams(LinkedList<IParam> params) {
 		this.params = params;
 	}
 
 	@Override
-	public IRenderingJobConfiguration copy() {
-		final RenderingJobConfiguration r = new RenderingJobConfiguration();
+	public IRenderingJobConfig copy() {
+		final RenderingJobConfig r = new RenderingJobConfig();
 		
 		r.setEnabled(enabled);
 		r.setPhase(phase);
@@ -77,7 +76,7 @@ public class RenderingJobConfiguration extends AbstractMergeable implements IRen
 
 	@Override
 	public String toString() {
-		return "RenderingPipelineTaskConfiguration [taskType=" + jobType
+		return "RenderingJobConfig [jobType=" + jobType
 				+ ", phase=" + phase + "]";
 	}
 }

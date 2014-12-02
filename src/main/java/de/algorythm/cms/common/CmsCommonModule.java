@@ -8,6 +8,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 
 import de.algorythm.cms.common.impl.CmsCommonFacade;
 import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
+import de.algorythm.cms.common.model.entity.impl.Bundle;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.model.loader.impl.BundleLoader;
@@ -70,7 +71,7 @@ public class CmsCommonModule extends AbstractModule {
 	
 	protected void bindJAXBContext(AnnotatedBindingBuilder<JAXBContext> bind) {
 		try {
-			bind.toInstance(JAXBContext.newInstance(PageInfo.class));
+			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageInfo.class));
 		} catch (JAXBException e) {
 			throw new RuntimeException("Cannot initialize JAXB context", e);
 		}

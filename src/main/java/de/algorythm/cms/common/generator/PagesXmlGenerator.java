@@ -9,7 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import de.algorythm.cms.common.Configuration;
-import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.IPage;
 
 @Singleton
 public class PagesXmlGenerator {
@@ -21,11 +21,10 @@ public class PagesXmlGenerator {
 		this.jaxbContext = jaxbContext;
 	}
 	
-	public void generatePagesXml(final IBundle bundle, final File outputDirectory) throws JAXBException {
+	public void generatePagesXml(final IPage startPage, final File outputDirectory) throws JAXBException {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
 		
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		bundle.getStartPage().getName(); // Resolves proxy
-		marshaller.marshal(bundle.getStartPage(), new File(outputDirectory, "pages.xml"));
+		marshaller.marshal(startPage, new File(outputDirectory, "pages.xml"));
 	}
 }

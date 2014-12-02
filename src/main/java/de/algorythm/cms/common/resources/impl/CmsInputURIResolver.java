@@ -13,11 +13,9 @@ import de.algorythm.cms.common.resources.IResourceResolver;
 public class CmsInputURIResolver implements URIResolver {
 
 	private final IResourceResolver uriResolver;
-	private final String scheme;
 	
 	public CmsInputURIResolver(final IResourceResolver uriResolver, final String scheme) {
 		this.uriResolver = uriResolver;
-		this.scheme = scheme;
 	}
 	
 	@Override

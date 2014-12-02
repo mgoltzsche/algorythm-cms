@@ -20,13 +20,11 @@
 					<xsl:value-of select="current()/@title" />
 				</title>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<link rel="stylesheet" href="{$resourceDirectory}/css/default-theme/main.css" />
+				<link rel="stylesheet" href="{$resourceDirectory}/main.css" />
 				<!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular.js"></script>
 				<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-route.js"></script>-->
 				<script type="text/javascript">var cms = {'baseUrl': '<xsl:value-of select="$relativeBaseUrl"></xsl:value-of>'};</script>
-				<script src="{$resourceDirectory}/scripts/angular.js"></script>
-				<script src="{$resourceDirectory}/scripts/angular-route.js"></script>
-				<script src="{$resourceDirectory}/scripts/cms.js"></script>
+				<script src="{$resourceDirectory}/main.js"></script>
 			</head>
 			<body>
 				<div id="container">

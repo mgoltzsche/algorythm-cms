@@ -71,7 +71,7 @@ public class PageInfoHandler extends DefaultHandler {
 		final String title = atts.getValue("title");
 		
 		pageInfo.setNavigationTitle(atts.getValue("nav-title"));
-		pageInfo.setInNavigation(atts.getValue("in-menu").equals("true"));
+		pageInfo.setInNavigation("true".equals(atts.getValue("in-menu")));
 		
 		if (title != null && !title.trim().isEmpty()) {
 			pageInfo.setTitle(title);

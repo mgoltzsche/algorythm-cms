@@ -5,22 +5,22 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 import java.util.Locale;
 
+import javax.xml.bind.JAXBContext;
+
 import org.junit.Test;
 
-import de.algorythm.cms.common.Configuration;
-import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
-import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
+import de.algorythm.cms.common.model.entity.impl.PageInfo;
 import de.algorythm.cms.common.model.loader.impl.BundleLoader;
 
 public class TestXmlResourceDao {
 
 	@Test
 	public void testXmlResourceDao() throws Exception {
-		Configuration cfg = new Configuration();
-		XmlReaderFactory readerFactory = new XmlReaderFactory();
-		BundleLoader testee = new BundleLoader(cfg, readerFactory);
+		JAXBContext jaxbContext = JAXBContext.newInstance(Bundle.class, PageInfo.class);
+		BundleLoader testee = new BundleLoader(jaxbContext);
 		File bundleXml = new File(getClass().getResource("/test-repo/example1.org/bundle.xml").toURI());
 		IBundle bundle = testee.getBundle(bundleXml);
 		IBundle expectedBundle = createSite("example.org", "My example site", Locale.ENGLISH, "/site1");
@@ -34,7 +34,7 @@ public class TestXmlResourceDao {
 			throw new AssertionError(expectedBundle.getName() + " - " + e.getMessage());
 		}
 		
-		printPage(bundle.getStartPage(), 0);
+		printPage(testee.loadPages(bundle), 0);
 	}
 	
 	private void printPage(IPage p, int depth) {

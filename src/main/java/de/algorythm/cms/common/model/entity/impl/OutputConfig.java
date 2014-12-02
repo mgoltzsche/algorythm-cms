@@ -7,18 +7,18 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.algorythm.cms.common.model.entity.IOutputConfiguration;
-import de.algorythm.cms.common.model.entity.IRenderingJobConfiguration;
+import de.algorythm.cms.common.model.entity.IOutputConfig;
+import de.algorythm.cms.common.model.entity.IRenderingJobConfig;
 
-@XmlRootElement(name="output", namespace="http://cms.algorythm.de/common/Site")
-public class OutputConfiguration extends AbstractMergeable implements IOutputConfiguration {
+@XmlRootElement(name="output", namespace="http://cms.algorythm.de/common/Bundle")
+public class OutputConfig extends AbstractMergeable implements IOutputConfig {
 
 	@XmlAttribute(required = true)
 	private String id;
 	@XmlAttribute
 	private boolean enabled = true;
-	@XmlElementRef(type = RenderingJobConfiguration.class)
-	private Set<IRenderingJobConfiguration> jobs = new LinkedHashSet<IRenderingJobConfiguration>();
+	@XmlElementRef(type = RenderingJobConfig.class)
+	private Set<IRenderingJobConfig> jobs = new LinkedHashSet<IRenderingJobConfig>();
 
 	@Override
 	public String getId() {
@@ -39,20 +39,20 @@ public class OutputConfiguration extends AbstractMergeable implements IOutputCon
 	}
 
 	@Override
-	public Set<IRenderingJobConfiguration> getJobs() {
+	public Set<IRenderingJobConfig> getJobs() {
 		return jobs;
 	}
 
-	public void setJobs(Set<IRenderingJobConfiguration> jobs) {
+	public void setJobs(Set<IRenderingJobConfig> jobs) {
 		this.jobs = jobs;
 	}
 
 	@Override
-	public IOutputConfiguration copy() {
-		final OutputConfiguration r = new OutputConfiguration();
-		final Set<IRenderingJobConfiguration> jobs = new LinkedHashSet<IRenderingJobConfiguration>();
+	public IOutputConfig copy() {
+		final OutputConfig r = new OutputConfig();
+		final Set<IRenderingJobConfig> jobs = new LinkedHashSet<IRenderingJobConfig>();
 		
-		for (IRenderingJobConfiguration job : this.jobs)
+		for (IRenderingJobConfig job : this.jobs)
 			jobs.add(job.copy());
 		
 		r.setId(id);
@@ -69,6 +69,6 @@ public class OutputConfiguration extends AbstractMergeable implements IOutputCon
 
 	@Override
 	public String toString() {
-		return "OutputConfiguration [id=" + id + "]";
+		return "OutputConfig [id=" + id + "]";
 	}
 }

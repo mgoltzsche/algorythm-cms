@@ -5,27 +5,24 @@ import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
-import de.algorythm.cms.common.model.entity.IOutputConfiguration;
+import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
-import de.algorythm.cms.common.model.entity.IRenderingJobConfiguration;
+import de.algorythm.cms.common.model.entity.IRenderingJobConfig;
 import de.algorythm.cms.common.resources.IDependencyLoader;
 import de.algorythm.cms.common.resources.IResourceResolver;
 
 public class ResourceResolver implements IResourceResolver {
 
-	static private final Logger log = LoggerFactory.getLogger(ResourceResolver.class);
-	
 	private final Collection<URI> rootPathes;
 	private final IBundle mergedBundle;
 	
@@ -34,34 +31,39 @@ public class ResourceResolver implements IResourceResolver {
 		rootPathSet.add(bundle.getLocation());
 		rootPathSet.add(tmpDirectory.toURI());
 		
-		final LinkedHashSet<IBundle> flattenedBundles = new LinkedHashSet<IBundle>();
-		
-		flattenedBundles.add(bundle);
+		final LinkedHashSet<IBundle> flattenedBundles = new LinkedHashSet<IBundle>(); // To perform breadth-first search
+		final Set<IBundle> includedBundles = new HashSet<IBundle>(); // To not include duplicates
 		
 		mergedBundle = bundle.copy();
 		
-		do {
+		for (IDependency bundleRef : bundle.getDependencies())
+			resolveDependency(bundle, bundleRef, flattenedBundles, includedBundles, dependencyLoader);
+		
+		while (!flattenedBundles.isEmpty()) {
 			final Iterator<IBundle> iter = flattenedBundles.iterator();
 			final IBundle nextBundle = iter.next();
-			iter.remove();
 			
+			iter.remove();
 			rootPathSet.add(nextBundle.getLocation());
 			mergeBundle(nextBundle, mergedBundle);
 			
-			for (IDependency bundleRef : nextBundle.getDependencies()) {
-				final String bName = bundleRef.getName();
-				
-				if (bName == null)
-					throw new IllegalStateException("Incomplete dependency in '" + bundle.getName() + '\'');
-				
-				final IBundle dependency = dependencyLoader.loadDependency(bName);
-				
-				if (!flattenedBundles.add(dependency))
-					throw new IllegalStateException("Cyclic reference between '" + nextBundle.getName() + "' and '" + bName + '\'');
-			}
-		} while (!flattenedBundles.isEmpty());
+			for (IDependency bundleRef : nextBundle.getDependencies())
+				resolveDependency(nextBundle, bundleRef, flattenedBundles, includedBundles, dependencyLoader);
+		}
 		
 		rootPathes = Collections.unmodifiableCollection(rootPathSet);
+	}
+	
+	private void resolveDependency(final IBundle bundle, final IDependency bundleRef, final Set<IBundle> flattenedBundles, final Set<IBundle> includedBundles, final IDependencyLoader dependencyLoader) {
+		final String bName = bundleRef.getName();
+		
+		if (bName == null)
+			throw new IllegalStateException("Incomplete dependency in '" + bundle.getName() + '\'');
+		
+		final IBundle dependency = dependencyLoader.loadDependency(bName);
+		
+		if (includedBundles.add(dependency) && !flattenedBundles.add(dependency))
+			throw new IllegalStateException("Cyclic reference between '" + bundle.getName() + "' and '" + bName + '\'');
 	}
 	
 	public IBundle getMergedBundle() {
@@ -69,36 +71,43 @@ public class ResourceResolver implements IResourceResolver {
 	}
 	
 	private void mergeBundle(final IBundle source, final IBundle target) {
-		final Set<IParam> mergedProperties = target.getParams();
+		target.getParams().addAll(source.getParams());
 		
-		for (IOutputConfiguration output : source.getOutput()) {
+		for (IOutputConfig output : source.getOutput()) {
 			if (target.containsOutput(output)) { // Merge output cfg
-				final IOutputConfiguration mergedOutput = target.getOutput(output.getId());
+				final IOutputConfig mergedOutput = target.getOutput(output.getId());
 				
 				mergeJobs(mergedOutput.getJobs(), output.getJobs());
 			} else { // Add new output cfg
 				target.addOutput(output.copy());
 			}
 		}
-		
-		mergedProperties.addAll(source.getParams());
 	}
 	
-	private void mergeJobs(final Set<IRenderingJobConfiguration> mergedJobs, final Set<IRenderingJobConfiguration> jobs) {
-		for (IRenderingJobConfiguration job : jobs) {
+	private void mergeJobs(final Set<IRenderingJobConfig> mergedJobs, final Set<IRenderingJobConfig> jobs) {
+		for (IRenderingJobConfig job : jobs) {
 			if (!mergedJobs.add(job)) {
-				IRenderingJobConfiguration mergeJob = null;
+				IRenderingJobConfig mergeJob = null;
 				
-				for (IRenderingJobConfiguration mergedJob : mergedJobs) {
+				for (IRenderingJobConfig mergedJob : mergedJobs) {
 					if (mergedJob.equals(job)) {
 						mergeJob = mergedJob;
 						break;
 					}
 				}
 				
-				mergeJob.getParams().addAll(job.getParams());
+				final LinkedList<IParam> mergeParams = mergeJob.getParams();
+				final Iterator<IParam> paramIter = job.getParams().descendingIterator();
+				
+				while (paramIter.hasNext())
+					mergeParams.addFirst(paramIter.next());
 			}
 		}
+	}
+	
+	@Override
+	public Collection<URI> getRootPathes() {
+		return rootPathes;
 	}
 	
 	@Override

@@ -4,10 +4,10 @@
 	elementFormDefault="qualified">
 	<include schemaLocation="Types.xsd" />
 	<include schemaLocation="Page.xsd" />
-	<include schemaLocation="Site.xsd" />
 	<include schemaLocation="Include.xsd" />
 	<include schemaLocation="FlowLayout.xsd" />
 	<include schemaLocation="Grid.xsd" />
 	<include schemaLocation="Navigation.xsd" />
-	<include schemaLocation="Pages.xsd" />
+	<import namespace="http://cms.algorythm.de/common/Pages" schemaLocation="Pages.xsd" />
+	<import namespace="http://cms.algorythm.de/common/Article" schemaLocation="Article.xsd" />
 </schema>

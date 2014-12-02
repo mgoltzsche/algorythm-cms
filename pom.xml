@@ -53,14 +53,19 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
-							<outputDirectory>${project.build.outputDirectory}/de/algorythm/common</outputDirectory>
+							<outputDirectory>${project.build.outputDirectory}/de/algorythm/cms/common/types/de.algorythm.cms.common</outputDirectory>
 							<transformSchemas>
+								<transformSchema>
+									<uri>http://cms.algorythm.de/common/Bundle</uri>
+									<toFile>Bundle.xsd</toFile>
+								</transformSchema>
 								<transformSchema>
 									<uri>http://cms.algorythm.de/common/Pages</uri>
 									<toFile>Pages.xsd</toFile>
 								</transformSchema>
 							</transformSchemas>
 							<includes>
+								<include>de/algorythm/cms/common/model/entity/impl/Bundle.java</include>
 								<include>de/algorythm/cms/common/model/entity/impl/PageInfo.java</include>
 							</includes>
 						</configuration>
@@ -130,7 +135,18 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-sass-compiler</artifactId>
-			<version>0.9.10</version>
+			<version>0.9.11</version>
+		</dependency>
+		<!-- wro4j -->
+		<dependency>
+			<groupId>ro.isdc.wro4j</groupId>
+			<artifactId>wro4j-core</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+		<dependency>
+			<groupId>ro.isdc.wro4j</groupId>
+			<artifactId>wro4j-extensions</artifactId>
+			<version>1.7.7</version>
 		</dependency>
 		<!-- JUnit -->
 		<dependency>

@@ -1,13 +1,32 @@
-<site xmlns="http://cms.algorythm.de/common/Site"
+<bundle xmlns="http://cms.algorythm.de/common/Bundle"
 		name="common.cms.algorythm.de"
 		title="My example site library"
 		default-locale="en"
 		default-template="http://cms.algorythm.de/common/theme/default-theme"
 		context-path="/site1">
-	<param id="testparam" value="asdf" />
+	<param id="testparam" value="paramvalue" />
 	<output id="html">
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.XsltRenderer" phase="GENERATE">
-			<param id="createChildren" value="2" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.XsltRenderer" phase="TRANSFORM">
+			<param id="theme" value="/templates/de.algorythm.cms.common/html/Theme.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/html/Article.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/html/Markup.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/html/Menu.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/html/SubNavigation.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/html/Grid.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
+			<param id="schemas" value="/types/de.algorythm.cms.common/CMS.xsd" />
+		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM">
+			<param id="sources" value="/css/default-theme/main.scss" />
+		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor" phase="TRANSFORM">
+			<param id="sources" value="/scripts/angular.js" />
+			<param id="sources" value="/scripts/angular-route.js" />
+			<param id="sources" value="/scripts/cms.js" />
 		</job>
 	</output>
-</site>
+	<output id="pdf">
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE" />
+	</output>
+</bundle>

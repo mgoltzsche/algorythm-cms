@@ -25,16 +25,16 @@ public class XmlReaderFactory implements IXmlReaderFactory {
 	private final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 	
 	public XmlReaderFactory() {
-		try {
+		/*try {
 			final String staticSchemaDir = "/de/algorythm/cms/common/types/";
-			final Schema schema = createSchema(/*staticSchemaDir + "xhtml1-strict.xsd", staticSchemaDir + "Page.xsd", staticSchemaDir + "Site.xsd", */staticSchemaDir + "CMS.xsd", staticSchemaDir + "Article.xsd");
+			final Schema schema = createSchema(staticSchemaDir + "CMS.xsd", staticSchemaDir + "Article.xsd");
 			//parserFactory.setValidating(true); REQUIRED FOR DTD VALIDATION ONLY
 			parserFactory.setNamespaceAware(true);
 			//parserFactory.setXIncludeAware(true);
 			parserFactory.setSchema(schema); // REQUIRED FOR VALIDATION ONLY
 		} catch(SAXException e) {
 			throw new IllegalStateException("Cannot load XML content renderer", e);
-		}
+		}*/
 	}
 	
 	@Override
