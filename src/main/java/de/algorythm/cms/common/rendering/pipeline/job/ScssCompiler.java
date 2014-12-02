@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +20,7 @@ import com.vaadin.sass.internal.resolver.ScssStylesheetResolver;
 
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.resources.IOutputUriResolver;
 
 public class ScssCompiler implements IRenderingJob {
 
@@ -48,25 +48,22 @@ public class ScssCompiler implements IRenderingJob {
 	}
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
-		final URI outputFileUri = ctx.getOutputUriResolver().resolveResourceUri(MAIN_CSS_URI);
+		final IOutputUriResolver outResolver = ctx.getOutputUriResolver();
+		final URI outputFileUri = outResolver.resolveResourceUri(MAIN_CSS_URI);
 		final File cssFile = new File(outputFileUri);
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
 		final ScssStylesheet stylesheet = docHandler.getStyleSheet();
+		final Parser parser = new Parser();
+		final InputSource source = new InputSource(new StringReader(scss));
 		
 		stylesheet.addResolver(createResolver(ctx));
-		
-		final Parser parser = new Parser();
 		parser.setErrorHandler(errorHandler);
 		parser.setDocumentHandler(docHandler);
-		
-		final InputSource source = new InputSource(new StringReader(scss));
 		parser.parseStyleSheet(source);
-		stylesheet.addSourceUris(Arrays.asList(new String[] {ctx.getBundle().getName()}));
 		stylesheet.setCharset(parser.getInputSource().getEncoding());
         stylesheet.setFile(new File(ctx.getBundle().getLocation()));
 		stylesheet.compile();
-		
 		FileUtils.writeStringToFile(cssFile, stylesheet.printState());
 	}
 	
