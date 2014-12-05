@@ -3,9 +3,11 @@ package de.algorythm.cms.common.model.loader.impl;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,8 +25,10 @@ import de.algorythm.cms.common.impl.xml.InformationCompleteException;
 import de.algorythm.cms.common.impl.xml.contentHandler.PageInfoHandler;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPage;
+import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
+import de.algorythm.cms.common.model.entity.impl.SupportedLocale;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
 
 @Singleton
@@ -60,6 +64,14 @@ public class BundleLoader implements IBundleLoader {
 		if (bundle.getContextPath() == null)
 			bundle.setContextPath("");
 		
+		final Set<ISupportedLocale> supportedLocales = bundle.getSupportedLocales();
+		final Set<ISupportedLocale> mergedSupportedLocales = new LinkedHashSet<ISupportedLocale>(supportedLocales.size() + 1);
+		
+		mergedSupportedLocales.add(new SupportedLocale(bundle.getDefaultLocale()));
+		mergedSupportedLocales.addAll(supportedLocales);
+		
+		bundle.setSupportedLocales(mergedSupportedLocales);
+		
 		return bundle;
 	}
 	
@@ -71,13 +83,13 @@ public class BundleLoader implements IBundleLoader {
 	}
 	
 	@Override
-	public IPage loadPages(final IBundle bundle) {
+	public IPage loadPages(final IBundle bundle, final Locale locale) {
+		final URI rootUri = bundle.getLocation().resolve("international/pages");
 		final IPage startPage;
 		
 		try {
 			final XMLReader reader = parserFactory.newSAXParser().getXMLReader();
 			final PageInfoHandler pageInfoHandler = new PageInfoHandler();
-			final URI rootUri = URI.create(bundle.getLocation() + "/pages");
 			
 			reader.setContentHandler(pageInfoHandler);
 			startPage = loadPages(rootUri, "", bundle.getName(), reader, pageInfoHandler);
@@ -85,22 +97,31 @@ public class BundleLoader implements IBundleLoader {
 			throw new RuntimeException("Cannot load start page of " + bundle.getName(), e);
 		}
 		
+		if (startPage == null)
+			throw new IllegalStateException("No start page defined in " + rootUri.getPath() + '/');
+		
 		return startPage;
 	}
 	
 	private IPage loadPages(final URI rootUri, final String path, final String name, final XMLReader reader, final PageInfoHandler handler) throws IOException, SAXException {
 		final URI pageUri = URI.create(rootUri + path);
 		final PageInfo page = loadPage(rootUri, path, name, reader, handler);
-		final List<IPage> subPages = new LinkedList<IPage>();
 		
-		page.setPages(subPages);
-		
-		for (File subDir : new File(pageUri).listFiles()) {
-			if (subDir.isDirectory()) {
-				final String subDirName = subDir.getName();
-				final String subPath = path + '/' + subDirName;
-				
-				subPages.add(loadPages(rootUri, subPath, subDirName, reader, handler));
+		if (page != null) {
+			final List<IPage> subPages = new LinkedList<IPage>();
+			final File[] children = new File(pageUri).listFiles();
+			
+			page.setPages(subPages);
+			
+			if (children != null) {
+				for (File subDir : children) {
+					if (subDir.isDirectory()) {
+						final String subDirName = subDir.getName();
+						final String subPath = path + '/' + subDirName;
+						
+						subPages.add(loadPages(rootUri, subPath, subDirName, reader, handler));
+					}
+				}
 			}
 		}
 		
@@ -119,8 +140,9 @@ public class BundleLoader implements IBundleLoader {
 				reader.parse(pageFile.getAbsolutePath());
 			} catch (InformationCompleteException e) {
 			}
-		}
-		
-		return page;
+			
+			return page;
+		} else
+			return null;
 	}
 }

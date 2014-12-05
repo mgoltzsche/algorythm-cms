@@ -60,10 +60,10 @@ public class TestRingBuffer {
 		assertEquals("final size after all elements removed", 0, testee.size());
 	}
 	
-	private void assertFinished(boolean shouldBeFinished) {
-		assertEquals("finished", shouldBeFinished, finished);
-		
+	private void assertFinished(boolean shouldBeFinished) throws Throwable {
 		if (error != null)
-			throw new AssertionError("next() call failed", error);
+			throw error;
+		
+		assertEquals("finished", shouldBeFinished, finished);
 	}
 }

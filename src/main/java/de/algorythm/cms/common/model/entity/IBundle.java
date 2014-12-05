@@ -12,6 +12,7 @@ public interface IBundle extends Comparable<IBundle> {
 	String getDescription();
 	String getContextPath();
 	Locale getDefaultLocale();
+	Set<ISupportedLocale> getSupportedLocales();
 	String getDefaultTemplate();
 	Set<IParam> getParams();
 	Set<IDependency> getDependencies();

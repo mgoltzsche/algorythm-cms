@@ -41,7 +41,7 @@ public class Renderer implements IRenderer {
 	private Injector injector;
 	
 	@Override
-	public IFuture render(final IResourceResolver uriResolver, final File tmpDirectory, final File outputDirectory, final Iterable<IOutputConfig> outputCfgs) {
+	public IFuture<Void> render(final IResourceResolver uriResolver, final File tmpDirectory, final File outputDirectory, final Iterable<IOutputConfig> outputCfgs) {
 		final String resourceOutputPrefix = "/r/" + new Date().getTime();
 		final IOutputUriResolver outputUriResolver = new OutputUriResolver(outputDirectory.toURI(), resourceOutputPrefix);
 		final IBundleRenderingContext context = new RenderingContext(uriResolver, outputUriResolver, resourceOutputPrefix, tmpDirectory, outputDirectory);
@@ -72,7 +72,7 @@ public class Renderer implements IRenderer {
 				processJobs.add(jobs);
 		}
 		
-		final Future future = new Future();
+		final Future<Void> future = new Future<Void>();
 		
 		scheduler.execute(new RenderingProcess(context, processJobs, injector, future));
 		
@@ -146,7 +146,7 @@ public class Renderer implements IRenderer {
 		} else if (Integer.class == fieldType || int.class == fieldType) {
 			return Integer.parseInt(param.getValue());
 		} else if (File.class == fieldType) {
-			return new File(uriResolver.toSystemUri(URI.create(param.getValue()), uriResolver.getMergedBundle().getLocation().resolve("bundle.xml")));
+			return new File(uriResolver.toSystemUri(URI.create(param.getValue())));
 		} else if (URI.class == fieldType) {
 			return URI.create(param.getValue()).normalize();
 		} else {

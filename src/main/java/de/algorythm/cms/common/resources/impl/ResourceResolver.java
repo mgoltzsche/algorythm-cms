@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
@@ -23,8 +24,15 @@ import de.algorythm.cms.common.resources.IResourceResolver;
 
 public class ResourceResolver implements IResourceResolver {
 
-	private final Collection<URI> rootPathes;
 	private final IBundle mergedBundle;
+	private final Collection<URI> unlocalizedRootPathes;
+	private final Collection<URI> rootPathes;
+	
+	private ResourceResolver(final Collection<URI> unlocalizedRootPathes, final IBundle mergedBundle, final Locale locale) {
+		this.mergedBundle = mergedBundle;
+		this.unlocalizedRootPathes = unlocalizedRootPathes;
+		rootPathes = createLocalizedRootPathes(locale.getLanguage(), "international");
+	}
 	
 	public ResourceResolver(final IBundle bundle, final File tmpDirectory, final IDependencyLoader dependencyLoader) {
 		final LinkedHashSet<URI> rootPathSet = new LinkedHashSet<URI>();
@@ -51,7 +59,18 @@ public class ResourceResolver implements IResourceResolver {
 				resolveDependency(nextBundle, bundleRef, flattenedBundles, includedBundles, dependencyLoader);
 		}
 		
-		rootPathes = Collections.unmodifiableCollection(rootPathSet);
+		unlocalizedRootPathes = Collections.unmodifiableCollection(rootPathSet);
+		rootPathes = createLocalizedRootPathes("international");
+	}
+	
+	private Collection<URI> createLocalizedRootPathes(final String... localePrefixes) {
+		final Collection<URI> localizedRootPathes = new LinkedHashSet<URI>();
+		
+		for (URI rootPath : unlocalizedRootPathes)
+			for (String localePrefix : localePrefixes)
+				localizedRootPathes.add(URI.create(rootPath + localePrefix + '/'));
+		
+		return Collections.unmodifiableCollection(localizedRootPathes);
 	}
 	
 	private void resolveDependency(final IBundle bundle, final IDependency bundleRef, final Set<IBundle> flattenedBundles, final Set<IBundle> includedBundles, final IDependencyLoader dependencyLoader) {
@@ -66,6 +85,12 @@ public class ResourceResolver implements IResourceResolver {
 			throw new IllegalStateException("Cyclic reference between '" + bundle.getName() + "' and '" + bName + '\'');
 	}
 	
+	@Override
+	public IResourceResolver createLocalizedResolver(final Locale locale) {
+		return new ResourceResolver(unlocalizedRootPathes, mergedBundle, locale);
+	}
+	
+	@Override
 	public IBundle getMergedBundle() {
 		return mergedBundle;
 	}
@@ -121,12 +146,14 @@ public class ResourceResolver implements IResourceResolver {
 	}
 	
 	@Override
-	public URI toSystemUri(final URI absolutePublicUri) throws FileNotFoundException {
-		final URI bundleUri = absolutePublicUri;
-		final String relativeBundleUriPath = bundleUri.getPath().substring(1);
+	public URI toSystemUri(final URI publicUri) throws FileNotFoundException {
+		final String path = publicUri.getPath();
+		final String relativePath = path.isEmpty()
+				? path
+				: (path.charAt(0) == '/' ? path.substring(1) : path);
 		
 		for (URI rootPath : rootPathes) {
-			final URI systemUri = rootPath.resolve(relativeBundleUriPath).normalize();
+			final URI systemUri = rootPath.resolve(relativePath).normalize();
 			final File resolvedFile = new File(systemUri);
 			
 			if (resolvedFile.exists()) {
@@ -138,7 +165,7 @@ public class ResourceResolver implements IResourceResolver {
 		}
 		
 		throw new FileNotFoundException("Cannot resolve resource URI "
-				+ absolutePublicUri + ". Pathes: \n\t"
+				+ publicUri + ". Pathes: \n\t"
 				+ Joiner.on("\n\t").join(rootPathes));
 	}
 	

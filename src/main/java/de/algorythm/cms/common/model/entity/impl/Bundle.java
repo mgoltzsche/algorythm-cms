@@ -18,6 +18,7 @@ import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
+import de.algorythm.cms.common.model.entity.ISupportedLocale;
 
 @XmlRootElement(name="bundle", namespace="http://cms.algorythm.de/common/Bundle")
 public class Bundle implements IBundle {
@@ -33,6 +34,8 @@ public class Bundle implements IBundle {
 	@XmlAttribute(name = "default-locale")
 	@XmlJavaTypeAdapter(LocaleXmlAdapter.class)
 	private Locale defaultLocale;
+	@XmlElementRef(type = SupportedLocale.class)
+	private Set<ISupportedLocale> supportedLocales = new LinkedHashSet<ISupportedLocale>();
 	@XmlAttribute(name = "default-template")
 	private String defaultTemplate;
 	@XmlAttribute(name = "context-path")
@@ -98,7 +101,16 @@ public class Bundle implements IBundle {
 	public void setDefaultLocale(Locale defaultLocale) {
 		this.defaultLocale = defaultLocale;
 	}
-	
+
+	@Override
+	public Set<ISupportedLocale> getSupportedLocales() {
+		return supportedLocales;
+	}
+
+	public void setSupportedLocales(Set<ISupportedLocale> supportedLocales) {
+		this.supportedLocales = supportedLocales;
+	}
+
 	@Override
 	public String getDefaultTemplate() {
 		return defaultTemplate;
@@ -166,9 +178,10 @@ public class Bundle implements IBundle {
 		r.setContextPath(contextPath);
 		r.dependencies.addAll(dependencies);
 		r.params.addAll(params);
+		r.supportedLocales.addAll(supportedLocales);
 		
-		for (IOutputConfig output : output)
-			r.output.add(output.copy());
+		for (IOutputConfig outputCfg : output)
+			r.output.add(outputCfg.copy());
 		
 		return r;
 	}

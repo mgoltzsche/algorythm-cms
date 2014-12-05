@@ -34,7 +34,7 @@ public class TestXmlResourceDao {
 			throw new AssertionError(expectedBundle.getName() + " - " + e.getMessage());
 		}
 		
-		printPage(testee.loadPages(bundle), 0);
+		printPage(testee.loadPages(bundle, Locale.ENGLISH), 0);
 	}
 	
 	private void printPage(IPage p, int depth) {

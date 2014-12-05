@@ -13,6 +13,7 @@ import java.io.StringReader;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.xml.XMLConstants;
@@ -43,6 +44,7 @@ import org.xml.sax.XMLReader;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.IParam;
+import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.renderer.RenderingException;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
@@ -84,13 +86,18 @@ public class XsltRenderer implements IRenderingJob {
 	
 	@Override
 	public void run(final IRenderingContext ctx) {
-		final IResourceResolver uriResolver = ctx.getInputUriResolver();
 		final IBundle bundle = ctx.getBundle();
-		final SAXParserFactory parserFactory = createSAXParserFactory(uriResolver);
-		final Templates templates = createTransformationTemplates(uriResolver);
-		final IPage startPage = loader.loadPages(bundle);
+		final IResourceResolver uriResolver = ctx.getInputUriResolver();
 		
-		renderPages(startPage, ctx, parserFactory, templates);
+		for (ISupportedLocale supportedLocale : bundle.getSupportedLocales()) {
+			final Locale locale = supportedLocale.getLocale();
+			final IResourceResolver localizedUriResolver = uriResolver.createLocalizedResolver(locale);
+			final SAXParserFactory parserFactory = createSAXParserFactory(uriResolver);
+			final Templates templates = createTransformationTemplates(localizedUriResolver);
+			final IPage startPage = loader.loadPages(bundle, locale);
+			
+			renderPages(startPage, ctx, parserFactory, templates);
+		}
 	}
 	
 	private void renderPages(final IPage page, final IRenderingContext ctx, final SAXParserFactory parserFactory, final Templates templates) {
@@ -114,11 +121,9 @@ public class XsltRenderer implements IRenderingJob {
 		ctx.execute(new IRenderingJob() {
 			@Override
 			public void run(final IRenderingContext ctx) throws Exception {
-				final URI pageUri = ctx.getBundle().getLocation().resolve("pages" + page.getPath() + "/page.xml");
+				final URI pageUri = ctx.getBundle().getLocation().resolve("international/pages" + page.getPath() + "/page.xml");
 				final InputSource src = new InputSource(pageUri.getPath());
 				final Source pageSource = new SAXSource(reader, src);
-				
-				//reader.parse(pageUri.getPath());
 				
 				render(pageSource, page, ctx, reader, transformer);
 			}

@@ -20,6 +20,9 @@
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM">
 			<param id="sources" value="/css/default-theme/main.scss" />
 		</job>
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.FontConverter" phase="TRANSFORM">
+			<param id="source" value="/fonts/blaster.ttf" />
+		</job>-->
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor" phase="TRANSFORM">
 			<param id="sources" value="/scripts/angular.js" />
 			<param id="sources" value="/scripts/angular-route.js" />

@@ -53,7 +53,7 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
-							<outputDirectory>${project.build.outputDirectory}/de/algorythm/cms/common/types/de.algorythm.cms.common</outputDirectory>
+							<outputDirectory>${project.build.outputDirectory}/de/algorythm/cms/common/international/types/de.algorythm.cms.common</outputDirectory>
 							<transformSchemas>
 								<transformSchema>
 									<uri>http://cms.algorythm.de/common/Bundle</uri>
@@ -147,6 +147,12 @@
 			<groupId>ro.isdc.wro4j</groupId>
 			<artifactId>wro4j-extensions</artifactId>
 			<version>1.7.7</version>
+		</dependency>
+		<!-- sfntly -->
+		<dependency>
+			<groupId>fr.opensagres.xdocreport.sfntly</groupId>
+			<artifactId>sfntly</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 		<!-- JUnit -->
 		<dependency>

@@ -1,6 +1,6 @@
 package de.algorythm.cms.common.scheduling;
 
-public interface IFuture {
+public interface IFuture<R> {
 
-	void sync() throws InterruptedException;
+	R sync() throws Throwable;
 }

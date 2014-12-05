@@ -7,7 +7,7 @@ import org.junit.Test;
 public class TestMain {
 
 	@Test
-	public void testMain() throws Exception {
+	public void testMain() throws Throwable {
 		File bundleXml = new File(getClass().getResource("/test-repo/example1.org/bundle.xml").toURI());
 		File outputDir = new Configuration().outputDirectory;
 		

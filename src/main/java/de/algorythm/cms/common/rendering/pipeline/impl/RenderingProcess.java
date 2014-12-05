@@ -40,9 +40,9 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	private final IBundleRenderingContext context;
 	private final Iterator<PipelinePhase> phaseIter;
 	private PipelinePhase currentPhase;
-	private final IProgressObserver observer;
+	private final IProgressObserver<Void> observer;
 
-	public RenderingProcess(final IBundleRenderingContext context, final List<Collection<IRenderingJob>> jobPhases, final Injector injector, final IProgressObserver observer) {
+	public RenderingProcess(final IBundleRenderingContext context, final List<Collection<IRenderingJob>> jobPhases, final Injector injector, final IProgressObserver<Void> observer) {
 		if (jobPhases.isEmpty())
 			throw new IllegalArgumentException("No jobs to execute");
 		
@@ -75,24 +75,22 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 				nextJob.run(this);
 			} catch(Throwable e) {
 				log.error("Rendering process job '" + nextJob + "' failed", e);
-				notifyTermination(processObserver);
+				processObserver.terminateProcess();
+				observer.finishedWithError(e);
 				return;
 			}
 			
 			synchronized(phaseIter) {
 				if (--currentPhase.pendingSize == 0) {
-					if (phaseIter.hasNext())
+					if (phaseIter.hasNext()) {
 						currentPhase = phaseIter.next();
-					else
-						notifyTermination(processObserver);
+					} else {
+						processObserver.terminateProcess();
+						observer.finished();
+					}
 				}
 			}
 		}
-	}
-	
-	private void notifyTermination(final IProcessObserver processObserver) {
-		processObserver.terminateProcess();
-		observer.ready();
 	}
 	
 	@Override

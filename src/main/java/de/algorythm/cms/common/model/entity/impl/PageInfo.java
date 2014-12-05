@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.commons.lang.StringUtils;
+
 import de.algorythm.cms.common.model.entity.IPage;
 
 @XmlRootElement(name="page", namespace="http://cms.algorythm.de/common/Pages")
@@ -18,7 +20,7 @@ public class PageInfo implements IPage, Comparable<IPage> {
 	@XmlTransient
 	private String name;
 	@XmlTransient
-	private String title;
+	private String title = StringUtils.EMPTY;
 	@XmlAttribute(name="title", required = true)
 	private String navigationTitle;
 	@XmlAttribute(name="in-navigation")

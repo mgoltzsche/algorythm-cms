@@ -8,5 +8,5 @@ import de.algorythm.cms.common.scheduling.IFuture;
 
 public interface IRenderer {
 
-	IFuture render(IResourceResolver resourceResolver, File tmpDirectory, File outputDirectory, Iterable<IOutputConfig> outputCfgs);
+	IFuture<Void> render(IResourceResolver resourceResolver, File tmpDirectory, File outputDirectory, Iterable<IOutputConfig> outputCfgs);
 }

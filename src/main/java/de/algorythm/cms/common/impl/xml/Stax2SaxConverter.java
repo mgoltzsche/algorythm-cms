@@ -1,12 +1,15 @@
 package de.algorythm.cms.common.impl.xml;
 
-import javax.xml.stream.XMLStreamReader;
+import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
+import static javax.xml.stream.XMLStreamConstants.END_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.START_DOCUMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
+
 import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-
-import static javax.xml.stream.events.XMLEvent.*;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;

@@ -1,7 +1,6 @@
 package de.algorythm.cms.common;
 
 import java.io.File;
-import java.io.IOException;
 
 import javax.inject.Inject;
 
@@ -55,7 +54,7 @@ public class CmsCommonMain {
 		Guice.createInjector(module).injectMembers(this);
 	}
 	
-	public void generate(final File bundleXml, final File outputDirectory) throws IOException, InterruptedException {
+	public void generate(final File bundleXml, final File outputDirectory) throws Throwable {
 		final IBundle bundle = facade.loadBundle(bundleXml);
 		/*final String tmpDirName = "algorythm-cms-" + new Date().getTime();
 		final File tmpDirectory = new File(System.getProperty("java.io.tmpdir", null), tmpDirName);
