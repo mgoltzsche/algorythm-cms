@@ -8,8 +8,6 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.typography.font.sfntly.Font;
 import com.google.typography.font.sfntly.FontFactory;
-import com.google.typography.font.sfntly.data.ReadableFontData;
-import com.google.typography.font.sfntly.table.Table;
 import com.google.typography.font.tools.conversion.woff.WoffWriter;
 
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;

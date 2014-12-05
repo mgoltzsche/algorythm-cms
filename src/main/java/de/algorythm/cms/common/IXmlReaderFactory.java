@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.renderer.impl.xml;
+package de.algorythm.cms.common;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;

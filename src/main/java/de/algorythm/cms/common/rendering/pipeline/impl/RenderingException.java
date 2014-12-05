@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.renderer;
+package de.algorythm.cms.common.rendering.pipeline.impl;
 
 public class RenderingException extends Exception {
 

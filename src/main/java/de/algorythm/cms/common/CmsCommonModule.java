@@ -12,9 +12,6 @@ import de.algorythm.cms.common.model.entity.impl.Bundle;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.model.loader.impl.BundleLoader;
-import de.algorythm.cms.common.renderer.IContentRenderer;
-import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
-import de.algorythm.cms.common.renderer.impl.xml.XmlContentRenderer;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.rendering.pipeline.impl.Renderer;
 import de.algorythm.cms.common.resources.IDependencyLoader;
@@ -35,7 +32,6 @@ public class CmsCommonModule extends AbstractModule {
 			bindIDependencyLoader(bind(IDependencyLoader.class));
 			bindIXmlReaderFactory(bind(IXmlReaderFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
-			bindIContentRenderer(bind(IContentRenderer.class));
 		} catch(Exception e) {
 			throw new RuntimeException("Cannot initialize module", e);
 		}
@@ -75,9 +71,5 @@ public class CmsCommonModule extends AbstractModule {
 		} catch (JAXBException e) {
 			throw new RuntimeException("Cannot initialize JAXB context", e);
 		}
-	}
-	
-	protected void bindIContentRenderer(AnnotatedBindingBuilder<IContentRenderer> bind) {
-		bind.to(XmlContentRenderer.class);
 	}
 }

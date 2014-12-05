@@ -13,10 +13,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
+import de.algorythm.cms.common.IXmlReaderFactory;
 import de.algorythm.cms.common.impl.xml.Constants.Attribute;
 import de.algorythm.cms.common.impl.xml.Constants.Namespace;
 import de.algorythm.cms.common.impl.xml.Constants.Tag;
-import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
 import de.algorythm.cms.common.resources.IResourceUriResolver;
 
 public class IncludingHandler implements ContentHandler, ErrorHandler {

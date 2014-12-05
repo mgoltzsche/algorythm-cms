@@ -14,7 +14,7 @@ public class CmsInputURIResolver implements URIResolver {
 
 	private final IResourceResolver uriResolver;
 	
-	public CmsInputURIResolver(final IResourceResolver uriResolver, final String scheme) {
+	public CmsInputURIResolver(final IResourceResolver uriResolver) {
 		this.uriResolver = uriResolver;
 	}
 	

@@ -17,7 +17,7 @@ import javax.xml.validation.SchemaFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import de.algorythm.cms.common.renderer.impl.xml.IXmlReaderFactory;
+import de.algorythm.cms.common.IXmlReaderFactory;
 
 @Singleton
 public class XmlReaderFactory implements IXmlReaderFactory {
