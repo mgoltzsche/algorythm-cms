@@ -1,6 +1,7 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -104,8 +105,8 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public String getResourcePrefix() {
-		return context.getResourcePrefix();
+	public URI getPublicResourceOutputDirectory() {
+		return context.getPublicResourceOutputDirectory();
 	}
 
 	@Override

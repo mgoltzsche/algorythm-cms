@@ -6,9 +6,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 
-import org.apache.commons.io.Charsets;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
+
+import com.google.common.base.Charsets;
 
 import de.algorythm.cms.common.resources.IResourceResolver;
 

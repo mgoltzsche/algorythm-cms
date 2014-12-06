@@ -20,6 +20,10 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import net.sf.saxon.Controller;
+import net.sf.saxon.jaxp.TransformerImpl;
+import net.sf.saxon.lib.OutputURIResolver;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -31,6 +35,7 @@ import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.resources.IOutputUriResolver;
 import de.algorythm.cms.common.resources.IResourceResolver;
 import de.algorythm.cms.common.resources.impl.CmsInputURIResolver;
+import de.algorythm.cms.common.resources.impl.CmsOutputURIResolver;
 import de.algorythm.cms.common.resources.impl.XsdResourceResolver;
 
 public class TransformationContext {
@@ -118,6 +123,7 @@ public class TransformationContext {
 	private final SAXParserFactory parserFactory;
 	private final Templates templates;
 	private final URIResolver uriResolverAdapter;
+	private final OutputURIResolver outputUriResolverAdapter;
 	
 	public TransformationContext(final IRenderingContext processCtx, final Collection<URI> schemaFiles, final Collection<URI> xslSources) throws FileNotFoundException {
 		this(processCtx,
@@ -133,14 +139,19 @@ public class TransformationContext {
 		this.parserFactory = parserFactory;
 		this.templates = templates;
 		uriResolverAdapter = new CmsInputURIResolver(resourceResolver);
+		outputUriResolverAdapter = new CmsOutputURIResolver(outputUriResolver);
 	}
 	
-	public TransformationContext createLocalized(final Locale locale) {
-		return new TransformationContext(processCtx, parserFactory, templates, resourceResolver.createLocalizedResolver(locale), outputUriResolver.createLocalizedResolver(locale));
+	public TransformationContext createLocalized(final Locale locale, final boolean localizedOutput) {
+		final IResourceResolver inputResolver = resourceResolver.createLocalizedResolver(locale);
+		final IOutputUriResolver outputResolver = localizedOutput
+				? outputUriResolver.createLocalizedResolver(locale)
+				: outputUriResolver;
+		
+		return new TransformationContext(processCtx, parserFactory, templates, inputResolver, outputResolver);
 	}
 	
 	public XMLReader createReader() {
-		
 		try {
 			final XMLReader reader = parserFactory.newSAXParser().getXMLReader();
 			
@@ -155,8 +166,11 @@ public class TransformationContext {
 	public Transformer createTransformer() {
 		try {
 			final Transformer transformer = templates.newTransformer();
+			final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
 			
 			transformer.setURIResolver(uriResolverAdapter);
+			trnsfrmCtrl.setOutputURIResolver(outputUriResolverAdapter);
+			
 			
 			return transformer;
 		} catch (TransformerConfigurationException e) {

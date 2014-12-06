@@ -1,6 +1,7 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,20 +13,20 @@ import de.algorythm.cms.common.resources.IResourceResolver;
 
 public class RenderingContext implements IBundleRenderingContext {
 
-	private final String resourcePrefix;
+	private final URI publicResourceOutputDirectory;
 	private final IBundle bundle;
 	private final IResourceResolver inputUriResolver;
 	private final IOutputUriResolver outputUriResolver;
 	private final File tempDirectory, outputDirectory;
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 
-	public RenderingContext(final IResourceResolver inputUriResolver, final IOutputUriResolver outputUriResolver, final String resourcePrefix, final File tempDirectory, final File outputDirectory) {
+	public RenderingContext(final IResourceResolver inputUriResolver, final IOutputUriResolver outputUriResolver, final URI publicResourceOutputDirectory, final File tempDirectory, final File outputDirectory) {
 		this.bundle = inputUriResolver.getMergedBundle();
 		this.inputUriResolver = inputUriResolver;
 		this.outputUriResolver = outputUriResolver;
 		this.tempDirectory = tempDirectory;
 		this.outputDirectory = outputDirectory;
-		this.resourcePrefix = resourcePrefix;
+		this.publicResourceOutputDirectory = publicResourceOutputDirectory;
 	}
 
 	@Override
@@ -39,8 +40,8 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public String getResourcePrefix() {
-		return resourcePrefix;
+	public URI getPublicResourceOutputDirectory() {
+		return publicResourceOutputDirectory;
 	}
 
 	@Override

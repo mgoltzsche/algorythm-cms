@@ -2,49 +2,29 @@ package de.algorythm.cms.common.resources.impl;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.saxon.lib.OutputURIResolver;
+import de.algorythm.cms.common.resources.IOutputUriResolver;
 
 public class CmsOutputURIResolver implements OutputURIResolver {
 
-	private final URI rootUri;
-	private final URI baseUri;
+	private final IOutputUriResolver resolver;
 	
-	public CmsOutputURIResolver(final URI outputRootUri, final URI baseUri) {
-		this.rootUri = outputRootUri;
-		this.baseUri = baseUri;
+	public CmsOutputURIResolver(final IOutputUriResolver resolver) {
+		this.resolver = resolver;
 	}
 	
 	@Override
 	public Result resolve(final String href, final String base) throws TransformerException {
-		final URI absoluteUri;
+		final URI publicUri = URI.create(href);
+		final URI systemBaseUri = URI.create(href);
+		final URI systemUri = resolver.resolveUri(publicUri, systemBaseUri);
 		
-		try {
-			if (href.charAt(0) == '/') { // Absolute
-				absoluteUri = new URI(rootUri + href).normalize();
-			} else if (href.matches("^\\w+:/.*")) {
-				final URI hrefUri = new URI(href);
-				absoluteUri = new URI(rootUri + hrefUri.getPath());
-			} else {
-				absoluteUri = baseUri.resolve(href).normalize();
-			}
-		} catch(URISyntaxException e) {
-			throw new TransformerException("Unsupported URI syntax", e);
-		}
-		
-		validateWithinRootUri(absoluteUri);
-		
-		return new StreamResult(new File(absoluteUri)); // TODO: close file?!
-	}
-	
-	private void validateWithinRootUri(final URI absoluteUri) throws TransformerException {
-		if (!absoluteUri.getPath().startsWith(rootUri.getPath()))
-			throw new TransformerException("URI " + absoluteUri + " is outside output URI " + rootUri);
+		return new StreamResult(new File(systemUri)); // TODO: close file?!
 	}
 	
 	@Override

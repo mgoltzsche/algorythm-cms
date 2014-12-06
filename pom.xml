@@ -82,11 +82,6 @@
 	</build>
 
 	<dependencies>
-		<dependency>
-			<groupId>de.algorythm.cms</groupId>
-			<artifactId>cms-lib</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- Guice -->
 		<dependency>
 			<groupId>com.google.inject</groupId>

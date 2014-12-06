@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.xml.transform.Source;
@@ -21,8 +22,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.saxon.Controller;
 import net.sf.saxon.jaxp.TransformerImpl;
-import net.sf.saxon.lib.OutputURIResolver;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -36,7 +37,7 @@ import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.rendering.pipeline.impl.RenderingException;
 import de.algorythm.cms.common.rendering.pipeline.impl.TransformationContext;
-import de.algorythm.cms.common.resources.impl.CmsOutputURIResolver;
+import de.algorythm.cms.common.resources.IOutputUriResolver;
 
 public class XsltRenderer implements IRenderingJob {
 
@@ -59,17 +60,19 @@ public class XsltRenderer implements IRenderingJob {
 		
 		final IBundle bundle = ctx.getBundle();
 		final TransformationContext transformCtx = new TransformationContext(ctx, schemas, tpls);
+		final Set<ISupportedLocale> supportedLocales = bundle.getSupportedLocales();
+		final boolean localizeOutput = supportedLocales.size() > 1;
 		
-		for (ISupportedLocale supportedLocale : bundle.getSupportedLocales()) {
+		for (ISupportedLocale supportedLocale : supportedLocales) {
 			final Locale locale = supportedLocale.getLocale();
-			final TransformationContext localizedTransformCtx = transformCtx.createLocalized(locale);
+			final TransformationContext localizedTransformCtx = transformCtx.createLocalized(locale, localizeOutput);
 			final IPage startPage = loader.loadPages(bundle, locale);
 			
-			renderPages(startPage, localizedTransformCtx, ctx.getResourcePrefix(), ctx.getOutputDirectory().toURI());
+			renderPages(startPage, localizedTransformCtx, ctx.getPublicResourceOutputDirectory(), ctx.getOutputDirectory().toURI());
 		}
 	}
 	
-	private void renderPages(final IPage page, final TransformationContext transformCtx, final String outputResourceDirectory, final URI outputDirectoryUri) {
+	private void renderPages(final IPage page, final TransformationContext transformCtx, final URI outputResourceDirectory, final URI outputDirectoryUri) {
 		transformCtx.execute(new IRenderingJob() {
 			@Override
 			public void run(final IRenderingContext ctx) throws Exception {
@@ -86,21 +89,24 @@ public class XsltRenderer implements IRenderingJob {
 			renderPages(child, transformCtx, outputResourceDirectory, outputDirectoryUri);
 	}
 	
-	private void render(final IBundle bundle, final IPage page, final TransformationContext ctx, final String outputResourceDirectory, final URI outputDirectoryUri) throws RenderingException {
+	private void render(final IBundle bundle, final IPage page, final TransformationContext ctx, final URI outputResourceDirectory, final URI outputDirectoryUri) throws RenderingException {
 		final XMLReader reader = ctx.createReader();
-		final URI pageUri = bundle.getLocation().resolve("international/pages" + page.getPath() + "/page.xml");
-		final InputSource src = new InputSource(pageUri.getPath());
+		final URI systemPageUri = bundle.getLocation().resolve("international/pages" + page.getPath() + "/page.xml");
+		final InputSource src = new InputSource(systemPageUri.getPath());
 		final Source pageSource = new SAXSource(reader, src);
 		final String name = bundle.getName();
 		final String pagePath = page.getPath();
 		final String relativeBaseUrl = relativeBaseUrl(pagePath);
 		final URI outputFileUri = ctx.getOutputUriResolver().resolveUri(URI.create(page.getPath() + "/index.html"));
 		final File outputFile = new File(outputFileUri);
-		final OutputURIResolver outputUriResolver = new CmsOutputURIResolver(outputDirectoryUri, outputFileUri);
+		final IOutputUriResolver outputUriResolver = ctx.getOutputUriResolver();
 		final StreamResult result = new StreamResult(outputFile);
 		final Transformer transformer = ctx.createTransformer();
+		final URI publicPageOutputUri = URI.create(page.getPath() + "/index.html");
+		final URI systemPageOutputUri = outputUriResolver.resolveUri(publicPageOutputUri);
+		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
 		
-		((TransformerImpl) transformer).getUnderlyingController().setOutputURIResolver(outputUriResolver);
+		trnsfrmCtrl.setBaseOutputURI(systemPageOutputUri.toString());
 		transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
 		transformer.setParameter(RESOURCE_DIRECTORY, relativeBaseUrl + outputResourceDirectory);
 		transformer.setParameter(SITE_NAME, name);

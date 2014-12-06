@@ -1,6 +1,7 @@
 package de.algorythm.cms.common.rendering.pipeline;
 
 import java.io.File;
+import java.net.URI;
 
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.resources.IOutputUriResolver;
@@ -11,7 +12,7 @@ public interface IBundleRenderingContext {
 	IBundle getBundle();
 	IResourceResolver getInputUriResolver();
 	IOutputUriResolver getOutputUriResolver();
-	String getResourcePrefix();
+	URI getPublicResourceOutputDirectory();
 	File getTempDirectory();
 	File getOutputDirectory();
 	String getProperty(String name);

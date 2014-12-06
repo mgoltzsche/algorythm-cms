@@ -6,6 +6,6 @@ import java.util.Locale;
 public interface IOutputUriResolver {
 
 	URI resolveUri(URI publicUri);
-	URI resolveResourceUri(URI publicUri);
+	URI resolveUri(URI publicUri, URI systemBaseUri);
 	IOutputUriResolver createLocalizedResolver(Locale locale);
 }

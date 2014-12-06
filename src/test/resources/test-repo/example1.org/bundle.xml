@@ -4,6 +4,7 @@
 		default-locale="en"
 		default-template="http://cms.algorythm.de/common/theme/default-theme"
 		context-path="/site1">
+	<locale locale="de" />
 	<param id="testparam" value="overwritten" />
 	<dependency name="common.cms.algorythm.de" />
 	<output id="html">

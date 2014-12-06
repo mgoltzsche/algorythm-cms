@@ -42,9 +42,9 @@ public class Renderer implements IRenderer {
 	
 	@Override
 	public IFuture<Void> render(final IResourceResolver uriResolver, final File tmpDirectory, final File outputDirectory, final Iterable<IOutputConfig> outputCfgs) {
-		final String resourceOutputPrefix = "/r/" + new Date().getTime();
-		final IOutputUriResolver outputUriResolver = new OutputUriResolver(outputDirectory.toURI(), resourceOutputPrefix);
-		final IBundleRenderingContext context = new RenderingContext(uriResolver, outputUriResolver, resourceOutputPrefix, tmpDirectory, outputDirectory);
+		final URI resourceOutputPath = URI.create("/r/" + new Date().getTime());
+		final IOutputUriResolver outputUriResolver = new OutputUriResolver(outputDirectory.toURI());
+		final IBundleRenderingContext context = new RenderingContext(uriResolver, outputUriResolver, resourceOutputPath, tmpDirectory, outputDirectory);
 		final Map<RenderingPhase, Set<IRenderingJob>> phaseMap = new HashMap<RenderingPhase, Set<IRenderingJob>>();
 		
 		for (IOutputConfig outputCfg : outputCfgs) {

@@ -49,8 +49,9 @@ public class ScssCompiler implements IRenderingJob {
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
 		final IOutputUriResolver outResolver = ctx.getOutputUriResolver();
-		final URI outputFileUri = outResolver.resolveResourceUri(MAIN_CSS_URI);
-		final File cssFile = new File(outputFileUri);
+		final URI cssUri = ctx.getPublicResourceOutputDirectory().resolve(MAIN_CSS_URI);
+		final URI cssSystemUri = outResolver.resolveUri(cssUri);
+		final File cssFile = new File(cssSystemUri);
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
 		final ScssStylesheet stylesheet = docHandler.getStyleSheet();
