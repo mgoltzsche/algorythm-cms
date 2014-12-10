@@ -107,7 +107,7 @@ directive('cmsLanguage', ['$location', function($location) {
 			
 			if (lang) {
 				scope.$on('$locationChangeStart', function() {
-					el.attr('href', absSiteRootUrl + "../" + lang + "/#" + $location.path());
+					el.attr('href', absSiteRootUrl + '../' + lang + '/#' + $location.path());
 				});
 			}
 		}

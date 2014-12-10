@@ -28,17 +28,19 @@ public class TransformationContext implements ITransformationContext {
 	private final Templates templates;
 	private final URIResolver uriResolverAdapter;
 	private final OutputURIResolver outputUriResolverAdapter;
+	private final Path notFoundContent;
 	
-	public TransformationContext(final IRenderingContext processCtx, final Collection<Path> xslSources) {
-		this(createTransformationTemplates(xslSources, processCtx.getResourceResolver()),
-			processCtx.getResourceResolver(), processCtx.getOutputResolver());
+	public TransformationContext(final IRenderingContext processCtx, final Collection<Path> xslSources, final Path notFoundContent) {
+		this(createTransformationTemplates(xslSources, processCtx.getResourceResolver(), notFoundContent),
+			processCtx.getResourceResolver(), processCtx.getOutputResolver(), notFoundContent);
 	}
 	
-	private TransformationContext(final Templates templates, final IUriResolver uriResolver, final IOutputUriResolver outputUriResolver) {
+	private TransformationContext(final Templates templates, final IUriResolver uriResolver, final IOutputUriResolver outputUriResolver, final Path notFoundContent) {
 		this.resourceResolver = uriResolver;
 		this.outputResolver = outputUriResolver;
 		this.templates = templates;
-		uriResolverAdapter = new CmsInputURIResolver(uriResolver);
+		this.notFoundContent = notFoundContent;
+		uriResolverAdapter = new CmsInputURIResolver(uriResolver, notFoundContent);
 		outputUriResolverAdapter = new CmsOutputURIResolver(outputUriResolver);
 	}
 	
@@ -49,7 +51,7 @@ public class TransformationContext implements ITransformationContext {
 				? outputResolver.createLocalizedResolver(locale)
 				: outputResolver;
 		
-		return new TransformationContext(templates, inResolver, outResolver);
+		return new TransformationContext(templates, inResolver, outResolver, notFoundContent);
 	}
 	
 	@Override

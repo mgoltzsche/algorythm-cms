@@ -7,7 +7,6 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.RESOURCE_BAS
 import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_NAME;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_PARAM_PREFIX;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -52,18 +51,19 @@ public class XsltRenderer implements IRenderingJob {
 	
 	@Inject
 	private IBundleLoader loader;
-	private Path theme;
 	private List<Path> templates = new LinkedList<Path>();
+	private Path theme;
+	private Path notFoundContent;
 	
 	@Override
-	public void run(final IRenderingContext ctx) throws FileNotFoundException {
+	public void run(final IRenderingContext ctx) {
 		final LinkedList<Path> tpls = new LinkedList<Path>();
 		
 		tpls.addAll(templates);
 		tpls.add(theme);
 		
 		final IBundle bundle = ctx.getBundle();
-		final TransformationContext transformCtx = new TransformationContext(ctx, tpls);
+		final TransformationContext transformCtx = new TransformationContext(ctx, tpls, notFoundContent);
 		final Path resourceBasePath = ctx.getResourcePrefix();
 		final Set<ISupportedLocale> supportedLocales = bundle.getSupportedLocales();
 		final boolean localizeOutput = supportedLocales.size() > 1;

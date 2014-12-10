@@ -10,6 +10,7 @@
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.XsltRenderer" phase="TRANSFORM">
+			<param id="notFoundContent" value="/contents/not-found.xml" />
 			<param id="theme" value="/templates/de.algorythm.cms.common/html/Theme.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Article.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Markup.xsl" />

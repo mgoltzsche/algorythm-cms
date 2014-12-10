@@ -7,9 +7,11 @@ import java.util.Collection;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -44,11 +46,33 @@ public class TransformationContextInitializationUtil {
 		}
 	};
 	
-	static public Templates createTransformationTemplates(final Collection<Path> xslSources, final IUriResolver uriResolver) {
+	static private final ErrorListener TRANSFORM_ERROR_LISTENER = new ErrorListener() {
+		
+		@Override
+		public void warning(TransformerException exception)
+				throws TransformerException {
+			throw new RuntimeException(exception);
+		}
+		
+		@Override
+		public void fatalError(TransformerException exception)
+				throws TransformerException {
+			throw new RuntimeException(exception);
+		}
+		
+		@Override
+		public void error(TransformerException exception)
+				throws TransformerException {
+			throw new RuntimeException(exception);
+		}
+	};
+	
+	static public Templates createTransformationTemplates(final Collection<Path> xslSources, final IUriResolver uriResolver, final Path notFoundContent) {
 		final Source xslSource = createMergedXslSource(xslSources);
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		
-		transformerFactory.setURIResolver(new CmsInputURIResolver(uriResolver));
+		transformerFactory.setErrorListener(TRANSFORM_ERROR_LISTENER);
+		transformerFactory.setURIResolver(new CmsInputURIResolver(uriResolver, notFoundContent));
 		
 		try {
 			return transformerFactory.newTemplates(xslSource);
