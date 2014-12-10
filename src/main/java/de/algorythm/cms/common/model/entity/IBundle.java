@@ -1,13 +1,18 @@
 package de.algorythm.cms.common.model.entity;
 
-import java.net.URI;
+import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 public interface IBundle extends Comparable<IBundle> {
 
 	String getName();
-	URI getLocation();
+	Path getLocation();
+	LinkedList<ISchemaLocation> getSchemaLocations();
+	List<Path> getRootDirectories();
+	void setRootDirectories(List<Path> rootDirectories);
 	String getTitle();
 	String getDescription();
 	String getContextPath();

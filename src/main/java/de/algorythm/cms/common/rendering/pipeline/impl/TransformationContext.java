@@ -1,168 +1,58 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.URI;
+import static de.algorythm.cms.common.rendering.pipeline.impl.TransformationContextInitializationUtil.createTransformationTemplates;
+
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Locale;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import net.sf.saxon.Controller;
 import net.sf.saxon.jaxp.TransformerImpl;
 import net.sf.saxon.lib.OutputURIResolver;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
-
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.rendering.pipeline.ITransformationContext;
 import de.algorythm.cms.common.resources.IOutputUriResolver;
-import de.algorythm.cms.common.resources.IResourceResolver;
-import de.algorythm.cms.common.resources.impl.CmsInputURIResolver;
-import de.algorythm.cms.common.resources.impl.CmsOutputURIResolver;
-import de.algorythm.cms.common.resources.impl.XsdResourceResolver;
+import de.algorythm.cms.common.resources.IUriResolver;
+import de.algorythm.cms.common.resources.adapter.impl.CmsInputURIResolver;
+import de.algorythm.cms.common.resources.adapter.impl.CmsOutputURIResolver;
 
-public class TransformationContext {
+public class TransformationContext implements ITransformationContext {
 
-	static private ErrorHandler ERROR_HANDLER = new ErrorHandler() {
-
-		@Override
-		public void warning(final SAXParseException exception) throws SAXException {
-			throw exception;
-		}
-
-		@Override
-		public void error(final SAXParseException exception) throws SAXException {
-			throw new SAXException(exception.toString(), exception);
-		}
-
-		@Override
-		public void fatalError(final SAXParseException exception) throws SAXException {
-			throw new SAXException(exception.toString(), exception);
-		}
-	};
-	
-	static private Templates createTransformationTemplates(final Collection<URI> xslSources, final IResourceResolver uriResolver) {
-		final Source xslSource = createMergedXslSource(xslSources);
-		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		
-		transformerFactory.setURIResolver(new CmsInputURIResolver(uriResolver));
-		
-		try {
-			return transformerFactory.newTemplates(xslSource);
-		} catch (TransformerConfigurationException e) {
-			throw new IllegalStateException("Cannot load XSL templates. " + e, e);
-		}
-	}
-	
-	static private Source createMergedXslSource(final Collection<URI> xslSources) {
-		if (xslSources.size() == 1)
-			return new StreamSource(new File(xslSources.iterator().next()));
-		
-		final StringBuilder xslt = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xsl:stylesheet version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">");
-		
-		for (URI source : xslSources) {
-			xslt.append("\n<xsl:import href=\"")
-				.append(StringEscapeUtils.escapeXml(source.getPath()))
-				.append("\" />");
-		}
-		
-		final String mergedXsl = xslt.append("</xsl:stylesheet>").toString();
-		final Reader mergedTplReader = new StringReader(mergedXsl);
-		
-		return new StreamSource(mergedTplReader);
-	}
-	
-	static private SAXParserFactory createSAXParserFactory(final Collection<URI> schemaLocations, final IResourceResolver uriResolver) throws FileNotFoundException {
-		final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-		final Schema schema = createSchema(schemaLocations, uriResolver);
-		
-		parserFactory.setNamespaceAware(true);
-		parserFactory.setSchema(schema); // REQUIRED FOR VALIDATION ONLY
-		
-		return parserFactory;
-	}
-	
-	static private Schema createSchema(final Collection<URI> schemaLocations, final IResourceResolver uriResolver) throws FileNotFoundException {
-		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		final Source[] sources = new Source[schemaLocations.size()];
-		int i = 0;
-		
-		schemaFactory.setResourceResolver(new XsdResourceResolver(uriResolver));
-		
-		for (URI schemaLocation : schemaLocations)
-			sources[i++] = new StreamSource(new File(uriResolver.toSystemUri(schemaLocation)));
-		
-		try {
-			return schemaFactory.newSchema(sources);
-			//schema = schemaFactory.newSchema(new StreamSource(new File("/home/max/development/java/algorythm-cms/target/classes/de/algorythm/cms/common/types/CMS.xsd")));
-		} catch(SAXException e) {
-			throw new IllegalStateException("Cannot load XML schema. " + e, e);
-		}
-	}
-	
-	private final IRenderingContext processCtx;
-	private final IResourceResolver resourceResolver;
-	private final IOutputUriResolver outputUriResolver;
-	private final SAXParserFactory parserFactory;
+	private final IUriResolver resourceResolver;
+	private final IOutputUriResolver outputResolver;
 	private final Templates templates;
 	private final URIResolver uriResolverAdapter;
 	private final OutputURIResolver outputUriResolverAdapter;
 	
-	public TransformationContext(final IRenderingContext processCtx, final Collection<URI> schemaFiles, final Collection<URI> xslSources) throws FileNotFoundException {
-		this(processCtx,
-			createSAXParserFactory(schemaFiles, processCtx.getInputUriResolver()),
-			createTransformationTemplates(xslSources, processCtx.getInputUriResolver()),
-			processCtx.getInputUriResolver(), processCtx.getOutputUriResolver());
+	public TransformationContext(final IRenderingContext processCtx, final Collection<Path> xslSources) {
+		this(createTransformationTemplates(xslSources, processCtx.getResourceResolver()),
+			processCtx.getResourceResolver(), processCtx.getOutputResolver());
 	}
 	
-	private TransformationContext(final IRenderingContext processCtx, final SAXParserFactory parserFactory, final Templates templates, final IResourceResolver resourceResolver, final IOutputUriResolver outputUriResolver) {
-		this.processCtx = processCtx;
-		this.resourceResolver = resourceResolver;
-		this.outputUriResolver = outputUriResolver;
-		this.parserFactory = parserFactory;
+	private TransformationContext(final Templates templates, final IUriResolver uriResolver, final IOutputUriResolver outputUriResolver) {
+		this.resourceResolver = uriResolver;
+		this.outputResolver = outputUriResolver;
 		this.templates = templates;
-		uriResolverAdapter = new CmsInputURIResolver(resourceResolver);
+		uriResolverAdapter = new CmsInputURIResolver(uriResolver);
 		outputUriResolverAdapter = new CmsOutputURIResolver(outputUriResolver);
 	}
 	
+	@Override
 	public TransformationContext createLocalized(final Locale locale, final boolean localizedOutput) {
-		final IResourceResolver inputResolver = resourceResolver.createLocalizedResolver(locale);
-		final IOutputUriResolver outputResolver = localizedOutput
-				? outputUriResolver.createLocalizedResolver(locale)
-				: outputUriResolver;
+		final IUriResolver inResolver = resourceResolver.createLocalizedResolver(locale);
+		final IOutputUriResolver outResolver = localizedOutput
+				? outputResolver.createLocalizedResolver(locale)
+				: outputResolver;
 		
-		return new TransformationContext(processCtx, parserFactory, templates, inputResolver, outputResolver);
+		return new TransformationContext(templates, inResolver, outResolver);
 	}
 	
-	public XMLReader createReader() {
-		try {
-			final XMLReader reader = parserFactory.newSAXParser().getXMLReader();
-			
-			reader.setErrorHandler(ERROR_HANDLER);
-			
-			return reader;
-		} catch(Exception e) {
-			throw new IllegalStateException("Cannot create SAX parser. " + e, e);
-		}
-	}
-	
+	@Override
 	public Transformer createTransformer() {
 		try {
 			final Transformer transformer = templates.newTransformer();
@@ -171,22 +61,33 @@ public class TransformationContext {
 			transformer.setURIResolver(uriResolverAdapter);
 			trnsfrmCtrl.setOutputURIResolver(outputUriResolverAdapter);
 			
-			
 			return transformer;
 		} catch (TransformerConfigurationException e) {
 			throw new IllegalStateException("Cannot create transformer. " + e, e);
 		}
 	}
-	
-	public void execute(IRenderingJob job) {
-		processCtx.execute(job);
-	}
 
-	public IResourceResolver getResourceResolver() {
+	@Override
+	public IUriResolver getResourceResolver() {
 		return resourceResolver;
 	}
 
+	@Override
 	public IOutputUriResolver getOutputUriResolver() {
-		return outputUriResolver;
+		return outputResolver;
 	}
+	
+	/*public void transform(final Path source, final Path target) throws IOException, TransformerException {
+		final XMLReader xmlReader = createReader();
+		final Transformer transformer = createTransformer();
+		final Reader fileReader = Files.newBufferedReader(source, StandardCharsets.UTF_8);
+		final Writer writer = Files.newBufferedWriter(target, StandardCharsets.UTF_8);
+		final InputSource src = new InputSource(fileReader);
+		final Source xmlSource = new SAXSource(xmlReader, src);
+		final StreamResult xmlResult = new StreamResult(writer);
+		
+		xmlSource.setSystemId(source.toString());
+		xmlResult.setSystemId(target.toString());
+		transformer.transform(xmlSource, xmlResult);
+	}*/
 }

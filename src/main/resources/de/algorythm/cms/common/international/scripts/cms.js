@@ -1,8 +1,8 @@
-(function(w) {
+(function(w, angular) {
 var absoluteUrlRegex = /^(\/|[\w]+:\/\/).+/;
 var parentUrlRegex = /^(.*?)\/?[^\/#?]*([#?].*)?$/;
 var urlBackRegex = /\/[^\/]+\/\.\./g
-var urlThisRegex = /\/\./g
+var urlThisRegex = /\/\.(\/|$)/g
 var startFileRegex = /^(.*?)(\/|\/index\.html)?[^\/#?]*$/;
 
 var parentUrl = function(url) {
@@ -10,34 +10,34 @@ var parentUrl = function(url) {
 };
 
 var normalizedUrl = function(url) {
+	var lastUrl;
+	
 	do {
 		lastUrl = url;
-		url = url.replace(urlBackRegex, ""); 
+		url = url.replace(urlThisRegex, '$1');
 	} while (url != lastUrl);
 	
 	do {
 		lastUrl = url;
-		url = url.replace(urlThisRegex, ""); 
+		url = url.replace(urlBackRegex, '');
 	} while (url != lastUrl);
 	
 	return url;
 };
 
-String.prototype.toAbsoluteUrl = function() {
-	if (absoluteUrlRegex.test(this))
-		return normalizedUrl(this);
+var absoluteUrl = function(href, base) {
+	if (absoluteUrlRegex.test(href))
+		return normalizedUrl(href);
 	else
-		return normalizedUrl(parentUrl(w.location.href) + '/' + this);
+		return normalizedUrl(parentUrl(base) + '/' + href);
 };
 
 if (cms.baseUrl != '.' || !startFileRegex.test(w.location.href)) {
-	var absBaseUrl = cms.baseUrl.toAbsoluteUrl();
 	var absUrl = w.location.href;
+	var absBaseUrl = absoluteUrl(cms.baseUrl, absUrl);
 	var anchor = parentUrl(absUrl.substring(absBaseUrl.length, absUrl.length));
 	w.location.href = absBaseUrl + '/#' + anchor;
 }
-})(window);
-
 
 var obj2str = function(o) {
 	var s = "";
@@ -47,27 +47,31 @@ var obj2str = function(o) {
 	return s;
 };
 
+var absSiteRootUrl = absoluteUrl(cms.baseUrl, w.location.href) + '/';
+
 angular.module('cms', ['ngRoute']).
 		config(['$routeProvider', function($routeProvider) {
 	var anchorRegex = /#(\/.+?)\/?$/;
 	var pathRegex = /^[\w]+:\/\/[^\/]*(\/.*?\/)([^\/]+)?(#.*)?$/
 	var url = window.location;
 	var match = pathRegex.exec(url);
-	//var basePath = match ? match[1] : '/';
-	//alert(basePath);
 	 
 	$routeProvider.otherwise({
 		templateUrl: function() {
-			var match = anchorRegex.exec(window.location);
+			var match = anchorRegex.exec(w.location);
 			
 			return cms.baseUrl + (match ? match[1] : '') + '/content.html';
-		}/*,
-		controller: function($rootScope) {
-			//alert('## ' + $('main'));
-			$rootScope.title = 'test';
-			//$('title').text('test');
-		}*/
+		},
+		controller: ['$scope', '$location', function($scope, $location) {
+			var path = $location.path();
+			
+			$scope.cmsAbsPageBaseUrl = path == '/'
+				? absSiteRootUrl : absoluteUrl(path.substring(1), absSiteRootUrl) + '/';
+		}]
 	});
+}]).
+run(['$rootScope', function($rootScope) {
+	$rootScope.cmsAbsPageBaseUrl = absSiteRootUrl;
 }]).
 directive('a', ['$location', function($location) {
 	return {
@@ -75,11 +79,14 @@ directive('a', ['$location', function($location) {
 		link: function(scope, el, attrs) {
 			var url = attrs.href;
 			
-			if (url.indexOf(cms.baseUrl) == 0 && url.indexOf('/index.html') == url.length - 11) {
-				// Rewrite internal URL to AJAX call
-				url = url.substring(cms.baseUrl.length, url.length - 11);
+			if (url) {
+				url = absoluteUrl(url, scope.cmsAbsPageBaseUrl);
 				
-				el.attr('href', '#' + (url ? url : '/'));
+				if (url.indexOf(absSiteRootUrl) == 0 && url.indexOf('/index.html') == url.length - 11) {
+					// Rewrite internal URL to AJAX call
+					url = url.substring(absSiteRootUrl.length - 1, url.length - 11);
+					el.attr('href', '#' + (url ? url : '/'));
+				}
 			}
 		}
 	};
@@ -89,6 +96,20 @@ directive('cmsPageTitle', ['$rootScope', function($rootScope) {
 		restrict: 'A',
 		link: function(scope, el, attrs) {
 			$rootScope.pageTitle = attrs.cmsPageTitle;
+		}
+	};
+}]).
+directive('cmsLanguage', ['$location', function($location) {
+	return {
+		restrict: 'A',
+		link: function(scope, el, attrs) {
+			var lang = attrs.cmsLanguage;
+			
+			if (lang) {
+				scope.$on('$locationChangeStart', function() {
+					el.attr('href', absSiteRootUrl + "../" + lang + "/#" + $location.path());
+				});
+			}
 		}
 	};
 }]).
@@ -117,3 +138,4 @@ directive('cmsMenu', ['$location', function($location) {
 		}
 	};
 }]);
+})(window, angular);

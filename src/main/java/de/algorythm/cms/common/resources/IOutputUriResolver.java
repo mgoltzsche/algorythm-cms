@@ -1,11 +1,12 @@
 package de.algorythm.cms.common.resources;
 
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.Locale;
 
 public interface IOutputUriResolver {
 
-	URI resolveUri(URI publicUri);
-	URI resolveUri(URI publicUri, URI systemBaseUri);
 	IOutputUriResolver createLocalizedResolver(Locale locale);
+	Path getOutputDirectory();
+	Path resolveUri(Path publicPath);
+	Path resolveUri(Path publicPath, Path systemBasePath);
 }

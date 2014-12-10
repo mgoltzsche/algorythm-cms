@@ -1,8 +1,8 @@
 package de.algorythm.cms.common.impl.xml.contentHandler;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Stack;
 
 import org.xml.sax.Attributes;
@@ -17,22 +17,22 @@ import de.algorythm.cms.common.IXmlReaderFactory;
 import de.algorythm.cms.common.impl.xml.Constants.Attribute;
 import de.algorythm.cms.common.impl.xml.Constants.Namespace;
 import de.algorythm.cms.common.impl.xml.Constants.Tag;
-import de.algorythm.cms.common.resources.IResourceUriResolver;
+import de.algorythm.cms.common.resources.IUriResolver;
 
 public class IncludingHandler implements ContentHandler, ErrorHandler {
 
 	private final IXmlReaderFactory readerFactory;
 	private ContentHandler delegator;
 	private final Stack<Locator> locators = new Stack<Locator>();
-	private final IResourceUriResolver contentUriResolver;
+	private final IUriResolver uriResolver;
 	
-	public IncludingHandler(final IXmlReaderFactory readerFactory, final IResourceUriResolver contentUriResolver) {
-		this(readerFactory, contentUriResolver, null);
+	public IncludingHandler(final IXmlReaderFactory readerFactory, final IUriResolver uriResolver) {
+		this(readerFactory, uriResolver, null);
 	}
 	
-	public IncludingHandler(final IXmlReaderFactory readerFactory, final IResourceUriResolver contentUriResolver, final ContentHandler handler) {
+	public IncludingHandler(final IXmlReaderFactory readerFactory, final IUriResolver uriResolver, final ContentHandler handler) {
 		this.readerFactory = readerFactory;
-		this.contentUriResolver = contentUriResolver;
+		this.uriResolver = uriResolver;
 		this.delegator = handler;
 	}
 	
@@ -55,28 +55,20 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 				throw new SAXException("Attribute '" + Attribute.HREF + "' of " + Namespace.CMS + ':' + Tag.INCLUDE + " must be set");
 			
 			final Locator locator = locators.peek();
-			final String systemId = locator.getSystemId();
-			final URI refSystemUri = contentUriResolver.toSystemUri(toUri(systemId), toUri(ref));
+			final Path systemId = Paths.get(locator.getSystemId());
+			final Path refSystemPath = uriResolver.resolve(Paths.get(ref), systemId);
 			final XMLReader reader = readerFactory.createReader();
 			
 			reader.setContentHandler(this);
 			reader.setErrorHandler(this);
 			
 			try {
-				reader.parse(refSystemUri.toString());
+				reader.parse(refSystemPath.toString());
 			} catch (IOException e) {
-				throw new SAXException("Cannot include " + refSystemUri + " into " + systemId, e);
+				throw new SAXException("Cannot include " + refSystemPath + " into " + systemId, e);
 			}
 		} else
 			delegator.startElement(uri, localName, qName, atts);
-	}
-	
-	private URI toUri(final String uri) throws SAXException {
-		try {
-			return new URI(uri);
-		} catch (URISyntaxException e) {
-			throw new SAXException("Invalid URI: " + uri, e);
-		}
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package de.algorythm.cms.common;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.inject.Inject;
 
@@ -22,16 +24,11 @@ public class CmsCommonMain {
 			System.exit(1);
 		}
 		
-		final File bundleXmlFile = new File(args[0]);
-		final File outputDirectory = new File(args[1]);
+		final Path bundleXmlFile = Paths.get(args[0]);
+		final Path outputDirectory = Paths.get(args[1]);
 		
-		if (!bundleXmlFile.exists()) {
+		if (!Files.exists(bundleXmlFile)) {
 			System.err.println("Invalid parameter value: " + bundleXmlFile + " not found");
-			System.exit(2);
-		}
-		
-		if (outputDirectory.isFile()) {
-			System.err.println("Invalid parameter value: " + outputDirectory + " is a file");
 			System.exit(2);
 		}
 		
@@ -54,7 +51,7 @@ public class CmsCommonMain {
 		Guice.createInjector(module).injectMembers(this);
 	}
 	
-	public void generate(final File bundleXml, final File outputDirectory) throws Throwable {
+	public void generate(final Path bundleXml, final Path outputDirectory) throws Throwable {
 		final IBundle bundle = facade.loadBundle(bundleXml);
 		/*final String tmpDirName = "algorythm-cms-" + new Date().getTime();
 		final File tmpDirectory = new File(System.getProperty("java.io.tmpdir", null), tmpDirName);

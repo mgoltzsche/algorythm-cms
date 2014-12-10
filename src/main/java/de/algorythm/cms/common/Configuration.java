@@ -1,8 +1,10 @@
 package de.algorythm.cms.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -22,7 +24,7 @@ public class Configuration {
 	}
 	
 	public final Locale defaultLanguage;
-	public final File outputDirectory;
+	public final Path outputDirectory;
 	
 	public Configuration() {
 		this(getPropertiesStream());
@@ -43,9 +45,9 @@ public class Configuration {
 		if (outputDirectoryStr == null)
 			throw new IllegalStateException("outputDirectory property is not configured");
 		
-		outputDirectory = new File(outputDirectoryStr);
+		outputDirectory = Paths.get(outputDirectoryStr);
 		
-		if (outputDirectory.isFile())
+		if (Files.isRegularFile(outputDirectory))
 			throw new IllegalStateException("outputDirectory " + outputDirectory + " is an existing file");
 		
 		defaultLanguage = defaultLangStr == null

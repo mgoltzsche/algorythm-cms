@@ -63,10 +63,15 @@
 									<uri>http://cms.algorythm.de/common/Pages</uri>
 									<toFile>Pages.xsd</toFile>
 								</transformSchema>
+								<transformSchema>
+									<uri>http://cms.algorythm.de/common/Locales</uri>
+									<toFile>Locales.xsd</toFile>
+								</transformSchema>
 							</transformSchemas>
 							<includes>
 								<include>de/algorythm/cms/common/model/entity/impl/Bundle.java</include>
 								<include>de/algorythm/cms/common/model/entity/impl/PageInfo.java</include>
+								<include>de/algorythm/cms/common/model/entity/impl/LocaleInfos.java</include>
 							</includes>
 						</configuration>
 					</execution>
@@ -125,6 +130,12 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
+		</dependency>
+		<!-- Jimfs -->
+		<dependency>
+			<groupId>com.google.jimfs</groupId>
+			<artifactId>jimfs</artifactId>
+			<version>1.0</version>
 		</dependency>
 		<!-- SASS compiler -->
 		<dependency>

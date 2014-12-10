@@ -1,7 +1,7 @@
 package de.algorythm.cms.common.resources.impl;
 
-import java.io.File;
 import java.net.URL;
+import java.nio.file.Paths;
 
 import javax.inject.Inject;
 
@@ -26,7 +26,7 @@ public class ClasspathDependencyLoader implements IDependencyLoader {
 			throw new IllegalArgumentException("Cannot find bundle " + bundleName);
 		
 		try {
-			return loader.getBundle(new File(bundleFileUrl.toURI()));
+			return loader.getBundle(Paths.get(bundleFileUrl.toURI()));
 		} catch(Exception e) {
 			throw new IllegalStateException("Cannot load bundle '" + bundleName + '\'', e);
 		}

@@ -1,11 +1,15 @@
 package de.algorythm.cms.common.model.loader.impl;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -18,6 +22,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -33,7 +38,7 @@ import de.algorythm.cms.common.model.loader.IBundleLoader;
 
 @Singleton
 public class BundleLoader implements IBundleLoader {
-	
+
 	private final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 	private final JAXBContext jaxbContext;
 	
@@ -44,16 +49,16 @@ public class BundleLoader implements IBundleLoader {
 	}
 	
 	@Override
-	public IBundle getBundle(final File bundleFile) throws JAXBException {
-		if (!bundleFile.exists())
+	public IBundle getBundle(final Path bundleFile) throws JAXBException {
+		if (!Files.exists(bundleFile))
 			throw new IllegalArgumentException(bundleFile + " does not exist");
 		
-		if (!bundleFile.isFile())
+		if (!Files.exists(bundleFile))
 			throw new IllegalArgumentException(bundleFile + " is a directory");
 		
 		final Bundle bundle = readBundle(bundleFile);
 		
-		bundle.setLocation(bundleFile.getParentFile().toURI());
+		bundle.setLocation(bundleFile.getParent());
 		
 		if (bundle.getTitle() == null)
 			bundle.setTitle(bundle.getName());
@@ -69,22 +74,21 @@ public class BundleLoader implements IBundleLoader {
 		
 		mergedSupportedLocales.add(new SupportedLocale(bundle.getDefaultLocale()));
 		mergedSupportedLocales.addAll(supportedLocales);
-		
 		bundle.setSupportedLocales(mergedSupportedLocales);
 		
 		return bundle;
 	}
 	
-	private Bundle readBundle(final File siteCfgFile) throws JAXBException {
+	private Bundle readBundle(final Path siteCfgFile) throws JAXBException {
 		final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		final Source source = new StreamSource(siteCfgFile.getAbsolutePath());
+		final Source source = new StreamSource(siteCfgFile.toString());
 		
 		return unmarshaller.unmarshal(source, Bundle.class).getValue();
 	}
 	
 	@Override
 	public IPage loadPages(final IBundle bundle, final Locale locale) {
-		final URI rootUri = bundle.getLocation().resolve("international/pages");
+		final Path rootPath = bundle.getLocation().resolve("international/pages");
 		final IPage startPage;
 		
 		try {
@@ -92,57 +96,98 @@ public class BundleLoader implements IBundleLoader {
 			final PageInfoHandler pageInfoHandler = new PageInfoHandler();
 			
 			reader.setContentHandler(pageInfoHandler);
-			startPage = loadPages(rootUri, "", bundle.getName(), reader, pageInfoHandler);
+			startPage = loadPages(rootPath, "", bundle.getName(), reader, pageInfoHandler);
 		} catch(Exception e) {
 			throw new RuntimeException("Cannot load start page of " + bundle.getName(), e);
 		}
 		
 		if (startPage == null)
-			throw new IllegalStateException("No start page defined in " + rootUri.getPath() + '/');
+			throw new IllegalStateException("No start page defined in " + rootPath);
 		
 		return startPage;
 	}
 	
-	private IPage loadPages(final URI rootUri, final String path, final String name, final XMLReader reader, final PageInfoHandler handler) throws IOException, SAXException {
-		final URI pageUri = URI.create(rootUri + path);
-		final PageInfo page = loadPage(rootUri, path, name, reader, handler);
+	static private class Result {
+		public IPage page;
+	}
+	
+	private IPage loadPages(final Path location, final String path, final String name, final XMLReader reader, final PageInfoHandler handler) throws IOException, SAXException {
+		final Path pageDirectory = location.getFileSystem().getPath(location.toString(), path);
+		//final PageInfo page = loadPage(location, path, name, reader, handler);
+		final LinkedList<IPage> pageStack = new LinkedList<IPage>();
+		final Result result = new Result();
 		
-		if (page != null) {
-			final List<IPage> subPages = new LinkedList<IPage>();
-			final File[] children = new File(pageUri).listFiles();
-			
-			page.setPages(subPages);
-			
-			if (children != null) {
-				for (File subDir : children) {
-					if (subDir.isDirectory()) {
-						final String subDirName = subDir.getName();
-						final String subPath = path + '/' + subDirName;
-						
-						subPages.add(loadPages(rootUri, subPath, subDirName, reader, handler));
+		Files.walkFileTree(pageDirectory, new FileVisitor<Path>() {
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir,
+					BasicFileAttributes attrs) throws IOException {
+				final Path pageFile = dir.resolve("page.xml");
+				
+				if (Files.exists(pageFile)) {
+					final IPage parentPage = pageStack.peek();
+					final String pageName = parentPage == null
+							? name
+							: pageFile.getParent().getFileName().toString();
+					String publicPath = location.relativize(dir).toString();
+					final IPage page;
+					
+					if (!publicPath.isEmpty())
+						publicPath = '/' + publicPath;
+					
+					try {
+						page = loadPage(pageFile, publicPath, pageName, reader, handler);
+					} catch (SAXException e) {
+						throw new RuntimeException("Cannot load page " + pageFile, e);
 					}
+					
+					if (parentPage != null)
+						parentPage.getPages().add(page);
+					
+					pageStack.push(page);
+					
+					return FileVisitResult.CONTINUE;
+				} else {
+					return FileVisitResult.SKIP_SUBTREE;
 				}
 			}
+
+			@Override
+			public FileVisitResult visitFile(Path file,
+					BasicFileAttributes attrs) throws IOException {
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFileFailed(Path file,
+					IOException exc) throws IOException {
+				throw exc;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir,
+					IOException exc) throws IOException {
+				result.page = pageStack.pop();
+				
+				return FileVisitResult.CONTINUE;
+			}
+		});
+		
+		return result.page;
+	}
+	
+	private PageInfo loadPage(final Path pageFile, final String publicPath, final String name, final XMLReader xmlReader, final PageInfoHandler handler) throws IOException, SAXException {
+		final PageInfo page = new PageInfo(publicPath, name);
+		final Reader fileReader = Files.newBufferedReader(pageFile, StandardCharsets.UTF_8);
+		final InputSource source = new InputSource(fileReader);
+		
+		source.setSystemId(pageFile.toString());
+		handler.setPage(page);
+		
+		try {
+			xmlReader.parse(source);
+		} catch (InformationCompleteException e) {
 		}
 		
 		return page;
-	}
-	
-	private PageInfo loadPage(final URI rootUri, final String path, final String name, final XMLReader reader, final PageInfoHandler handler) throws IOException, SAXException {
-		final PageInfo page = new PageInfo(path, name);
-		final URI pageUri = URI.create(rootUri + path + "/page.xml");
-		final File pageFile = new File(pageUri);
-		
-		if (pageFile.exists()) {
-			handler.setPage(page);
-			
-			try {
-				reader.parse(pageFile.getAbsolutePath());
-			} catch (InformationCompleteException e) {
-			}
-			
-			return page;
-		} else
-			return null;
 	}
 }

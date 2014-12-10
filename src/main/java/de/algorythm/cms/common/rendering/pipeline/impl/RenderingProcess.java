@@ -1,7 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
-import java.io.File;
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,15 +8,16 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.XMLReader;
 
 import com.google.inject.Injector;
 
 import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.resources.IOutputUriResolver;
-import de.algorythm.cms.common.resources.IResourceResolver;
+import de.algorythm.cms.common.resources.IUriResolver;
 import de.algorythm.cms.common.scheduling.IProcess;
 import de.algorythm.cms.common.scheduling.IProcessObserver;
 import de.algorythm.cms.common.scheduling.IProgressObserver;
@@ -105,35 +105,40 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public URI getPublicResourceOutputDirectory() {
-		return context.getPublicResourceOutputDirectory();
-	}
-
-	@Override
 	public IBundle getBundle() {
 		return context.getBundle();
 	}
 
 	@Override
-	public IResourceResolver getInputUriResolver() {
-		return context.getInputUriResolver();
-	}
-	
-	@Override
-	public IOutputUriResolver getOutputUriResolver() {
-		return context.getOutputUriResolver();
+	public Path getResourcePrefix() {
+		return context.getResourcePrefix();
 	}
 
 	@Override
-	public File getTempDirectory() {
+	public Path getTempDirectory() {
 		return context.getTempDirectory();
 	}
 
 	@Override
-	public File getOutputDirectory() {
+	public Path getOutputDirectory() {
 		return context.getOutputDirectory();
 	}
 
+	@Override
+	public IUriResolver getResourceResolver() {
+		return context.getResourceResolver();
+	}
+	
+	@Override
+	public IOutputUriResolver getOutputResolver() {
+		return context.getOutputResolver();
+	}
+
+	@Override
+	public XMLReader createXmlReader() {
+		return context.createXmlReader();
+	}
+	
 	@Override
 	public String getProperty(String name) {
 		return context.getProperty(name);

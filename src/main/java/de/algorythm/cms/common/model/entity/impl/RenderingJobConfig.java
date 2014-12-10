@@ -71,7 +71,7 @@ public class RenderingJobConfig extends AbstractMergeable implements IRenderingJ
 
 	@Override
 	protected String getMergeableId() {
-		return phase.name() + '-' + jobType.getName();
+		return (phase == null ? "" : phase.name()) + '-' + (jobType == null ? "" : jobType.getName());
 	}
 
 	@Override

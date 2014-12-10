@@ -9,5 +9,6 @@
 	<include schemaLocation="Grid.xsd" />
 	<include schemaLocation="Navigation.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Pages" schemaLocation="Pages.xsd" />
+	<import namespace="http://cms.algorythm.de/common/Locales" schemaLocation="Locales.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Article" schemaLocation="Article.xsd" />
 </schema>

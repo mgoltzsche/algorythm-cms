@@ -1,35 +1,45 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
-import java.io.File;
-import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
-
-import com.google.common.base.Charsets;
 
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.resources.IOutputUriResolver;
+import de.algorythm.cms.common.resources.IUriResolver;
 
 public class JavascriptCompressor implements IRenderingJob {
 
-	static private final URI MAIN_JS_URI = URI.create("main.js");
+	static private final Path MAIN_JS = Paths.get("main.js");
 	
-	private final Set<File> sources = new LinkedHashSet<File>();
+	private final Set<Path> sources = new LinkedHashSet<Path>();
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
-		final IOutputUriResolver outputResolver = ctx.getOutputUriResolver();
-		final URI jsUri = ctx.getPublicResourceOutputDirectory().resolve(MAIN_JS_URI);
-		final URI jsSystemUri = outputResolver.resolveUri(jsUri);
-		final File jsFile = new File(jsSystemUri);
-		final StringBuilder scripts = new StringBuilder();
+		final IUriResolver inResolver = ctx.getResourceResolver();
+		final IOutputUriResolver outResolver = ctx.getOutputResolver();
+		final Path jsPath = ctx.getResourcePrefix().resolve(MAIN_JS);
+		final Path jsSystemPath = outResolver.resolveUri(jsPath);
+		final LinkedList<String> scriptLines = new LinkedList<String>();
 		
-		for (File source : sources)
-			scripts.append(FileUtils.readFileToString(source, Charsets.UTF_8.name()));
+		for (Path source : sources) {
+			final Path file = inResolver.resolve(source);
+			
+			for (String line : Files.readAllLines(file, StandardCharsets.UTF_8))
+				scriptLines.add(line);
+		}
 		
-		FileUtils.writeStringToFile(jsFile, scripts.toString(), Charsets.UTF_8.name());
+		Files.createDirectories(jsSystemPath.getParent());
+		Files.write(jsSystemPath, scriptLines, StandardCharsets.UTF_8);
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 }

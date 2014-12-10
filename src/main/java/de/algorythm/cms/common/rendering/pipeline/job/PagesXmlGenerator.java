@@ -1,6 +1,8 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
-import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -14,7 +16,7 @@ import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 
-public class PageIndexer implements IRenderingJob {
+public class PagesXmlGenerator implements IRenderingJob {
 
 	@Inject
 	private IBundleLoader pageLoader;
@@ -24,25 +26,26 @@ public class PageIndexer implements IRenderingJob {
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
 		final IBundle bundle = ctx.getBundle();
-		final File outputDirectory = ctx.getTempDirectory();
+		final Path outputDir = ctx.getTempDirectory();
 		
 		for (ISupportedLocale supportedLocale : bundle.getSupportedLocales()) {
 			final Locale locale = supportedLocale.getLocale();
-			final File localizedDirectory = new File(outputDirectory, locale.getLanguage());
+			final Path localizedDir = outputDir.resolve(locale.getLanguage());
 			
-			localizedDirectory.mkdirs();
+			Files.createDirectories(localizedDir);
 			ctx.execute(new IRenderingJob() {
 				@Override
 				public void run(final IRenderingContext ctx) throws Exception {
 					final IPage startPage = pageLoader.loadPages(bundle, locale);
+					final Path pagesXml = localizedDir.resolve("pages.xml");
 					final Marshaller marshaller = jaxbContext.createMarshaller();
 					
 					marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-					marshaller.marshal(startPage, new File(localizedDirectory, "pages.xml"));
+					marshaller.marshal(startPage, Files.newBufferedWriter(pagesXml, StandardCharsets.UTF_8));
 				}
 				@Override
 				public String toString() {
-					return "PageIndexer:" + locale.getLanguage();
+					return PagesXmlGenerator.class.getSimpleName() + ":" + locale.getLanguage();
 				}
 			});
 		}
@@ -66,6 +69,6 @@ public class PageIndexer implements IRenderingJob {
 	
 	@Override
 	public String toString() {
-		return "PageIndexer";
+		return getClass().getSimpleName();
 	}
 }

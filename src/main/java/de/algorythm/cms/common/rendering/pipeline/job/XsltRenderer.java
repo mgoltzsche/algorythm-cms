@@ -3,13 +3,18 @@ package de.algorythm.cms.common.rendering.pipeline.job;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_PATH;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_TITLE;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.RELATIVE_BASE_URL;
-import static de.algorythm.cms.common.ParameterNameConstants.Render.RESOURCE_DIRECTORY;
+import static de.algorythm.cms.common.ParameterNameConstants.Render.RESOURCE_BASE_URL;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_NAME;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_PARAM_PREFIX;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.net.URI;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -44,39 +49,42 @@ public class XsltRenderer implements IRenderingJob {
 	static private final String BACK_SLASH = "../";
 	static private final String BACK = "..";
 	static private final String DOT = ".";
-		
+	
 	@Inject
 	private IBundleLoader loader;
-	private URI theme;
-	private List<URI> templates = new LinkedList<URI>();
-	private List<URI> schemas = new LinkedList<URI>();
+	private Path theme;
+	private List<Path> templates = new LinkedList<Path>();
 	
 	@Override
 	public void run(final IRenderingContext ctx) throws FileNotFoundException {
-		final LinkedList<URI> tpls = new LinkedList<URI>();
+		final LinkedList<Path> tpls = new LinkedList<Path>();
 		
-		tpls.add(theme);
 		tpls.addAll(templates);
+		tpls.add(theme);
 		
 		final IBundle bundle = ctx.getBundle();
-		final TransformationContext transformCtx = new TransformationContext(ctx, schemas, tpls);
+		final TransformationContext transformCtx = new TransformationContext(ctx, tpls);
+		final Path resourceBasePath = ctx.getResourcePrefix();
 		final Set<ISupportedLocale> supportedLocales = bundle.getSupportedLocales();
 		final boolean localizeOutput = supportedLocales.size() > 1;
+		final Path localizedResourceBasePath = localizeOutput
+				? Paths.get("/.." + resourceBasePath)
+				: resourceBasePath;
 		
 		for (ISupportedLocale supportedLocale : supportedLocales) {
 			final Locale locale = supportedLocale.getLocale();
 			final TransformationContext localizedTransformCtx = transformCtx.createLocalized(locale, localizeOutput);
 			final IPage startPage = loader.loadPages(bundle, locale);
 			
-			renderPages(startPage, localizedTransformCtx, ctx.getPublicResourceOutputDirectory(), ctx.getOutputDirectory().toURI());
+			renderPages(startPage, ctx, localizedTransformCtx, localizedResourceBasePath);
 		}
 	}
 	
-	private void renderPages(final IPage page, final TransformationContext transformCtx, final URI outputResourceDirectory, final URI outputDirectoryUri) {
-		transformCtx.execute(new IRenderingJob() {
+	private void renderPages(final IPage page, final IRenderingContext ctx, final TransformationContext transformCtx, final Path resourceBasePath) {
+		ctx.execute(new IRenderingJob() {
 			@Override
 			public void run(final IRenderingContext ctx) throws Exception {
-				render(ctx.getBundle(), page, transformCtx, outputResourceDirectory, outputDirectoryUri);
+				render(ctx.getBundle(), page, ctx, transformCtx, resourceBasePath);
 			}
 			@Override
 			public String toString() {
@@ -86,29 +94,32 @@ public class XsltRenderer implements IRenderingJob {
 		
 		// Render sub pages
 		for (IPage child : page.getPages())
-			renderPages(child, transformCtx, outputResourceDirectory, outputDirectoryUri);
+			renderPages(child, ctx, transformCtx, resourceBasePath);
 	}
 	
-	private void render(final IBundle bundle, final IPage page, final TransformationContext ctx, final URI outputResourceDirectory, final URI outputDirectoryUri) throws RenderingException {
-		final XMLReader reader = ctx.createReader();
-		final URI systemPageUri = bundle.getLocation().resolve("international/pages" + page.getPath() + "/page.xml");
-		final InputSource src = new InputSource(systemPageUri.getPath());
-		final Source pageSource = new SAXSource(reader, src);
+	private void render(final IBundle bundle, final IPage page, final IRenderingContext ctx, final TransformationContext transformCtx, final Path resourceBasePath) throws RenderingException, IOException {
+		final XMLReader xmlReader = ctx.createXmlReader();
+		final Path systemPagePath = bundle.getLocation().resolve("international/pages" + page.getPath() + "/page.xml");
+		final Reader fileReader = Files.newBufferedReader(systemPagePath, StandardCharsets.UTF_8);
+		final InputSource src = new InputSource(fileReader);
+		final Source pageSource = new SAXSource(xmlReader, src);
+		pageSource.setSystemId(systemPagePath.toString());
 		final String name = bundle.getName();
 		final String pagePath = page.getPath();
 		final String relativeBaseUrl = relativeBaseUrl(pagePath);
-		final URI outputFileUri = ctx.getOutputUriResolver().resolveUri(URI.create(page.getPath() + "/index.html"));
-		final File outputFile = new File(outputFileUri);
-		final IOutputUriResolver outputUriResolver = ctx.getOutputUriResolver();
-		final StreamResult result = new StreamResult(outputFile);
-		final Transformer transformer = ctx.createTransformer();
-		final URI publicPageOutputUri = URI.create(page.getPath() + "/index.html");
-		final URI systemPageOutputUri = outputUriResolver.resolveUri(publicPageOutputUri);
+		final Path publicPageFile = Paths.get(pagePath, "/index.html");
+		final IOutputUriResolver outputResolver = transformCtx.getOutputUriResolver();
+		final Path outputFile = outputResolver.resolveUri(publicPageFile);
+		Files.createDirectories(outputFile.getParent());
+		final Writer writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8);
+		final StreamResult result = new StreamResult(writer);
+		final Transformer transformer = transformCtx.createTransformer();
 		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
 		
-		trnsfrmCtrl.setBaseOutputURI(systemPageOutputUri.toString());
+		result.setSystemId(outputFile.toString());
+		trnsfrmCtrl.setBaseOutputURI(outputFile.toString());
 		transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
-		transformer.setParameter(RESOURCE_DIRECTORY, relativeBaseUrl + outputResourceDirectory);
+		transformer.setParameter(RESOURCE_BASE_URL, relativeBaseUrl + resourceBasePath);
 		transformer.setParameter(SITE_NAME, name);
 		transformer.setParameter(PAGE_PATH, pagePath);
 		transformer.setParameter(PAGE_TITLE, page.getTitle());
@@ -148,5 +159,10 @@ public class XsltRenderer implements IRenderingJob {
 				depth++;
 
 		return depth;
+	}
+	
+	@Override
+	public String toString() {
+		return "XsltRenderer";
 	}
 }

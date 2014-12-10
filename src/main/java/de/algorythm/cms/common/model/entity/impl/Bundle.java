@@ -1,8 +1,10 @@
 package de.algorythm.cms.common.model.entity.impl;
 
-import java.net.URI;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +20,7 @@ import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
+import de.algorythm.cms.common.model.entity.ISchemaLocation;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
 
 @XmlRootElement(name="bundle", namespace="http://cms.algorythm.de/common/Bundle")
@@ -26,7 +29,11 @@ public class Bundle implements IBundle {
 	@XmlAttribute(required = true)
 	private String name;
 	@XmlTransient
-	private URI location;
+	private Path location;
+	@XmlTransient
+	private List<Path> rootDirectories;
+	@XmlElementRef(type = SchemaLocation.class)
+	private final LinkedList<ISchemaLocation> schemaLocations = new LinkedList<ISchemaLocation>();
 	@XmlAttribute
 	private String title;
 	@XmlAttribute
@@ -48,22 +55,41 @@ public class Bundle implements IBundle {
 	private final Set<IOutputConfig> output = new LinkedHashSet<IOutputConfig>();
 	@XmlTransient
 	private Map<String, IOutputConfig> outputMap;
-	
+
 	@Override
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	public URI getLocation() {
+
+	@Override
+	public Path getLocation() {
 		return location;
 	}
 
-	public void setLocation(URI location) {
+	public void setLocation(Path location) {
 		this.location = location;
+	}
+
+	@Override
+	public LinkedList<ISchemaLocation> getSchemaLocations() {
+		return schemaLocations;
+	}
+
+	@Override
+	public List<Path> getRootDirectories() {
+		if (rootDirectories == null)
+			throw new IllegalStateException("Bundle '" + name + "' has not been expanded");
+		
+		return rootDirectories;
+	}
+
+	@Override
+	public void setRootDirectories(List<Path> rootDirectories) {
+		this.rootDirectories = rootDirectories;
 	}
 
 	@Override
@@ -169,8 +195,8 @@ public class Bundle implements IBundle {
 	public Bundle copy() {
 		final Bundle r = new Bundle();
 		
-		r.setName(name);
 		r.setLocation(location);
+		r.setName(name);
 		r.setTitle(title);
 		r.setDescription(description);
 		r.setDefaultLocale(defaultLocale);
@@ -179,6 +205,9 @@ public class Bundle implements IBundle {
 		r.dependencies.addAll(dependencies);
 		r.params.addAll(params);
 		r.supportedLocales.addAll(supportedLocales);
+		
+		for (ISchemaLocation schemaLocation : schemaLocations)
+			r.schemaLocations.add(new SchemaLocation(schemaLocation.getUri().normalize()));
 		
 		for (IOutputConfig outputCfg : output)
 			r.output.add(outputCfg.copy());

@@ -1,37 +1,41 @@
 package de.algorythm.cms.common.impl;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.io.FileUtils;
+import com.google.common.jimfs.Configuration;
+import com.google.common.jimfs.Jimfs;
 
 import de.algorythm.cms.common.ICmsCommonFacade;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
-import de.algorythm.cms.common.resources.IDependencyLoader;
-import de.algorythm.cms.common.resources.impl.ResourceResolver;
+import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.scheduling.IFuture;
 
 public class CmsCommonFacade implements ICmsCommonFacade {
 
-	private final IDependencyLoader dependencyLoader;
 	private final IBundleLoader bundleLoader;
+	private final IBundleExpander expander;
 	private final IRenderer renderer;
 	
 	@Inject
-	public CmsCommonFacade(final IBundleLoader bundleLoader, final IDependencyLoader dependencyLoader, final IRenderer renderer) throws IOException {
-		this.dependencyLoader = dependencyLoader;
+	public CmsCommonFacade(final IBundleLoader bundleLoader, final IBundleExpander expander, final IRenderer renderer) throws IOException {
 		this.bundleLoader = bundleLoader;
+		this.expander = expander;
 		this.renderer = renderer;
 	}
 	
 	@Override
-	public IBundle loadBundle(final File bundleXml) {
+	public IBundle loadBundle(final Path bundleXml) {
 		try {
 			return bundleLoader.getBundle(bundleXml);
 		} catch (JAXBException e) {
@@ -40,25 +44,53 @@ public class CmsCommonFacade implements ICmsCommonFacade {
 	}
 
 	@Override
-	public IFuture<Void> render(final IBundle bundle, final File outputDirectory) {
-		final String tmpDirName = "algorythm-cms-" + bundle.getName() + '-' + new Date().getTime();
-		final File tmpDirectory = new File(System.getProperty("java.io.tmpdir", null), tmpDirName);
+	public IFuture<Void> render(final IBundle bundle, final Path outputDirectory) {
+		final FileSystem tmpFs = Jimfs.newFileSystem(Configuration.unix());
+		final Path tempDirectory = tmpFs.getPath("/");
+		final IBundle expandedBundle = expander.expandBundle(bundle);
 		
 		try {
-			if (!tmpDirectory.mkdir())
-				throw new IOException("Cannot create temp directory " + tmpDirectory);
+			if (Files.exists(outputDirectory))
+				deleteDirectory(outputDirectory);
 			
-			if (outputDirectory.exists())
-				FileUtils.deleteDirectory(outputDirectory);
-			
-			if (!outputDirectory.mkdirs())
-				throw new IOException("Cannot create output directory " + outputDirectory);
+			Files.createDirectories(outputDirectory);
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}
 		
-		final ResourceResolver resourceResolver = new ResourceResolver(bundle, tmpDirectory, dependencyLoader);
-		
-		return renderer.render(resourceResolver, tmpDirectory, outputDirectory, resourceResolver.getMergedBundle().getOutput());
+		return renderer.render(expandedBundle, tempDirectory, outputDirectory);
+	}
+	
+	private void deleteDirectory(final Path directory) throws IOException {
+		Files.walkFileTree(directory, new FileVisitor<Path>() {
+
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir,
+					BasicFileAttributes attrs) throws IOException {
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path file,
+					BasicFileAttributes attrs) throws IOException {
+				Files.delete(file);
+				
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFileFailed(Path file, IOException exc)
+					throws IOException {
+				throw exc;
+			}
+
+			@Override
+			public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+					throws IOException {
+				Files.delete(dir);
+				
+				return FileVisitResult.CONTINUE;
+			}
+		});
 	}
 }

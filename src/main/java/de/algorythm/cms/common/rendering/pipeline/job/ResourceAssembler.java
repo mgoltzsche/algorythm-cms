@@ -17,13 +17,13 @@ public class ResourceAssembler implements IRenderingJob {
 	
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
-		final File outputDirectory = ctx.getOutputDirectory();
+		/*final File outputDirectory = ctx.getOutputDirectory();
 		final List<Pattern> compiledPattern = new LinkedList<Pattern>();
 		
 		for (String p : pattern)
 			compiledPattern.add(Pattern.compile(p));
 		
-		for (URI rootPath : ctx.getInputUriResolver().getRootPathes()) {
+		for (URI rootPath : ctx.getResourceResolver().getRootPathes()) {
 			final File rootDirectory = new File(rootPath);
 			
 			for (String resDirName : new String[] { "scripts", "img" }) {
@@ -33,6 +33,6 @@ public class ResourceAssembler implements IRenderingJob {
 				if (resDirectory.exists())
 					FileUtils.copyDirectory(resDirectory, outDirectory);
 			}
-		}
+		}*/
 	}
 }

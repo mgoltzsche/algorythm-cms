@@ -9,12 +9,15 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import de.algorythm.cms.common.impl.CmsCommonFacade;
 import de.algorythm.cms.common.impl.xml.XmlReaderFactory;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
+import de.algorythm.cms.common.model.entity.impl.LocaleInfos;
 import de.algorythm.cms.common.model.entity.impl.PageInfo;
 import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.model.loader.impl.BundleLoader;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.rendering.pipeline.impl.Renderer;
+import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IDependencyLoader;
+import de.algorythm.cms.common.resources.impl.BundleExpander;
 import de.algorythm.cms.common.resources.impl.ClasspathDependencyLoader;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler2;
@@ -30,6 +33,7 @@ public class CmsCommonModule extends AbstractModule {
 			bindIBundleLoader(bind(IBundleLoader.class));
 			bindIRenderer(bind(IRenderer.class));
 			bindIDependencyLoader(bind(IDependencyLoader.class));
+			bindIBundleExpander(bind(IBundleExpander.class));
 			bindIXmlReaderFactory(bind(IXmlReaderFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
 		} catch(Exception e) {
@@ -53,6 +57,10 @@ public class CmsCommonModule extends AbstractModule {
 		bind.to(BundleLoader.class);
 	}
 	
+	protected void bindIBundleExpander(AnnotatedBindingBuilder<IBundleExpander> bind) {
+		bind.to(BundleExpander.class);
+	}
+	
 	protected void bindIRenderer(AnnotatedBindingBuilder<IRenderer> bind) {
 		bind.to(Renderer.class);
 	}
@@ -67,7 +75,7 @@ public class CmsCommonModule extends AbstractModule {
 	
 	protected void bindJAXBContext(AnnotatedBindingBuilder<JAXBContext> bind) {
 		try {
-			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageInfo.class));
+			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageInfo.class, LocaleInfos.class));
 		} catch (JAXBException e) {
 			throw new RuntimeException("Cannot initialize JAXB context", e);
 		}

@@ -2,7 +2,8 @@ package de.algorythm.cms.common.model.dao.impl.xml;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Locale;
 
 import javax.xml.bind.JAXBContext;
@@ -21,7 +22,7 @@ public class TestXmlResourceDao {
 	public void testXmlResourceDao() throws Exception {
 		JAXBContext jaxbContext = JAXBContext.newInstance(Bundle.class, PageInfo.class);
 		BundleLoader testee = new BundleLoader(jaxbContext);
-		File bundleXml = new File(getClass().getResource("/test-repo/example1.org/bundle.xml").toURI());
+		Path bundleXml = Paths.get(getClass().getResource("/test-repo/example1.org/bundle.xml").toURI());
 		IBundle bundle = testee.getBundle(bundleXml);
 		IBundle expectedBundle = createSite("example.org", "My example site", Locale.ENGLISH, "/site1");
 		

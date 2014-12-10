@@ -5,8 +5,10 @@
 		default-template="http://cms.algorythm.de/common/theme/default-theme"
 		context-path="/site1">
 	<param id="testparam" value="paramvalue" />
+	<schema src="/types/de.algorythm.cms.common/CMS.xsd" />
 	<output id="html">
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.XsltRenderer" phase="TRANSFORM">
 			<param id="theme" value="/templates/de.algorythm.cms.common/html/Theme.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Article.xsl" />
@@ -15,7 +17,6 @@
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/SubNavigation.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Grid.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
-			<param id="schemas" value="/types/de.algorythm.cms.common/CMS.xsd" />
 		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM">
 			<param id="sources" value="/css/default-theme/main.scss" />
@@ -30,6 +31,6 @@
 		</job>
 	</output>
 	<output id="pdf">
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />
 	</output>
 </bundle>
