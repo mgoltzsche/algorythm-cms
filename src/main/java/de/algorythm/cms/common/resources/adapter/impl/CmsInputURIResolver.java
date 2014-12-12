@@ -6,7 +6,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -18,27 +17,28 @@ import de.algorythm.cms.common.resources.IUriResolver;
 public class CmsInputURIResolver implements URIResolver {
 
 	private final IUriResolver resolver;
-	private final Path notFoundContent;
+	private final URI notFoundContent;
 	
-	public CmsInputURIResolver(final IUriResolver resolver, final Path notFoundContent) {
+	public CmsInputURIResolver(final IUriResolver resolver, final URI notFoundContent) {
 		this.resolver = resolver;
 		this.notFoundContent = notFoundContent;
 	}
 	
 	@Override
 	public Source resolve(final String href, final String base) throws TransformerException {
-		final Path hrefPath = Paths.get(URI.create(href).getPath());
-		final Path basePath = Paths.get(URI.create(base).getPath());
+		final URI baseUri = URI.create(base);
+		URI publicUri = baseUri.resolve(href);
 		final Reader reader;
 		Path filePath;
 		
 		try {
-			filePath = resolver.resolve(hrefPath, basePath);
+			filePath = resolver.resolve(publicUri);
 		} catch(IllegalStateException e) {
 			if (notFoundContent == null)
 				throw e;
 			
 			filePath = resolver.resolve(notFoundContent);
+			publicUri = notFoundContent;
 		}
 		
 		try {
@@ -49,8 +49,8 @@ public class CmsInputURIResolver implements URIResolver {
 		
 		final Source source = new StreamSource(reader);
 		
-		source.setSystemId(filePath.toString());
-		
+		source.setSystemId(publicUri.toString());
+		System.out.println("##" + publicUri + "  " + filePath);
 		return source;
 	}
 }

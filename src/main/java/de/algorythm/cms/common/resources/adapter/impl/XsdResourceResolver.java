@@ -7,7 +7,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -25,11 +24,11 @@ public class XsdResourceResolver implements LSResourceResolver {
 	@Override
 	public LSInput resolveResource(String type, String namespaceURI,
 			String publicId, String systemId, String baseURI) {
-		final Path href = Paths.get(systemId);
-		final Path base = Paths.get(URI.create(baseURI).getPath());
-		final Path systemPath = uriResolver.resolve(href, base);
+		final URI base = URI.create(baseURI);
+		final URI publicUri = base.resolve(systemId);
+		final Path systemPath = uriResolver.resolve(publicUri);
 		
-		return new XsdInput(systemPath);
+		return new XsdInput(publicUri, systemPath);
 	}
 	
 	static private class XsdInput implements LSInput {
@@ -39,19 +38,15 @@ public class XsdResourceResolver implements LSResourceResolver {
 		private String encoding;
 		private boolean certifiedText;
 		
-		public XsdInput(final Path path) {
+		public XsdInput(final URI uri, final Path path) {
 			this.path = path;
-			systemId = path.toString();
+			systemId = uri.toString();
 			encoding = StandardCharsets.UTF_8.name();
 		}
 
 		@Override
 		public Reader getCharacterStream() {
-			try {
-				return Files.newBufferedReader(path, StandardCharsets.UTF_8);
-			} catch (IOException e) {
-				throw new RuntimeException("Cannot read schema file " + path, e);
-			}
+			return null;
 		}
 
 		@Override
@@ -61,7 +56,11 @@ public class XsdResourceResolver implements LSResourceResolver {
 
 		@Override
 		public InputStream getByteStream() {
-			return null;
+			try {
+				return Files.newInputStream(path);
+			} catch (IOException e) {
+				throw new RuntimeException("Cannot read " + path, e);
+			}
 		}
 
 		@Override

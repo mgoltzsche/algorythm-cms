@@ -6,7 +6,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public class Renderer implements IRenderer {
 
 	@Override
 	public IFuture<Void> render(final IBundle bundle, final Path tmpDirectory, final Path outputDirectory) {
-		final Path resourceOutputPath = Paths.get("/r/" + new Date().getTime() + '/');
+		final URI resourceOutputPath = URI.create("/r/" + new Date().getTime() + '/');
 		final IBundleRenderingContext ctx = new RenderingContext(bundle, tmpDirectory, outputDirectory, resourceOutputPath);
 		final Map<RenderingPhase, Set<IRenderingJob>> phaseMap = new HashMap<RenderingPhase, Set<IRenderingJob>>();
 		
@@ -154,7 +153,7 @@ public class Renderer implements IRenderer {
 		} else if (Integer.class == fieldType || int.class == fieldType) {
 			return Integer.parseInt(param.getValue());
 		} else if (Path.class == fieldType) {
-			return Paths.get(param.getValue());
+			return uriResolver.resolve(URI.create(param.getValue()).normalize());
 		} else if (URI.class == fieldType) {
 			return URI.create(param.getValue()).normalize();
 		} else {

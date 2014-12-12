@@ -1,8 +1,8 @@
 package de.algorythm.cms.common.impl.xml.contentHandler;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Stack;
 
 import org.xml.sax.Attributes;
@@ -55,8 +55,10 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 				throw new SAXException("Attribute '" + Attribute.HREF + "' of " + Namespace.CMS + ':' + Tag.INCLUDE + " must be set");
 			
 			final Locator locator = locators.peek();
-			final Path systemId = Paths.get(locator.getSystemId());
-			final Path refSystemPath = uriResolver.resolve(Paths.get(ref), systemId);
+			final URI hrefUri = URI.create(ref);
+			final URI baseUri = URI.create(locator.getSystemId());
+			final URI publicUri = baseUri.resolve(hrefUri);
+			final Path refSystemPath = uriResolver.resolve(publicUri);
 			final XMLReader reader = readerFactory.createReader();
 			
 			reader.setContentHandler(this);
@@ -65,7 +67,7 @@ public class IncludingHandler implements ContentHandler, ErrorHandler {
 			try {
 				reader.parse(refSystemPath.toString());
 			} catch (IOException e) {
-				throw new SAXException("Cannot include " + refSystemPath + " into " + systemId, e);
+				throw new SAXException("Cannot include " + hrefUri + " into " + baseUri, e);
 			}
 		} else
 			delegator.startElement(uri, localName, qName, atts);

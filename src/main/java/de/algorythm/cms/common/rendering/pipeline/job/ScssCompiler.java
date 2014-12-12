@@ -1,5 +1,8 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +28,7 @@ import de.algorythm.cms.common.resources.IOutputUriResolver;
 
 public class ScssCompiler implements IRenderingJob {
 
-	static private final String MAIN_CSS = "main.css";
+	static private final URI MAIN_CSS = URI.create("main.css");
 	
 	private List<URI> config = new LinkedList<URI>();
 	private List<URI> sources = new LinkedList<URI>();
@@ -50,7 +53,7 @@ public class ScssCompiler implements IRenderingJob {
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
 		final IOutputUriResolver outResolver = ctx.getOutputResolver();
-		final Path cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS);
+		final URI cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS);
 		final Path cssSystemPath = outResolver.resolveUri(cssPath);
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
@@ -63,7 +66,7 @@ public class ScssCompiler implements IRenderingJob {
 		parser.parseStyleSheet(source);
 		stylesheet.addResolver(createResolver(ctx));
 		stylesheet.setCharset(parser.getInputSource().getEncoding());
-        stylesheet.setFile(cssSystemPath.toFile());
+        stylesheet.setFile(new File(cssPath.getPath()));
 		stylesheet.compile();
 		Files.createDirectories(cssSystemPath.getParent());
 		Files.write(cssSystemPath, stylesheet.printState().getBytes(StandardCharsets.UTF_8));
@@ -73,11 +76,23 @@ public class ScssCompiler implements IRenderingJob {
 		return new ScssStylesheetResolver() {
 			@Override
 			public InputSource resolve(final ScssStylesheet parentStylesheet, final String identifier) {
-				final Path publicPath = Paths.get(identifier);
-				final Path basePath = Paths.get(parentStylesheet.getFileName());
-				final Path resolvedUri = ctx.getResourceResolver().resolve(publicPath, basePath);
+				final URI href = URI.create(identifier);
+				final URI base = URI.create(parentStylesheet.getFileName());
+				final URI publicUri = base.resolve(href);
+				final Path resolvedPath = ctx.getResourceResolver().resolve(publicUri);
+				final Reader reader;
 				
-				return new InputSource(resolvedUri.toString());
+				try {
+					reader = Files.newBufferedReader(resolvedPath, StandardCharsets.UTF_8);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+				
+				final InputSource source = new InputSource(reader);
+				
+				source.setURI(publicUri.toString());
+				
+				return source;
 			}
 		};
 	}

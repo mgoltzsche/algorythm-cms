@@ -2,6 +2,7 @@ package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import static de.algorythm.cms.common.rendering.pipeline.impl.TransformationContextInitializationUtil.createTransformationTemplates;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Locale;
@@ -28,14 +29,14 @@ public class TransformationContext implements ITransformationContext {
 	private final Templates templates;
 	private final URIResolver uriResolverAdapter;
 	private final OutputURIResolver outputUriResolverAdapter;
-	private final Path notFoundContent;
+	private final URI notFoundContent;
 	
-	public TransformationContext(final IRenderingContext processCtx, final Collection<Path> xslSources, final Path notFoundContent) {
+	public TransformationContext(final IRenderingContext processCtx, final Collection<URI> xslSources, final URI notFoundContent) {
 		this(createTransformationTemplates(xslSources, processCtx.getResourceResolver(), notFoundContent),
 			processCtx.getResourceResolver(), processCtx.getOutputResolver(), notFoundContent);
 	}
 	
-	private TransformationContext(final Templates templates, final IUriResolver uriResolver, final IOutputUriResolver outputUriResolver, final Path notFoundContent) {
+	private TransformationContext(final Templates templates, final IUriResolver uriResolver, final IOutputUriResolver outputUriResolver, final URI notFoundContent) {
 		this.resourceResolver = uriResolver;
 		this.outputResolver = outputUriResolver;
 		this.templates = templates;

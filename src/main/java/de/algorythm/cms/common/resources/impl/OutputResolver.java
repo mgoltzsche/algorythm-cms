@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.resources.impl;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -8,7 +9,7 @@ import de.algorythm.cms.common.resources.IOutputUriResolver;
 
 public class OutputResolver implements IOutputUriResolver {
 
-	static private final Path ROOT_PATH = Paths.get("/");
+	//static private final Path ROOT_PATH = Paths.get("/");
 	
 	private final Path directory;
 	private final Path localizedDirectory;
@@ -33,17 +34,20 @@ public class OutputResolver implements IOutputUriResolver {
 	}
 
 	@Override
-	public Path resolveUri(final Path publicPath) {
-		final Path systemPath = (publicPath.isAbsolute()
-				? localizedDirectory.resolve(ROOT_PATH.relativize(publicPath))
-				: localizedDirectory.resolve(publicPath)).normalize();
+	public Path resolveUri(final URI publicUri) {
+		final String path = publicUri.normalize().getPath();
+		final String relativePath = !path.isEmpty() && path.charAt(0) == '/'
+			? path.substring(1)
+			: path;
 		
-		validateSystemPath(systemPath);
+		if (relativePath.length() > 2 && relativePath.startsWith("../") ||
+				relativePath.startsWith(".."))
+			throw new IllegalAccessError("Output parent directory access denied: " + publicUri);
 		
-		return systemPath;
+		return localizedDirectory.resolve(relativePath);
 	}
 
-	@Override
+	/*@Override
 	public Path resolveUri(final Path publicPath, final Path systemBasePath) {
 		final Path systemPath = (publicPath.isAbsolute()
 				? localizedDirectory.resolve(ROOT_PATH.relativize(publicPath))
@@ -57,5 +61,5 @@ public class OutputResolver implements IOutputUriResolver {
 	private void validateSystemPath(final Path systemPath) {
 		if (!systemPath.startsWith(localizedDirectory))
 			throw new IllegalAccessError("Cannot write to " + systemPath + " since it is outside output directory " + localizedDirectory);
-	}
+	}*/
 }

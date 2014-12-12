@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
 import de.algorythm.cms.common.resources.IOutputUriResolver;
 import de.algorythm.cms.common.resources.IUriResolver;
 import de.algorythm.cms.common.scheduling.IProcess;
@@ -110,7 +112,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public Path getResourcePrefix() {
+	public URI getResourcePrefix() {
 		return context.getResourcePrefix();
 	}
 
@@ -139,6 +141,11 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 		return context.createXmlReader();
 	}
 	
+	@Override
+	public IXmlLoader getXmlLoader() {
+		return context.getXmlLoader();
+	}
+
 	@Override
 	public String getProperty(String name) {
 		return context.getProperty(name);

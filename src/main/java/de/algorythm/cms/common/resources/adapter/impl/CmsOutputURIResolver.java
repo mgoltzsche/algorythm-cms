@@ -2,10 +2,10 @@ package de.algorythm.cms.common.resources.adapter.impl;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.TransformerException;
@@ -24,9 +24,9 @@ public class CmsOutputURIResolver implements OutputURIResolver {
 	
 	@Override
 	public Result resolve(final String href, final String base) throws TransformerException {
-		final Path publicPath = Paths.get(href);
-		final Path systemBasePath = Paths.get(base);
-		final Path systemPath = resolver.resolveUri(publicPath, systemBasePath);
+		final URI baseUri = URI.create(base);
+		final URI publicUri = baseUri.resolve(href);
+		final Path systemPath = resolver.resolveUri(publicUri);
 		final Writer writer;
 		
 		try {

@@ -1,8 +1,8 @@
 package de.algorythm.cms.common.resources.impl;
 
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -17,7 +17,7 @@ import de.algorythm.cms.common.resources.IUriResolver;
 
 public class ResourceResolver implements IUriResolver {
 
-	static private final Path ROOT_PATH = Paths.get("/");
+	//static private final Path ROOT_PATH = Paths.get("/");
 	
 	private final Collection<Path> unlocalizedRootPathes;
 	private final Collection<Path> rootPathes;
@@ -36,7 +36,7 @@ public class ResourceResolver implements IUriResolver {
 		for (Path rootPath : bundle.getRootDirectories())
 			rootPathSet.add(rootPath);
 		
-		unlocalizedRootPathes = Collections.unmodifiableCollection(new LinkedList<Path>(rootPathSet));
+		unlocalizedRootPathes = new LinkedList<Path>(rootPathSet);
 		rootPathes = createLocalizedRootPathes("international");
 	}
 
@@ -60,45 +60,60 @@ public class ResourceResolver implements IUriResolver {
 		return rootPathes;
 	}
 
-	@Override
-	public Path resolve(final Path publicPath, final Path systemBasePath) {
-		return publicPath.isAbsolute()
+	/*@Override
+	public Path resolve(final URI publicPath, final URI systemBasePath) {
+		final String path = publicPath.getPath();
+		
+		return path.length() > 0 && path.charAt(0) == '/'
 			? resolve(publicPath)
-			: resolve(toPublicPath(systemBasePath.resolveSibling(publicPath)));
-	}
+			: resolve(toPublicPath(systemBasePath.resolve(publicPath)));
+	}*/
 
 	@Override
-	public Path resolve(final Path publicPath) {
-		final Path relativePath = publicPath.isAbsolute()
-				? ROOT_PATH.relativize(publicPath)
-				: publicPath;
+	public Path resolve(final URI publicUri) {
+		final String path = publicUri.normalize().getPath();
+		final String relativePath = path.length() > 0 && path.charAt(0) == '/'
+			? path.substring(1) : path;
+		
+		if (relativePath.length() > 2 && relativePath.startsWith("../") ||
+				relativePath.startsWith(".."))
+			throw new IllegalAccessError("Bundle parent directory access denied: " + publicUri);
 		
 		for (Path rootPath : rootPathes) {
-			final Path systemPath = rootPath.resolve(relativePath.toString()).normalize();
+			final Path systemPath = rootPath.resolve(relativePath);
 			
-			if (Files.exists(systemPath)) {
-				if (!systemPath.startsWith(rootPath))
-					throw new IllegalArgumentException(systemPath + " is outside root path " + rootPath);
-				
+			if (Files.exists(systemPath))
 				return systemPath;
-			}
 		}
 		
-		throw new IllegalStateException("Cannot resolve resource "
-				+ publicPath + ". Pathes: \n\t"
+		throw new IllegalStateException("Cannot resolve resource URI "
+				+ publicUri + ". Pathes: \n\t"
 				+ Joiner.on("\n\t").join(rootPathes));
 	}
-
+	
+	/*@Override
+	public boolean exists(final Path publicPath, final Locale locale) {
+		final String relativePath = relativizeBundlePath(publicPath).toString();
+		
+		for (Path rootPath : unlocalizedRootPathes) {
+			final Path systemPath = rootPath.resolve("de/" + publicPath).resolve(relativePath.toString()).normalize();
+			
+			if (Files.exists(systemPath)) {
+				
+			}
+		}
+	}
+	
 	private Path toPublicPath(Path systemPath) {
 		systemPath = systemPath.normalize();
 		
 		for (Path rootPath : rootPathes) {
 			if (systemPath.startsWith(rootPath))
-				return ROOT_PATH.resolve(rootPath.relativize(systemPath));
+				return rootPath.resolve(rootPath.relativize(systemPath));
 		}
 		
 		throw new IllegalArgumentException("Cannot publish system path "
 				+ systemPath + " because it is not contained in any path. "
 				+ "Pathes: \n\t" + Joiner.on("\n\t").join(rootPathes));
-	}
+	}*/
 }

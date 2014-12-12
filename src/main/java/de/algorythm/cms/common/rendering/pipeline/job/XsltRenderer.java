@@ -10,6 +10,7 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_PARAM_P
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,6 +43,7 @@ import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.rendering.pipeline.impl.RenderingException;
 import de.algorythm.cms.common.rendering.pipeline.impl.TransformationContext;
 import de.algorythm.cms.common.resources.IOutputUriResolver;
+import de.algorythm.cms.common.resources.IUriResolver;
 
 public class XsltRenderer implements IRenderingJob {
 
@@ -51,24 +53,24 @@ public class XsltRenderer implements IRenderingJob {
 	
 	@Inject
 	private IBundleLoader loader;
-	private List<Path> templates = new LinkedList<Path>();
-	private Path theme;
-	private Path notFoundContent;
+	private List<URI> templates = new LinkedList<URI>();
+	private URI theme;
+	private URI notFoundContent;
 	
 	@Override
 	public void run(final IRenderingContext ctx) {
-		final LinkedList<Path> tpls = new LinkedList<Path>();
+		final LinkedList<URI> tpls = new LinkedList<URI>();
 		
 		tpls.addAll(templates);
 		tpls.add(theme);
 		
 		final IBundle bundle = ctx.getBundle();
 		final TransformationContext transformCtx = new TransformationContext(ctx, tpls, notFoundContent);
-		final Path resourceBasePath = ctx.getResourcePrefix();
+		final URI resourceBasePath = ctx.getResourcePrefix();
 		final Set<ISupportedLocale> supportedLocales = bundle.getSupportedLocales();
 		final boolean localizeOutput = supportedLocales.size() > 1;
-		final Path localizedResourceBasePath = localizeOutput
-				? Paths.get("/.." + resourceBasePath)
+		final URI localizedResourceBasePath = localizeOutput
+				? URI.create("/.." + resourceBasePath.getPath())
 				: resourceBasePath;
 		
 		for (ISupportedLocale supportedLocale : supportedLocales) {
@@ -80,7 +82,7 @@ public class XsltRenderer implements IRenderingJob {
 		}
 	}
 	
-	private void renderPages(final IPage page, final IRenderingContext ctx, final TransformationContext transformCtx, final Path resourceBasePath) {
+	private void renderPages(final IPage page, final IRenderingContext ctx, final TransformationContext transformCtx, final URI resourceBasePath) {
 		ctx.execute(new IRenderingJob() {
 			@Override
 			public void run(final IRenderingContext ctx) throws Exception {
@@ -97,19 +99,20 @@ public class XsltRenderer implements IRenderingJob {
 			renderPages(child, ctx, transformCtx, resourceBasePath);
 	}
 	
-	private void render(final IBundle bundle, final IPage page, final IRenderingContext ctx, final TransformationContext transformCtx, final Path resourceBasePath) throws RenderingException, IOException {
-		final XMLReader xmlReader = ctx.createXmlReader();
-		final Path systemPagePath = bundle.getLocation().resolve("international/pages" + page.getPath() + "/page.xml");
+	private void render(final IBundle bundle, final IPage page, final IRenderingContext ctx, final TransformationContext transformCtx, final URI resourceBasePath) throws RenderingException, IOException {
+		final IUriResolver uriResolver = ctx.getResourceResolver();
+		final URI pageUri = URI.create("/pages/" + page.getPath());
+		final Path systemPagePath = uriResolver.resolve(pageUri);
 		final Reader fileReader = Files.newBufferedReader(systemPagePath, StandardCharsets.UTF_8);
 		final InputSource src = new InputSource(fileReader);
 		final Source pageSource = new SAXSource(xmlReader, src);
-		pageSource.setSystemId(systemPagePath.toString());
+		pageSource.setSystemId(pageUri.toString());
 		final String name = bundle.getName();
 		final String pagePath = page.getPath();
 		final String relativeBaseUrl = relativeBaseUrl(pagePath);
-		final Path publicPageFile = Paths.get(pagePath, "/index.html");
+		final URI outputUri = URI.create(pagePath + "/index.html");
 		final IOutputUriResolver outputResolver = transformCtx.getOutputUriResolver();
-		final Path outputFile = outputResolver.resolveUri(publicPageFile);
+		final Path outputFile = outputResolver.resolveUri(outputUri);
 		Files.createDirectories(outputFile.getParent());
 		final Writer writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8);
 		final StreamResult result = new StreamResult(writer);
