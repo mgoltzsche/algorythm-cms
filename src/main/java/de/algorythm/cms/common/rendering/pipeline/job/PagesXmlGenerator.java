@@ -45,7 +45,7 @@ public class PagesXmlGenerator implements IRenderingJob {
 				}
 				@Override
 				public String toString() {
-					return PagesXmlGenerator.class.getSimpleName() + ":" + locale.getLanguage();
+					return PagesXmlGenerator.class.getSimpleName() + ':' + locale.getLanguage();
 				}
 			});
 		}

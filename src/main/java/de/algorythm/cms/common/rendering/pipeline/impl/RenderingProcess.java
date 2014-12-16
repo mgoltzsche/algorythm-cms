@@ -1,14 +1,23 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.xml.sax.XMLReader;
 
 import com.google.inject.Injector;
@@ -44,6 +53,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	private final Iterator<PipelinePhase> phaseIter;
 	private PipelinePhase currentPhase;
 	private final IProgressObserver<Void> observer;
+	private final long startTime = new Date().getTime();
 
 	public RenderingProcess(final IBundleRenderingContext context, final List<Collection<IRenderingJob>> jobPhases, final Injector injector, final IProgressObserver<Void> observer) {
 		if (jobPhases.isEmpty())
@@ -88,6 +98,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 					if (phaseIter.hasNext()) {
 						currentPhase = phaseIter.next();
 					} else {
+						log.info("Finished " + this + " in " + (new Date().getTime() - startTime) + "ms");
 						processObserver.terminateProcess();
 						observer.finished();
 					}
@@ -154,5 +165,38 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	@Override
 	public void setProperty(String name, String value) {
 		context.setProperty(name, value);
+	}
+
+	@Override
+	public IBundleRenderingContext createLocalized(Locale locale,
+			boolean localizeOutput) {
+		return context.createLocalized(locale, localizeOutput);
+	}
+
+	@Override
+	public Document getDocument(URI uri) {
+		return context.getDocument(uri);
+	}
+
+	@Override
+	public void transform(URI sourceUri, URI targetUri, Transformer transformer)
+			throws IOException, TransformerException {
+		context.transform(sourceUri, targetUri, transformer);
+	}
+
+	@Override
+	public Transformer createTransformer(Templates templates,
+			URI notFoundContent) throws TransformerConfigurationException {
+		return context.createTransformer(templates, notFoundContent);
+	}
+
+	@Override
+	public Templates compileTemplates(Collection<URI> xslSourceUris) {
+		return context.compileTemplates(xslSourceUris);
+	}
+	
+	@Override
+	public String toString() {
+		return "RenderingProcess [" + context.getBundle().getName() + ']';
 	}
 }

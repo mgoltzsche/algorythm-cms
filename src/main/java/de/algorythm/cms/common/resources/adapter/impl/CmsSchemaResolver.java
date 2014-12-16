@@ -13,11 +13,11 @@ import org.w3c.dom.ls.LSResourceResolver;
 
 import de.algorythm.cms.common.resources.IUriResolver;
 
-public class XsdResourceResolver implements LSResourceResolver {
+public class CmsSchemaResolver implements LSResourceResolver {
 
 	private final IUriResolver uriResolver;
 	
-	public XsdResourceResolver(final IUriResolver uriResolver) {
+	public CmsSchemaResolver(final IUriResolver uriResolver) {
 		this.uriResolver = uriResolver;
 	}
 	

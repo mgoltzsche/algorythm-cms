@@ -1,26 +1,23 @@
 package de.algorythm.cms.common.resources.adapter.impl;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.dom.DOMSource;
 
-import de.algorythm.cms.common.resources.IUriResolver;
+import org.w3c.dom.Node;
+
+import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 
 public class CmsInputURIResolver implements URIResolver {
 
-	private final IUriResolver resolver;
+	private final IBundleRenderingContext ctx;
 	private final URI notFoundContent;
 	
-	public CmsInputURIResolver(final IUriResolver resolver, final URI notFoundContent) {
-		this.resolver = resolver;
+	public CmsInputURIResolver(final IBundleRenderingContext ctx, final URI notFoundContent) {
+		this.ctx = ctx;
 		this.notFoundContent = notFoundContent;
 	}
 	
@@ -28,29 +25,18 @@ public class CmsInputURIResolver implements URIResolver {
 	public Source resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);
 		URI publicUri = baseUri.resolve(href);
-		final Reader reader;
-		Path filePath;
+		Node document;
 		
 		try {
-			filePath = resolver.resolve(publicUri);
+			document = ctx.getDocument(publicUri);
 		} catch(IllegalStateException e) {
 			if (notFoundContent == null)
 				throw e;
 			
-			filePath = resolver.resolve(notFoundContent);
+			document = ctx.getDocument(notFoundContent);
 			publicUri = notFoundContent;
 		}
 		
-		try {
-			reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			throw new TransformerException("Cannot read content " + filePath, e);
-		}
-		
-		final Source source = new StreamSource(reader);
-		
-		source.setSystemId(publicUri.toString());
-		System.out.println("##" + publicUri + "  " + filePath);
-		return source;
+		return new DOMSource(document, publicUri.toString());
 	}
 }

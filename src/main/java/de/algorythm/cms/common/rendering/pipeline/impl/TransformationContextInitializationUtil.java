@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.rendering.pipeline.impl;
+/*package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -131,4 +131,4 @@ public class TransformationContextInitializationUtil {
 		
 		return new StreamSource(mergedTplReader);
 	}
-}
+}*/

@@ -17,8 +17,10 @@ import de.algorythm.cms.common.resources.IOutputUriResolver;
 public class CmsOutputURIResolver implements OutputURIResolver {
 
 	private final IOutputUriResolver resolver;
+	private final IOutputUriResolver tmpResolver;
 	
-	public CmsOutputURIResolver(final IOutputUriResolver resolver) {
+	public CmsOutputURIResolver(final IOutputUriResolver tmpResolver, final IOutputUriResolver resolver) {
+		this.tmpResolver = tmpResolver;
 		this.resolver = resolver;
 	}
 	
@@ -26,6 +28,9 @@ public class CmsOutputURIResolver implements OutputURIResolver {
 	public Result resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);
 		final URI publicUri = baseUri.resolve(href);
+		final String scheme = publicUri.getScheme();
+		final IOutputUriResolver resolver = scheme != null && "tmp".equals(scheme.toLowerCase())
+				? tmpResolver : this.resolver;
 		final Path systemPath = resolver.resolveUri(publicUri);
 		final Writer writer;
 		
@@ -37,7 +42,7 @@ public class CmsOutputURIResolver implements OutputURIResolver {
 		
 		final Result result = new StreamResult(writer);
 		
-		result.setSystemId(systemPath.toString());
+		result.setSystemId(publicUri.toString());
 		
 		return result;
 	}

@@ -12,7 +12,6 @@
 			</all>
 			<attribute name="title" type="token" />
 			<attribute name="nav-title" type="token" use="optional" />
-			<attribute name="template" type="token" use="optional" />
 			<attribute name="in-menu" type="boolean" default="true" />
 		</complexType>
 	</element>

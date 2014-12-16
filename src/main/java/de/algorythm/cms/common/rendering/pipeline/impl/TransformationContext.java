@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.rendering.pipeline.impl;
+/*package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import static de.algorythm.cms.common.rendering.pipeline.impl.TransformationContextInitializationUtil.createTransformationTemplates;
 
@@ -80,7 +80,7 @@ public class TransformationContext implements ITransformationContext {
 		return outputResolver;
 	}
 	
-	/*public void transform(final Path source, final Path target) throws IOException, TransformerException {
+	public void transform(final Path source, final Path target) throws IOException, TransformerException {
 		final XMLReader xmlReader = createReader();
 		final Transformer transformer = createTransformer();
 		final Reader fileReader = Files.newBufferedReader(source, StandardCharsets.UTF_8);
@@ -92,5 +92,5 @@ public class TransformationContext implements ITransformationContext {
 		xmlSource.setSystemId(source.toString());
 		xmlResult.setSystemId(target.toString());
 		transformer.transform(xmlSource, xmlResult);
-	}*/
-}
+	}
+}*/

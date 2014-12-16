@@ -25,5 +25,6 @@ public interface IBundle extends Comparable<IBundle> {
 	IOutputConfig getOutput(String id);
 	boolean containsOutput(IOutputConfig cfg);
 	boolean addOutput(IOutputConfig cfg);
+	IPage getStartPage();
 	IBundle copy();
 }

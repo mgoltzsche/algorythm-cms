@@ -2,7 +2,6 @@ package de.algorythm.cms.common.resources.impl;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
 
 import de.algorythm.cms.common.resources.IOutputUriResolver;
@@ -19,8 +18,8 @@ public class OutputResolver implements IOutputUriResolver {
 	}
 
 	private OutputResolver(final Path directory, final Locale locale) {
-		this.directory = directory.normalize();
-		this.localizedDirectory = this.directory.resolve(locale.getLanguage());
+		this.directory = directory;
+		this.localizedDirectory = directory.resolve(locale.getLanguage());
 	}
 
 	@Override

@@ -15,10 +15,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.github.sommeri.less4j.core.ast.Page;
+
 import de.algorythm.cms.common.impl.jaxb.adapter.LocaleXmlAdapter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
+import de.algorythm.cms.common.model.entity.IPage;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.ISchemaLocation;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
@@ -55,6 +58,8 @@ public class Bundle implements IBundle {
 	private final Set<IOutputConfig> output = new LinkedHashSet<IOutputConfig>();
 	@XmlTransient
 	private Map<String, IOutputConfig> outputMap;
+	@XmlElementRef(type = PageInfo.class)
+	private IPage startPage;
 
 	@Override
 	public String getName() {
@@ -178,6 +183,15 @@ public class Bundle implements IBundle {
 	@Override
 	public IOutputConfig getOutput(final String id) {
 		return getOutputMap().get(id);
+	}
+
+	@Override
+	public IPage getStartPage() {
+		return startPage;
+	}
+	
+	public void setStartPage(IPage startPage) {
+		this.startPage = startPage;
 	}
 
 	private Map<String, IOutputConfig> getOutputMap() {

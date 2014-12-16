@@ -30,8 +30,8 @@ public class ResourceResolver implements IUriResolver {
 	public ResourceResolver(final IBundle bundle, final Path tmpDirectory) {
 		final Set<Path> rootPathSet = new LinkedHashSet<Path>();
 		
-		rootPathSet.add(bundle.getLocation());
 		rootPathSet.add(tmpDirectory);
+		rootPathSet.add(bundle.getLocation());
 		
 		for (Path rootPath : bundle.getRootDirectories())
 			rootPathSet.add(rootPath);

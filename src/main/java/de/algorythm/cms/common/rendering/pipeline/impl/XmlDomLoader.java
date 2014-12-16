@@ -23,7 +23,7 @@ import org.xml.sax.SAXParseException;
 import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
 import de.algorythm.cms.common.rendering.pipeline.impl.Cache.IValueLoader;
 import de.algorythm.cms.common.resources.IUriResolver;
-import de.algorythm.cms.common.resources.adapter.impl.XsdResourceResolver;
+import de.algorythm.cms.common.resources.adapter.impl.CmsSchemaResolver;
 
 public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 
@@ -57,7 +57,7 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 	}
 	
 	@Override
-	public Document loadDocument(final Path path) {
+	public Document getDocument(final Path path) {
 		return domCache.get(path, this);
 	}
 	
@@ -71,7 +71,7 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 			
 			return builder.parse(stream);
 		} catch(Exception e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Cannot load " + systemPath + ". " + e, e);
 		}
 	}
 
@@ -80,7 +80,7 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 		final Source[] sources = new Source[schemaLocationUris.size()];
 		int i = 0;
 		
-		schemaFactory.setResourceResolver(new XsdResourceResolver(uriResolver));
+		schemaFactory.setResourceResolver(new CmsSchemaResolver(uriResolver));
 		
 		for (URI schemaLocationUri : schemaLocationUris) {
 			final Path schemaLocation = uriResolver.resolve(schemaLocationUri);

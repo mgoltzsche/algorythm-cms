@@ -6,5 +6,5 @@ import org.w3c.dom.Document;
 
 public interface IXmlLoader {
 
-	Document loadDocument(Path path);
+	Document getDocument(Path path);
 }
