@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<page xmlns="http://cms.algorythm.de/common/CMS"
-	xmlns:a="http://cms.algorythm.de/common/Article"
-	title="My test page">
+<article xmlns="http://cms.algorythm.de/common/CMS"
+	title="About page">
 	<flow-layout>
-		<nav />
+		<nav parent=".." />
 		<include href="/contents/article.xml" />
 		<grid columns="12">
 			<cell>Cell A</cell><cell span="10">Cell B</cell><cell>Cell C</cell>
 		</grid>
 	</flow-layout>
-</page>
+</article>

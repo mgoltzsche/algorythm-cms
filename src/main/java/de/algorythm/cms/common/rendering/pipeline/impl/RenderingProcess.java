@@ -18,17 +18,17 @@ import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.XMLReader;
 
 import com.google.inject.Injector;
 
 import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
-import de.algorythm.cms.common.resources.IOutputUriResolver;
-import de.algorythm.cms.common.resources.IUriResolver;
+import de.algorythm.cms.common.resources.ISourceUriResolver;
+import de.algorythm.cms.common.resources.ITargetUriResolver;
 import de.algorythm.cms.common.scheduling.IProcess;
 import de.algorythm.cms.common.scheduling.IProcessObserver;
 import de.algorythm.cms.common.scheduling.IProgressObserver;
@@ -138,20 +138,15 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public IUriResolver getResourceResolver() {
+	public ISourceUriResolver getResourceResolver() {
 		return context.getResourceResolver();
 	}
 	
 	@Override
-	public IOutputUriResolver getOutputResolver() {
+	public ITargetUriResolver getOutputResolver() {
 		return context.getOutputResolver();
 	}
 
-	@Override
-	public XMLReader createXmlReader() {
-		return context.createXmlReader();
-	}
-	
 	@Override
 	public IXmlLoader getXmlLoader() {
 		return context.getXmlLoader();
@@ -168,33 +163,37 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public IBundleRenderingContext createLocalized(Locale locale,
-			boolean localizeOutput) {
-		return context.createLocalized(locale, localizeOutput);
+	public Document getDocument(URI uri, Locale locale) {
+		return context.getDocument(uri, locale);
 	}
 
 	@Override
-	public Document getDocument(URI uri) {
-		return context.getDocument(uri);
-	}
-
-	@Override
-	public void transform(URI sourceUri, URI targetUri, Transformer transformer)
+	public void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale)
 			throws IOException, TransformerException {
-		context.transform(sourceUri, targetUri, transformer);
+		context.transform(sourceUri, targetUri, transformer, locale);
 	}
 
 	@Override
 	public Transformer createTransformer(Templates templates,
-			URI notFoundContent) throws TransformerConfigurationException {
-		return context.createTransformer(templates, notFoundContent);
+			URI notFoundContent, Locale locale) throws TransformerConfigurationException {
+		return context.createTransformer(templates, notFoundContent, locale);
 	}
 
 	@Override
 	public Templates compileTemplates(Collection<URI> xslSourceUris) {
 		return context.compileTemplates(xslSourceUris);
 	}
-	
+
+	@Override
+	public IPageConfig getStartPage(Locale locale) {
+		return context.getStartPage(locale);
+	}
+
+	@Override
+	public void setStartPage(Locale locale, IPageConfig page) {
+		context.setStartPage(locale, page);
+	}
+
 	@Override
 	public String toString() {
 		return "RenderingProcess [" + context.getBundle().getName() + ']';

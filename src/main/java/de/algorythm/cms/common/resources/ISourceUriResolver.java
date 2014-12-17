@@ -5,10 +5,9 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Locale;
 
-public interface IUriResolver {
+public interface ISourceUriResolver {
 
-	IUriResolver createLocalizedResolver(Locale locale);
 	Collection<Path> getRootPathes();
-	Path resolve(URI publicUri);
+	Path resolve(URI publicUri, Locale locale);
 	//Path resolve(Path publicPath, Path systemBasePath);
 }

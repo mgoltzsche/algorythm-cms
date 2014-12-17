@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+	title="My test page info">
+	<breadcrumbs ignore-root="false" />
+	<p>
+		Testinhalt
+		<b>fett</b>
+		<p>asdf</p>
+	</p>
+</article>

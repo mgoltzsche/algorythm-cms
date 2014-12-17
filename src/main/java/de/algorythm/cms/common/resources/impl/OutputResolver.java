@@ -4,46 +4,43 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Locale;
 
-import de.algorythm.cms.common.resources.IOutputUriResolver;
+import de.algorythm.cms.common.resources.ITargetUriResolver;
 
-public class OutputResolver implements IOutputUriResolver {
+public class OutputResolver implements ITargetUriResolver {
 
 	//static private final Path ROOT_PATH = Paths.get("/");
 	
-	private final Path directory;
-	private final Path localizedDirectory;
+	private final Path outputDirectory;
+	private final Path tmpDirectory;
 
-	public OutputResolver(final Path directory) {
-		this.localizedDirectory = this.directory = directory.normalize();
-	}
-
-	private OutputResolver(final Path directory, final Locale locale) {
-		this.directory = directory;
-		this.localizedDirectory = directory.resolve(locale.getLanguage());
+	public OutputResolver(final Path outputDirectory, final Path tmpDirectory) {
+		this.outputDirectory = outputDirectory.normalize();
+		this.tmpDirectory = tmpDirectory.normalize();
 	}
 
 	@Override
 	public Path getOutputDirectory() {
-		return localizedDirectory;
+		return outputDirectory;
 	}
 
 	@Override
-	public IOutputUriResolver createLocalizedResolver(final Locale locale) {
-		return new OutputResolver(directory, locale);
-	}
-
-	@Override
-	public Path resolveUri(final URI publicUri) {
+	public Path resolveUri(final URI publicUri, final Locale locale) {
+		final String scheme = publicUri.getScheme();
+		final Path directory = scheme != null && scheme.toLowerCase().equals("tmp")
+				? tmpDirectory : outputDirectory;
 		final String path = publicUri.normalize().getPath();
-		final String relativePath = !path.isEmpty() && path.charAt(0) == '/'
-			? path.substring(1)
-			: path;
+		String lang = locale.getLanguage();
+		lang = lang.isEmpty() ? "international" : lang;
+		final String relativePath = path.isEmpty() || path.charAt(0) == '/'
+			? lang + path
+			: lang + '/' + path;
 		
-		if (relativePath.length() > 2 && relativePath.startsWith("../") ||
-				relativePath.startsWith(".."))
+		final Path resolvedDirectory = directory.resolve(relativePath);
+		
+		if (!resolvedDirectory.toString().startsWith(directory.toString()))
 			throw new IllegalAccessError("Output parent directory access denied: " + publicUri);
 		
-		return localizedDirectory.resolve(relativePath);
+		return resolvedDirectory;
 	}
 
 	/*@Override

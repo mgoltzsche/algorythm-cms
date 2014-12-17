@@ -2,13 +2,17 @@
 		name="example.org"
 		title="My example site"
 		default-locale="en"
-		default-template="http://cms.algorythm.de/common/theme/default-theme"
 		context-path="/site1">
 	<locale locale="de" />
 	<param id="testparam" value="overwritten" />
 	<dependency name="common.cms.algorythm.de" />
+	<page content="/contents/welcome.xml">
+		<page name="mystuff" content="/contents/mystuff.xml">
+			<page name="info" content="/contents/info.xml" />
+		</page>
+		<page name="about" content="/contents/about.xml" />
+	</page>
 	<output id="html">
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM">
-		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM"/>
 	</output>
 </bundle>

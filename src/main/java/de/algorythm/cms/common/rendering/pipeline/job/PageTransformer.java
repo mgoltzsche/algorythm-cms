@@ -14,17 +14,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
 import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.model.entity.IPage;
+import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
-import de.algorythm.cms.common.model.loader.IBundleLoader;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 
@@ -34,8 +31,6 @@ public class PageTransformer implements IRenderingJob {
 	static private final String BACK = "..";
 	static private final String DOT = ".";
 	
-	@Inject
-	private IBundleLoader loader;
 	private List<URI> templates = new LinkedList<URI>();
 	private URI theme;
 	private URI notFoundContent;
@@ -62,48 +57,48 @@ public class PageTransformer implements IRenderingJob {
 		
 		for (ISupportedLocale supportedLocale : supportedLocales) {
 			final Locale locale = supportedLocale.getLocale();
-			final IBundleRenderingContext localizedCtx = ctx.createLocalized(locale, localizeOutput);
-			final IPage startPage = loader.loadPages(bundle, locale);
+			final IPageConfig startPage = ctx.getStartPage(locale);
 			
-			renderPages(startPage, templates, ctx, localizedCtx, localizedResourceBasePath);
+			renderPages(startPage, templates, ctx, locale, localizedResourceBasePath);
 		}
 	}
 	
-	private void renderPages(final IPage page, final Templates compiledTemplates, final IRenderingContext ctx, final IBundleRenderingContext lctx, final String resourceBasePath) {
+	private void renderPages(final IPageConfig pageConfig, final Templates compiledTemplates, final IRenderingContext ctx, final Locale locale, final String resourceBasePath) {
 		ctx.execute(new IRenderingJob() {
 			@Override
-			public void run(final IRenderingContext c) throws Exception {
-				render(ctx.getBundle(), page, compiledTemplates, lctx, resourceBasePath);
+			public void run(final IRenderingContext ctx) throws Exception {
+				render(ctx, pageConfig, compiledTemplates, locale, resourceBasePath);
 			}
 			@Override
 			public String toString() {
-				return page.getPath() + "/page.xml";
+				return pageConfig.getPath() + "/page.xml";
 			}
 		});
 		
 		// Render sub pages
-		for (IPage child : page.getPages())
-			renderPages(child, compiledTemplates, ctx, lctx, resourceBasePath);
+		for (IPageConfig child : pageConfig.getPages())
+			renderPages(child, compiledTemplates, ctx, locale, resourceBasePath);
 	}
 	
-	private void render(final IBundle bundle, final IPage page, final Templates compiledTemplates, final IBundleRenderingContext ctx, final String resourceBasePath) throws IOException, TransformerException {
-		final String pagePath = page.getPath();
-		final URI sourceUri = URI.create("/pages" + page.getPath() + "/page.xml");
-		final URI targetUri = URI.create(page.getPath() + "/index.html");
+	private void render(final IRenderingContext ctx, final IPageConfig pageCfg, final Templates compiledTemplates, final Locale locale, final String resourceBasePath) throws IOException, TransformerException {
+		final IBundle bundle = ctx.getBundle();
+		final String pagePath = pageCfg.getPath();
+		final URI sourceUri = pageCfg.getContent();
+		final URI targetUri = URI.create(pageCfg.getPath() + "/index.html");
 		final String relativeBaseUrl = relativeBaseUrl(pagePath);
 		final String resourceBaseUrl = URI.create(relativeBaseUrl + resourceBasePath).normalize().toString();
-		final Transformer transformer = ctx.createTransformer(compiledTemplates, notFoundContent);
+		final Transformer transformer = ctx.createTransformer(compiledTemplates, notFoundContent, locale);
 		
 		transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
 		transformer.setParameter(RESOURCE_BASE_URL, resourceBaseUrl);
 		transformer.setParameter(SITE_NAME, bundle.getName());
 		transformer.setParameter(PAGE_PATH, pagePath);
-		transformer.setParameter(PAGE_TITLE, page.getTitle());
+		transformer.setParameter(PAGE_TITLE, pageCfg.getTitle());
 		
 		for (IParam param : bundle.getParams())
 			transformer.setParameter(SITE_PARAM_PREFIX + param.getId(), param.getValue());
 		
-		ctx.transform(sourceUri, targetUri, transformer);
+		ctx.transform(sourceUri, targetUri, transformer, locale);
 	}
 	
 	private String relativeBaseUrl(final String path) {

@@ -8,9 +8,9 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.css.sac.InputSource;
@@ -24,7 +24,7 @@ import com.vaadin.sass.internal.resolver.ScssStylesheetResolver;
 
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.IOutputUriResolver;
+import de.algorythm.cms.common.resources.ITargetUriResolver;
 
 public class ScssCompiler implements IRenderingJob {
 
@@ -52,9 +52,9 @@ public class ScssCompiler implements IRenderingJob {
 	}
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
-		final IOutputUriResolver outResolver = ctx.getOutputResolver();
+		final ITargetUriResolver outResolver = ctx.getOutputResolver();
 		final URI cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS);
-		final Path cssSystemPath = outResolver.resolveUri(cssPath);
+		final Path cssSystemPath = outResolver.resolveUri(URI.create("../" + cssPath.getPath()), Locale.ROOT);
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
 		final ScssStylesheet stylesheet = docHandler.getStyleSheet();
@@ -79,7 +79,7 @@ public class ScssCompiler implements IRenderingJob {
 				final URI href = URI.create(identifier);
 				final URI base = URI.create(parentStylesheet.getFileName());
 				final URI publicUri = base.resolve(href);
-				final Path resolvedPath = ctx.getResourceResolver().resolve(publicUri);
+				final Path resolvedPath = ctx.getResourceResolver().resolve(publicUri, Locale.ROOT);
 				final Reader reader;
 				
 				try {

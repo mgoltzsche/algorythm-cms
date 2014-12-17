@@ -6,32 +6,30 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.saxon.lib.OutputURIResolver;
-import de.algorythm.cms.common.resources.IOutputUriResolver;
+import de.algorythm.cms.common.resources.ITargetUriResolver;
 
 public class CmsOutputURIResolver implements OutputURIResolver {
 
-	private final IOutputUriResolver resolver;
-	private final IOutputUriResolver tmpResolver;
+	private final ITargetUriResolver resolver;
+	private final Locale locale;
 	
-	public CmsOutputURIResolver(final IOutputUriResolver tmpResolver, final IOutputUriResolver resolver) {
-		this.tmpResolver = tmpResolver;
+	public CmsOutputURIResolver(final ITargetUriResolver resolver, final Locale locale) {
 		this.resolver = resolver;
+		this.locale = locale;
 	}
 	
 	@Override
 	public Result resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);
 		final URI publicUri = baseUri.resolve(href);
-		final String scheme = publicUri.getScheme();
-		final IOutputUriResolver resolver = scheme != null && "tmp".equals(scheme.toLowerCase())
-				? tmpResolver : this.resolver;
-		final Path systemPath = resolver.resolveUri(publicUri);
+		final Path systemPath = resolver.resolveUri(publicUri, locale);
 		final Writer writer;
 		
 		try {

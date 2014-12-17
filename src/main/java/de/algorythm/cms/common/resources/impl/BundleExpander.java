@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
@@ -20,6 +21,7 @@ import de.algorythm.cms.common.model.entity.impl.SchemaLocation;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IDependencyLoader;
 
+@Singleton
 public class BundleExpander implements IBundleExpander {
 
 	private final IDependencyLoader dependencyLoader;
@@ -43,6 +45,9 @@ public class BundleExpander implements IBundleExpander {
 		while (!flattened.isEmpty()) {
 			final Iterator<IBundle> iter = flattened.iterator();
 			final IBundle nextBundle = iter.next();
+			
+			if (expandBundle.getStartPage() == null && nextBundle.getStartPage() != null)
+				expandBundle.setStartPage(nextBundle.getStartPage());
 			
 			iter.remove();
 			mergeBundle(nextBundle, expandBundle);

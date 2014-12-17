@@ -4,10 +4,9 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Locale;
 
-public interface IOutputUriResolver {
+public interface ITargetUriResolver {
 
-	IOutputUriResolver createLocalizedResolver(Locale locale);
 	Path getOutputDirectory();
-	Path resolveUri(URI publicUri);
+	Path resolveUri(URI publicUri, Locale locale);
 	//Path resolveUri(Path publicPath, Path systemBasePath);
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Welcome">
+	<p>Welcome to Algorythm CMS!</p>
+	<p>If you see this page you have not yet set up your site's start page.</p> 
+</article>

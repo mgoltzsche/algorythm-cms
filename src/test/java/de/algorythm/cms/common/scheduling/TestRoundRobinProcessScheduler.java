@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler2;
+import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler;
 import static org.junit.Assert.*;
 
 public class TestRoundRobinProcessScheduler {
@@ -28,7 +28,7 @@ public class TestRoundRobinProcessScheduler {
 	@Test
 	public void testRoundRobinProcessScheduler() throws Exception {
 		final int workerCount = Runtime.getRuntime().availableProcessors();
-		final RoundRobinProcessScheduler2 testee = new RoundRobinProcessScheduler2(workerCount);
+		final RoundRobinProcessScheduler testee = new RoundRobinProcessScheduler(workerCount);
 		final ProcessMock[] processMocks = new ProcessMock[workerCount * 2];
 		
 		for (int i = 0; i < processMocks.length; i++) {

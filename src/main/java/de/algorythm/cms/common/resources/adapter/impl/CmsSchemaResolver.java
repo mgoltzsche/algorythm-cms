@@ -7,18 +7,19 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
-import de.algorythm.cms.common.resources.IUriResolver;
+import de.algorythm.cms.common.resources.ISourceUriResolver;
 
 public class CmsSchemaResolver implements LSResourceResolver {
 
-	private final IUriResolver uriResolver;
+	private final ISourceUriResolver sourceUriResolver;
 	
-	public CmsSchemaResolver(final IUriResolver uriResolver) {
-		this.uriResolver = uriResolver;
+	public CmsSchemaResolver(final ISourceUriResolver sourceUriResolver) {
+		this.sourceUriResolver = sourceUriResolver;
 	}
 	
 	@Override
@@ -26,7 +27,7 @@ public class CmsSchemaResolver implements LSResourceResolver {
 			String publicId, String systemId, String baseURI) {
 		final URI base = URI.create(baseURI);
 		final URI publicUri = base.resolve(systemId);
-		final Path systemPath = uriResolver.resolve(publicUri);
+		final Path systemPath = sourceUriResolver.resolve(publicUri, Locale.ROOT);
 		
 		return new XsdInput(publicUri, systemPath);
 	}

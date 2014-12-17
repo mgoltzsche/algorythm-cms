@@ -7,7 +7,6 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Date;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
@@ -17,9 +16,9 @@ import com.google.common.jimfs.Jimfs;
 
 import de.algorythm.cms.common.ICmsCommonFacade;
 import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.model.loader.IBundleLoader;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.resources.IBundleExpander;
+import de.algorythm.cms.common.resources.IBundleLoader;
 import de.algorythm.cms.common.scheduling.IFuture;
 
 public class CmsCommonFacade implements ICmsCommonFacade {

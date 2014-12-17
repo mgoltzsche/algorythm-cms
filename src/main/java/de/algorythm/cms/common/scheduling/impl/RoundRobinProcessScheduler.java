@@ -1,75 +1,117 @@
-/*package de.algorythm.cms.common.scheduling.impl;
+package de.algorythm.cms.common.scheduling.impl;
 
+import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.algorythm.cms.common.scheduling.IProcess;
+import de.algorythm.cms.common.scheduling.IProcessObserver;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
+import de.algorythm.cms.common.scheduling.impl.BlockingCycle.INode;
 
+@Singleton
 public class RoundRobinProcessScheduler implements IProcessScheduler {
-	
+
 	static private final Logger log = LoggerFactory.getLogger(RoundRobinProcessScheduler.class);
+	
+	private class Worker extends Thread implements IProcessObserver {
 
-	private class ProcessJobRunner implements Runnable {
-
-		private final IProcess process;
-		private final Runnable job;
-
-		public ProcessJobRunner(final IProcess process, final Runnable job) {
-			this.process = process;
-			this.job = job;
+		private final Lock workerLock = new ReentrantLock();
+		private INode<IProcess> currentProcessNode;
+		
+		public Worker(final ThreadGroup threadGroup, final String name) {
+			super(threadGroup, name);
 		}
 
 		@Override
 		public void run() {
-			try {
+			while (execute) {
 				try {
-					job.run();
-				} catch(Throwable e) {
-					log.error("Job execution '" + job + "' failed. " + e.getMessage(), e);
-				} finally {
-					process.jobTerminated(job);
+					currentProcessNode = processes.next();
+				} catch(InterruptedException e) {
+					if (execute)
+						log.error("Worker thread interrupted", e);
+					else
+						return;
 				}
-			} finally {
-				executeNextJobsFromProcesses();
+				
+				workerLock.lock();
+				
+				try {
+					currentProcessNode.getValue().runProcess(this);
+				} catch (Throwable e) {
+					log.error("Process '" + currentProcessNode.getValue() + "' threw " + e.getClass().getName(), e);
+				} finally {
+					workerLock.unlock();
+				}
 			}
+		}
+
+		@Override
+		public void terminateProcess() {
+			currentProcessNode.remove();
+		}
+		
+		public boolean shutdown() {
+			if (workerLock.tryLock()) {
+				try {
+					interrupt();
+				} finally {
+					workerLock.unlock();
+				}
+				
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	private final LinkedList<Worker> workers = new LinkedList<Worker>();
+	private final BlockingCycle<IProcess> processes = new BlockingCycle<IProcess>();
+	private boolean execute = true;
+	
+	public RoundRobinProcessScheduler() {
+		this(Runtime.getRuntime().availableProcessors());
+	}
+	
+	public RoundRobinProcessScheduler(final int workerCount) {
+		final ThreadGroup threadGroup = new ThreadGroup("scheduler-workers");
+		
+		for (int i = 0; i < workerCount; i++) {
+			final String workerName = "scheduler-worker-" + i;
+			final Worker worker = new Worker(threadGroup, workerName);
+			
+			worker.start();
+			workers.add(worker);
 		}
 	}
 	
-	private final ThreadPoolExecutor executor;
-	private final LinkedList<IProcess> processes = new LinkedList<IProcess>();
-	private final int workerCount;
-
-	public RoundRobinProcessScheduler() {
-		workerCount = Runtime.getRuntime().availableProcessors();
-		executor = new ThreadPoolExecutor(workerCount, workerCount, 1, TimeUnit.MINUTES, new LinkedBlockingDeque<Runnable>());
-	}
-
 	@Override
-	public synchronized void executeProcess(final IProcess process) {
-		processes.addFirst(process);
-		executeNextJobsFromProcesses();
+	public void execute(final IProcess process) {
+		processes.add(process);
 	}
-
-	private synchronized void executeNextJobsFromProcesses() {
-		int freeCapacity = workerCount - executor.getQueue().size();
+	
+	public void shutdown() {
+		execute = false;
 		
-		while (freeCapacity > 0 && !processes.isEmpty()) {
-			final IProcess nextProcess = processes.poll();
-			final Runnable nextJob = nextProcess.nextJob();
+		final LinkedList<Worker> activeWorkers = new LinkedList<Worker>(workers);
+		
+		while (!activeWorkers.isEmpty()) {
+			final Iterator<Worker> activeWorkerIter = activeWorkers.iterator();
 			
-			if (nextJob != null) {
-				executor.execute(new ProcessJobRunner(nextProcess, nextJob));
-				processes.add(nextProcess);
-				freeCapacity--;
-			} else {
-				log.info("Process terminated: " + nextProcess);
+			while (activeWorkerIter.hasNext()) {
+				final Worker worker = activeWorkerIter.next();
+				
+				if (worker.shutdown())
+					activeWorkerIter.remove();
 			}
 		}
 	}
-}*/
+}

@@ -7,19 +7,20 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Locale;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamSource;
 
-import de.algorythm.cms.common.resources.IUriResolver;
+import de.algorythm.cms.common.resources.ISourceUriResolver;
 
 public class CmsTemplateURIResolver implements URIResolver {
 
-	private final IUriResolver resolver;
+	private final ISourceUriResolver resolver;
 	
-	public CmsTemplateURIResolver(final IUriResolver resolver) {
+	public CmsTemplateURIResolver(final ISourceUriResolver resolver) {
 		this.resolver = resolver;
 	}
 	
@@ -27,7 +28,7 @@ public class CmsTemplateURIResolver implements URIResolver {
 	public Source resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);
 		final URI publicUri = baseUri.resolve(href);
-		final Path filePath = resolver.resolve(publicUri);
+		final Path filePath = resolver.resolve(publicUri, Locale.ROOT);
 		final Reader reader;
 		
 		try {

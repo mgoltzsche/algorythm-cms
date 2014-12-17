@@ -5,15 +5,13 @@
 	elementFormDefault="qualified">
 	<include schemaLocation="Types.xsd" />
 
-	<element name="article" substitutionGroup="c:abstract-content">
-        <complexType>
+	<element name="breadcrumbs" substitutionGroup="c:abstract-content">
+		<complexType>
 			<complexContent>
-				<extension base="c:Markup">
-					<attribute name="title" type="string" use="optional" />
-					<attribute name="nav-title" type="string" use="optional" />
-					<attribute name="template" type="anyURI" use="optional" />
+				<extension base="c:ContentType">
+					<attribute name="ignore-root" type="boolean" default="true" />
 				</extension>
 			</complexContent>
 		</complexType>
-    </element>
+	</element>
 </schema>

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<page xmlns="http://cms.algorythm.de/common/CMS"
-	xmlns:a="http://cms.algorythm.de/common/Article"
+<article xmlns="http://cms.algorythm.de/common/CMS"
 	title="Welcome"
 	nav-title="Welcome nav">
+	<breadcrumbs />
 	<grid columns-sm="2" columns-md="3" columns-lg="4" columns-xl="5">
 		<cell span="5">
 			<nav />
 		</cell>
 		<cell>
 			<include href="/contents/article.xml" />
-			<a:article>
+			<article>
 				<p>
 					Testinhalt 1
 					<b>fett</b>
 					<p>asdf</p>
 				</p>
-			</a:article>
-			<a:article>
+			</article>
+			<article>
 				Testinhaltsdfgsdf
-			</a:article>
+			</article>
 		</cell>
 		<cell>
 			<include href="/contents/template.xml">
@@ -28,15 +28,15 @@
 			</include>
 		</cell>
 		<cell>
-			<a:article title="Testtitel">
+			<article title="Testtitel">
 				<p>
 					Testinhalt 2
 					<b>fett</b>
 				</p>
-			</a:article>
+			</article>
 		</cell>
 		<cell>
-			<a:article title="Testartikel embedded">
+			<article title="Testartikel embedded">
 				<p>
 					Testinhalt 3
 					<b>fett</b>
@@ -44,14 +44,14 @@
 				<p>
 					Noch'n Absatz
 				</p>
-			</a:article>
+			</article>
 		</cell>
 		<cell>
-			<a:article title="Noch'n Artikel">
+			<article title="Noch'n Artikel">
 				<p>
 					Noch'n Absatz
 				</p>
-			</a:article>
+			</article>
 		</cell>
 	</grid>
-</page>
+</article>

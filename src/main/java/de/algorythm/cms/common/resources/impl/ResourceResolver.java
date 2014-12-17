@@ -13,20 +13,12 @@ import java.util.Set;
 import com.google.common.base.Joiner;
 
 import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.resources.IUriResolver;
+import de.algorythm.cms.common.resources.ISourceUriResolver;
 
-public class ResourceResolver implements IUriResolver {
+public class ResourceResolver implements ISourceUriResolver {
 
-	//static private final Path ROOT_PATH = Paths.get("/");
-	
-	private final Collection<Path> unlocalizedRootPathes;
 	private final Collection<Path> rootPathes;
-
-	public ResourceResolver(final Collection<Path> unlocalizedRootPathes, final Locale locale) {
-		this.unlocalizedRootPathes = unlocalizedRootPathes;
-		rootPathes = createLocalizedRootPathes(locale.getLanguage(), "international");
-	}
-
+	
 	public ResourceResolver(final IBundle bundle, final Path tmpDirectory) {
 		final Set<Path> rootPathSet = new LinkedHashSet<Path>();
 		
@@ -36,23 +28,7 @@ public class ResourceResolver implements IUriResolver {
 		for (Path rootPath : bundle.getRootDirectories())
 			rootPathSet.add(rootPath);
 		
-		unlocalizedRootPathes = new LinkedList<Path>(rootPathSet);
-		rootPathes = createLocalizedRootPathes("international");
-	}
-
-	private Collection<Path> createLocalizedRootPathes(final String... localePrefixes) {
-		final Collection<Path> localizedRootPathes = new LinkedHashSet<Path>();
-		
-		for (Path rootPath : unlocalizedRootPathes)
-			for (String localePrefix : localePrefixes)
-				localizedRootPathes.add(rootPath.resolve(localePrefix));
-		
-		return Collections.unmodifiableCollection(localizedRootPathes);
-	}
-
-	@Override
-	public IUriResolver createLocalizedResolver(final Locale locale) {
-		return new ResourceResolver(unlocalizedRootPathes, locale);
+		rootPathes = Collections.unmodifiableList(new LinkedList<Path>(rootPathSet));
 	}
 
 	@Override
@@ -60,51 +36,34 @@ public class ResourceResolver implements IUriResolver {
 		return rootPathes;
 	}
 
-	/*@Override
-	public Path resolve(final URI publicPath, final URI systemBasePath) {
-		final String path = publicPath.getPath();
-		
-		return path.length() > 0 && path.charAt(0) == '/'
-			? resolve(publicPath)
-			: resolve(toPublicPath(systemBasePath.resolve(publicPath)));
-	}*/
-
 	@Override
-	public Path resolve(final URI publicUri) {
+	public Path resolve(final URI publicUri, final Locale locale) {
 		final String path = publicUri.normalize().getPath();
-		final String relativePath = path.length() > 0 && path.charAt(0) == '/'
-			? path.substring(1) : path;
-		
-		if (relativePath.length() > 2 && relativePath.startsWith("../") ||
-				relativePath.startsWith(".."))
-			throw new IllegalAccessError("Bundle parent directory access denied: " + publicUri);
+		final String absolutePath = path.isEmpty() || path.charAt(0) == '/'
+			? path : '/' + path;
+		final String[] localePrefixes = locale == Locale.ROOT
+				? new String[] {"international"} : new String[] {locale.getLanguage(), "international"};
 		
 		for (Path rootPath : rootPathes) {
-			final Path systemPath = rootPath.resolve(relativePath);
-			
-			if (Files.exists(systemPath))
-				return systemPath;
+			for (String localePrefix : localePrefixes) {
+				final String relativePath = localePrefix + absolutePath;
+				final Path systemPath = rootPath.resolve(relativePath);
+				
+				if (Files.exists(systemPath)) {
+					if (!systemPath.toString().startsWith(rootPath.toString()))
+						throw new IllegalAccessError("Bundle parent directory access denied: " + publicUri);
+					
+					return systemPath;
+				}
+			}
 		}
 		
 		throw new IllegalStateException("Cannot resolve resource URI "
 				+ publicUri + ". Pathes: \n\t"
 				+ Joiner.on("\n\t").join(rootPathes));
 	}
-	
-	/*@Override
-	public boolean exists(final Path publicPath, final Locale locale) {
-		final String relativePath = relativizeBundlePath(publicPath).toString();
-		
-		for (Path rootPath : unlocalizedRootPathes) {
-			final Path systemPath = rootPath.resolve("de/" + publicPath).resolve(relativePath.toString()).normalize();
-			
-			if (Files.exists(systemPath)) {
-				
-			}
-		}
-	}
-	
-	private Path toPublicPath(Path systemPath) {
+
+	/*private Path toPublicPath(Path systemPath) {
 		systemPath = systemPath.normalize();
 		
 		for (Path rootPath : rootPathes) {

@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -20,7 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.SourceLocator;
@@ -46,14 +44,14 @@ import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
 
 import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.ISchemaLocation;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
-import de.algorythm.cms.common.resources.IOutputUriResolver;
-import de.algorythm.cms.common.resources.IUriResolver;
+import de.algorythm.cms.common.resources.ISourceUriResolver;
+import de.algorythm.cms.common.resources.ITargetUriResolver;
 import de.algorythm.cms.common.resources.adapter.impl.CmsInputURIResolver;
 import de.algorythm.cms.common.resources.adapter.impl.CmsOutputURIResolver;
 import de.algorythm.cms.common.resources.adapter.impl.CmsTemplateURIResolver;
@@ -82,7 +80,7 @@ public class RenderingContext implements IBundleRenderingContext {
 		}
 	};
 	
-	static private final class TemplateDefinitionErrorListener implements ErrorListener {
+	static private final class TemplateErrorListener implements ErrorListener {
 		
 		private List<TransformerException> warnings = new LinkedList<TransformerException>();
 		private List<TransformerException> errors = new LinkedList<TransformerException>();
@@ -130,7 +128,7 @@ public class RenderingContext implements IBundleRenderingContext {
 					.append(l.getColumnNumber()).append(" - ");
 			}
 			
-			sb.append(error);
+			sb.append(error.getCause());
 		}
 		
 		return sb.toString();
@@ -140,21 +138,20 @@ public class RenderingContext implements IBundleRenderingContext {
 	private final URI resourcePrefix;
 	private final Path outputDirectory;
 	private final Path tempDirectory;
-	private final IUriResolver resourceResolver;
-	private final IOutputUriResolver outputResolver;
-	private final IOutputUriResolver tmpResolver;
+	private final ISourceUriResolver sourceResolver;
+	private final ITargetUriResolver targetResolver;
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
-	private SAXParserFactory saxParserFactory;
 	private final IXmlLoader xmlLoader;
+	private final Map<Locale, IPageConfig> localizedPages;
 
 	public RenderingContext(final IBundle bundle, final Path tempDirectory, final Path outputDirectory, final URI resourcePrefix) {
 		this.bundle = bundle;
 		this.tempDirectory = tempDirectory;
 		this.outputDirectory = outputDirectory;
 		this.resourcePrefix = resourcePrefix;
-		this.resourceResolver = new ResourceResolver(bundle, tempDirectory);
-		this.outputResolver = new OutputResolver(outputDirectory);
-		this.tmpResolver = new OutputResolver(tempDirectory);
+		this.sourceResolver = new ResourceResolver(bundle, tempDirectory);
+		this.targetResolver = new OutputResolver(outputDirectory, tempDirectory);
+		localizedPages = new HashMap<Locale, IPageConfig>();
 		final Set<ISchemaLocation> locations = new LinkedHashSet<ISchemaLocation>(bundle.getSchemaLocations());
 		final List<URI> schemaLocations = new LinkedList<URI>();
 		
@@ -162,52 +159,27 @@ public class RenderingContext implements IBundleRenderingContext {
 			schemaLocations.add(location.getUri());
 		
 		try {
-			this.xmlLoader = new XmlDomLoader(schemaLocations, resourceResolver);
+			this.xmlLoader = new XmlDomLoader(schemaLocations, sourceResolver);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public RenderingContext(final IBundle bundle, final IXmlLoader xmlLoader, final IUriResolver uriResolver, final IOutputUriResolver outUriResolver, final IOutputUriResolver tmpOutUriResolver, final Path tempDirectory, final Path outputDirectory, final URI resourcePrefix) {
-		this.bundle = bundle;
-		this.xmlLoader = xmlLoader;
-		this.resourceResolver = uriResolver;
-		this.outputResolver = outUriResolver;
-		this.tmpResolver = tmpOutUriResolver;
-		this.tempDirectory = tempDirectory;
-		this.outputDirectory = outputDirectory;
-		this.resourcePrefix = resourcePrefix;
-	}
 
-	@Override
-	public IBundleRenderingContext createLocalized(final Locale locale, boolean localizeOutput) {
-		final IUriResolver uriResolver = resourceResolver.createLocalizedResolver(locale);
-		final IOutputUriResolver tmpOutUriResolver = tmpResolver.createLocalizedResolver(locale);
-		final IOutputUriResolver outUriResolver = localizeOutput
-				? outputResolver.createLocalizedResolver(locale)
-				: outputResolver;
-		
-		return new RenderingContext(bundle, xmlLoader, uriResolver, outUriResolver, tmpOutUriResolver, tempDirectory, outputDirectory, resourcePrefix);
-	}
-	
 	@Override
 	public IBundle getBundle() {
 		return bundle;
 	}
 
 	@Override
-	public XMLReader createXmlReader() {
-		try {
-			final XMLReader r = saxParserFactory.newSAXParser().getXMLReader();
-			
-			r.setErrorHandler(ERROR_HANDLER);
-			
-			return r;
-		} catch(Exception e) {
-			throw new IllegalStateException("Cannot create SAX parser. " + e, e);
-		}
+	public IPageConfig getStartPage(Locale locale) {
+		return localizedPages.get(locale);
 	}
-	
+
+	@Override
+	public void setStartPage(final Locale locale, final IPageConfig startPage) {
+		localizedPages.put(locale, startPage);
+	}
+
 	@Override
 	public IXmlLoader getXmlLoader() {
 		return xmlLoader;
@@ -224,13 +196,13 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public IUriResolver getResourceResolver() {
-		return resourceResolver;
+	public ISourceUriResolver getResourceResolver() {
+		return sourceResolver;
 	}
 
 	@Override
-	public IOutputUriResolver getOutputResolver() {
-		return outputResolver;
+	public ITargetUriResolver getOutputResolver() {
+		return targetResolver;
 	}
 
 	@Override
@@ -249,8 +221,8 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public Document getDocument(URI uri) {
-		final Path path = resourceResolver.resolve(uri);
+	public Document getDocument(URI uri, Locale locale) {
+		final Path path = sourceResolver.resolve(uri, locale);
 		
 		return xmlLoader.getDocument(path);
 	}
@@ -259,11 +231,11 @@ public class RenderingContext implements IBundleRenderingContext {
 	public Templates compileTemplates(final Collection<URI> xslSourceUris) {
 		final Source xslSource = createMergedXslSource(xslSourceUris);
 		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		final TemplateDefinitionErrorListener errorListener = new TemplateDefinitionErrorListener();
+		final TemplateErrorListener errorListener = new TemplateErrorListener();
 		final Templates templates;
 		
 		transformerFactory.setErrorListener(errorListener);
-		transformerFactory.setURIResolver(new CmsTemplateURIResolver(resourceResolver));
+		transformerFactory.setURIResolver(new CmsTemplateURIResolver(sourceResolver));
 		
 		try {
 			templates = transformerFactory.newTemplates(xslSource);
@@ -279,11 +251,11 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public Transformer createTransformer(final Templates templates, final URI notFoundContent) throws TransformerConfigurationException {
+	public Transformer createTransformer(final Templates templates, final URI notFoundContent, final Locale locale) throws TransformerConfigurationException {
 		final Transformer transformer = templates.newTransformer();
 		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
-		final URIResolver uriResolverAdapter = new CmsInputURIResolver(this, notFoundContent);
-		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(tmpResolver, outputResolver);
+		final URIResolver uriResolverAdapter = new CmsInputURIResolver(this, locale, notFoundContent);
+		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(targetResolver, locale);
 		
 		transformer.setURIResolver(uriResolverAdapter);
 		trnsfrmCtrl.setOutputURIResolver(outputUriResolverAdapter);
@@ -292,35 +264,28 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public void transform(URI sourceUri, URI targetUri, Transformer transformer) throws IOException, TransformerException {
+	public void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException {
 		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
-		final Node sourceNode = getDocument(sourceUri);
+		final Node sourceNode = getDocument(sourceUri, locale);
 		final DOMSource source = new DOMSource(sourceNode, sourceUri.toString());
-		final String targetUriScheme = targetUri.getScheme();
-		final boolean tmp = targetUriScheme != null && "tmp".equals(targetUriScheme.toLowerCase());
-		final IOutputUriResolver outUriResolver = tmp
-				? tmpResolver : outputResolver;
-		final Path outputFile = outUriResolver.resolveUri(targetUri);
+		final Path outputFile = targetResolver.resolveUri(targetUri, locale);
 		Files.createDirectories(outputFile.getParent());
 		final Writer writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8);
 		final StreamResult result = new StreamResult(writer);
 		final String targetUriStr = targetUri.toString();
-		final TemplateDefinitionErrorListener errorListener = new TemplateDefinitionErrorListener();
+		final TemplateErrorListener errorListener = new TemplateErrorListener();
 		
 		result.setSystemId(targetUriStr);
 		trnsfrmCtrl.setBaseOutputURI(targetUriStr);
 		transformer.setErrorListener(errorListener);
-		final long startTime = new Date().getTime();
 		transformer.transform(source, result);
-		System.out.println("transform " + sourceUri + "  " + (new Date().getTime() - startTime));
-		
 		errorListener.evaluateErrors();
 	}
 
 	private Source createMergedXslSource(final Collection<URI> xslSourceUris) {
 		if (xslSourceUris.size() == 1) {
 			final URI sourceUri = xslSourceUris.iterator().next();
-			final Path sourcePath = resourceResolver.resolve(sourceUri);
+			final Path sourcePath = sourceResolver.resolve(sourceUri, Locale.ROOT);
 			final InputStream stream;
 			
 			try {

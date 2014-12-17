@@ -4,7 +4,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class BlockingRingBuffer<V> {
+public class BlockingCycle<V> {
 
 	static public interface INode<V> {
 		V getValue();

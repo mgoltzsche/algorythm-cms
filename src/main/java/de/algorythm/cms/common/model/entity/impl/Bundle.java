@@ -15,13 +15,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import com.github.sommeri.less4j.core.ast.Page;
-
 import de.algorythm.cms.common.impl.jaxb.adapter.LocaleXmlAdapter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
-import de.algorythm.cms.common.model.entity.IPage;
+import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.ISchemaLocation;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
@@ -46,8 +44,6 @@ public class Bundle implements IBundle {
 	private Locale defaultLocale;
 	@XmlElementRef(type = SupportedLocale.class)
 	private Set<ISupportedLocale> supportedLocales = new LinkedHashSet<ISupportedLocale>();
-	@XmlAttribute(name = "default-template")
-	private String defaultTemplate;
 	@XmlAttribute(name = "context-path")
 	private String contextPath;
 	@XmlElementRef(type = Param.class)
@@ -58,8 +54,8 @@ public class Bundle implements IBundle {
 	private final Set<IOutputConfig> output = new LinkedHashSet<IOutputConfig>();
 	@XmlTransient
 	private Map<String, IOutputConfig> outputMap;
-	@XmlElementRef(type = PageInfo.class)
-	private IPage startPage;
+	@XmlElementRef(type = PageConfig.class)
+	private IPageConfig startPage;
 
 	@Override
 	public String getName() {
@@ -143,15 +139,6 @@ public class Bundle implements IBundle {
 	}
 
 	@Override
-	public String getDefaultTemplate() {
-		return defaultTemplate;
-	}
-
-	public void setDefaultTemplate(String defaultTemplate) {
-		this.defaultTemplate = defaultTemplate;
-	}
-
-	@Override
 	public Set<IParam> getParams() {
 		return params;
 	}
@@ -186,11 +173,12 @@ public class Bundle implements IBundle {
 	}
 
 	@Override
-	public IPage getStartPage() {
+	public IPageConfig getStartPage() {
 		return startPage;
 	}
 	
-	public void setStartPage(IPage startPage) {
+	@Override
+	public void setStartPage(IPageConfig startPage) {
 		this.startPage = startPage;
 	}
 
@@ -214,8 +202,8 @@ public class Bundle implements IBundle {
 		r.setTitle(title);
 		r.setDescription(description);
 		r.setDefaultLocale(defaultLocale);
-		r.setDefaultTemplate(defaultTemplate);
 		r.setContextPath(contextPath);
+		r.setStartPage(startPage);
 		r.dependencies.addAll(dependencies);
 		r.params.addAll(params);
 		r.supportedLocales.addAll(supportedLocales);

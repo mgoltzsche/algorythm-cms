@@ -1,38 +1,35 @@
 package de.algorythm.cms.common.model.entity.impl;
 
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
-import org.apache.commons.lang.StringUtils;
+import de.algorythm.cms.common.model.entity.IPageConfig;
 
-import de.algorythm.cms.common.model.entity.IPage;
+@XmlRootElement(name="page", namespace="http://cms.algorythm.de/common/Bundle")
+public class PageConfig implements IPageConfig {
 
-@XmlRootElement(name="page", namespace="http://cms.algorythm.de/common/Pages")
-public class PageInfo implements IPage, Comparable<IPage> {
-	
 	@XmlAttribute(required = true)
-	private String path;
-	@XmlTransient
 	private String name;
-	@XmlTransient
-	private String title = StringUtils.EMPTY;
-	@XmlAttribute(name="title", required = true)
+	@XmlAttribute(required = true)
+	private URI content;
+	@XmlAttribute
+	private String title;
+	@XmlAttribute(name="nav-title")
 	private String navigationTitle;
-	@XmlAttribute(name="in-navigation")
+	@XmlAttribute(name="nav-contained")
 	private boolean inNavigation;
-	@XmlElementRef(type=PageInfo.class)
-	private List<IPage> pages = new LinkedList<IPage>();
+	@XmlElementRef(type=PageConfig.class)
+	private List<IPageConfig> pages = new LinkedList<IPageConfig>();
 	
-	public PageInfo() {}
+	public PageConfig() {}
 	
-	public PageInfo(final String path, final String name) {
+	public PageConfig(final String path, final String name) {
 		this.name = name;
-		this.path = path;
 	}
 	
 	@Override
@@ -42,11 +39,12 @@ public class PageInfo implements IPage, Comparable<IPage> {
 	
 	@Override
 	public String getPath() {
-		return path;
+		throw new UnsupportedOperationException("Path cannot be derived. Transform to DerivedPageConfig");
 	}
 	
-	public void setPath(final String path) {
-		this.path = path;
+	@Override
+	public URI getContent() {
+		return content;
 	}
 	
 	public String getTitle() {
@@ -74,17 +72,12 @@ public class PageInfo implements IPage, Comparable<IPage> {
 	}
 
 	@Override
-	public List<IPage> getPages() {
+	public List<IPageConfig> getPages() {
 		return pages;
 	}
 	
-	public void setPages(final List<IPage> pages) {
+	public void setPages(final List<IPageConfig> pages) {
 		this.pages = pages;
-	}
-	
-	@Override
-	public int compareTo(final IPage p) {
-		return getPath().compareTo(p.getPath());
 	}
 	
 	@Override

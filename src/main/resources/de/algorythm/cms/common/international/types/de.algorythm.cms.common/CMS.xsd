@@ -8,7 +8,8 @@
 	<include schemaLocation="FlowLayout.xsd" />
 	<include schemaLocation="Grid.xsd" />
 	<include schemaLocation="Navigation.xsd" />
+	<include schemaLocation="Breadcrumbs.xsd" />
+	<include schemaLocation="Article.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Pages" schemaLocation="Pages.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Locales" schemaLocation="Locales.xsd" />
-	<import namespace="http://cms.algorythm.de/common/Article" schemaLocation="Article.xsd" />
 </schema>

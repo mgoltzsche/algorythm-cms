@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xml>
-<article xmlns="http://cms.algorythm.de/common/Article" title="Testtitel">
-	<p xmlns="http://cms.algorythm.de/common/CMS">
+<article xmlns="http://cms.algorythm.de/common/CMS" title="Testtitel">
+	<p>
 		Importierter Testinhalt
 		<b>fett</b>
 		<b>fett2</b>

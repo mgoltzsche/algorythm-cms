@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:a="http://cms.algorythm.de/common/Article"
-	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="a">
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	exclude-result-prefixes="c">
 	
-	<xsl:template match="a:article">
+	<xsl:template match="c:article">
+		<xsl:param name="document-root" select="false()"/>
 		<article>
-			<xsl:if test="@title and name(parent::*) != 'page'">
-				<h3>
+			<xsl:if test="@title and $document-root = false()">
+				<h2>
 					<xsl:value-of select="@title" />
-				</h3>
+				</h2>
 			</xsl:if>
 			<xsl:apply-templates />
 		</article>

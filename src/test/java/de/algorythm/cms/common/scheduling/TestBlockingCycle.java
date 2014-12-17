@@ -2,19 +2,19 @@ package de.algorythm.cms.common.scheduling;
 
 import org.junit.Test;
 
-import de.algorythm.cms.common.scheduling.impl.BlockingRingBuffer;
-import de.algorythm.cms.common.scheduling.impl.BlockingRingBuffer.INode;
+import de.algorythm.cms.common.scheduling.impl.BlockingCycle;
+import de.algorythm.cms.common.scheduling.impl.BlockingCycle.INode;
 import static org.junit.Assert.*;
 
-public class TestRingBuffer {
+public class TestBlockingCycle {
 
 	private INode<String> nextNode;
 	private Throwable error;
 	private boolean finished;
 	
 	@Test
-	public void testRingBuffer() throws Throwable {
-		final BlockingRingBuffer<String> testee = new BlockingRingBuffer<String>();
+	public void testBlockingCycle() throws Throwable {
+		final BlockingCycle<String> testee = new BlockingCycle<String>();
 		
 		assertEquals("initial size", 0, testee.size());
 		

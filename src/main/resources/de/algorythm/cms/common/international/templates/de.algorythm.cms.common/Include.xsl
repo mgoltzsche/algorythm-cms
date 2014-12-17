@@ -8,8 +8,9 @@
 				<xsl:with-param name="baseUri" select="'file:/'"/>
 			</xsl:apply-templates>
 		</xsl:variable>
-		<!--<xsl:copy-of select="$includeOutput" />-->
-		<xsl:apply-templates select="$includeOutput" />
+		<xsl:apply-templates select="$includeOutput">
+			<xsl:with-param name="document-root" select="false()" />
+		</xsl:apply-templates>
 	</xsl:template>
 	
 	<xsl:template mode="include" match="c:include">

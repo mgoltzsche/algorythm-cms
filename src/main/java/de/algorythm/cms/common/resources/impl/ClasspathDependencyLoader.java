@@ -4,11 +4,13 @@ import java.net.URL;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.model.loader.IBundleLoader;
+import de.algorythm.cms.common.resources.IBundleLoader;
 import de.algorythm.cms.common.resources.IDependencyLoader;
 
+@Singleton
 public class ClasspathDependencyLoader implements IDependencyLoader {
 
 	private final IBundleLoader loader;

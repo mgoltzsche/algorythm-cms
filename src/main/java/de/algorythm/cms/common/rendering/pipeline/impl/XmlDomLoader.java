@@ -6,6 +6,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -22,7 +23,7 @@ import org.xml.sax.SAXParseException;
 
 import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
 import de.algorythm.cms.common.rendering.pipeline.impl.Cache.IValueLoader;
-import de.algorythm.cms.common.resources.IUriResolver;
+import de.algorythm.cms.common.resources.ISourceUriResolver;
 import de.algorythm.cms.common.resources.adapter.impl.CmsSchemaResolver;
 
 public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
@@ -47,8 +48,8 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 	private final DocumentBuilderFactory factory;
 	private final Cache<Path, Document> domCache;
 	
-	public XmlDomLoader(final Collection<URI> schemaLocationUris, final IUriResolver uriResolver) throws IOException {
-		final Schema schema = createSchema(schemaLocationUris, uriResolver);
+	public XmlDomLoader(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws IOException {
+		final Schema schema = createSchema(schemaLocationUris, sourceUriResolver);
 		this.domCache = new Cache<Path, Document>();
 		factory = DocumentBuilderFactory.newInstance();
 		
@@ -75,15 +76,15 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 		}
 	}
 
-	private Schema createSchema(final Collection<URI> schemaLocationUris, final IUriResolver uriResolver) throws IOException {
+	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws IOException {
 		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		final Source[] sources = new Source[schemaLocationUris.size()];
 		int i = 0;
 		
-		schemaFactory.setResourceResolver(new CmsSchemaResolver(uriResolver));
+		schemaFactory.setResourceResolver(new CmsSchemaResolver(sourceUriResolver));
 		
 		for (URI schemaLocationUri : schemaLocationUris) {
-			final Path schemaLocation = uriResolver.resolve(schemaLocationUri);
+			final Path schemaLocation = sourceUriResolver.resolve(schemaLocationUri, Locale.ROOT);
 			final InputStream stream = Files.newInputStream(schemaLocation);
 			final Source source = new StreamSource(stream);
 			sources[i++] = source;

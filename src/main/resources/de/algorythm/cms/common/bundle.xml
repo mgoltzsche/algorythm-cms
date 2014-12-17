@@ -2,17 +2,18 @@
 		name="common.cms.algorythm.de"
 		title="My example site library"
 		default-locale="en"
-		default-template="http://cms.algorythm.de/common/theme/default-theme"
 		context-path="/site1">
 	<param id="testparam" value="paramvalue" />
 	<schema src="/types/de.algorythm.cms.common/CMS.xsd" />
+	<page content="/contents/default-welcome-page.xml" />
 	<output id="html">
 		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE">
 			<param id="notFoundContent" value="/contents/not-found.xml" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/Copy.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
 		</job>-->
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />-->
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageTransformer" phase="TRANSFORM">
 			<param id="notFoundContent" value="/contents/not-found.xml" />
@@ -21,6 +22,7 @@
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Markup.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Menu.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/SubNavigation.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/html/Breadcrumbs.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Grid.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
 		</job>
@@ -42,6 +44,6 @@
 			<param id="templates" value="/templates/de.algorythm.cms.common/Copy.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
 		</job>-->
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />-->
 	</output>
 </bundle>

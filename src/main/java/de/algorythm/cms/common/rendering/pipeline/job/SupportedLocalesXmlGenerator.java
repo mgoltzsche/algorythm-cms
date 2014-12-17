@@ -43,6 +43,7 @@ public class SupportedLocalesXmlGenerator implements IRenderingJob {
 					: outputDirectory;
 			final Path outputFile = localizedOutputDirectory.resolve(SUPPORTED_LOCALES_XML);
 			
+			Files.createDirectories(localizedOutputDirectory);
 			marshaller.marshal(locales, Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8));
 		}
 	}

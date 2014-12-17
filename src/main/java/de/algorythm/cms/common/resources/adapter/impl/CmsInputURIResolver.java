@@ -1,6 +1,7 @@
 package de.algorythm.cms.common.resources.adapter.impl;
 
 import java.net.URI;
+import java.util.Locale;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -15,9 +16,11 @@ public class CmsInputURIResolver implements URIResolver {
 
 	private final IBundleRenderingContext ctx;
 	private final URI notFoundContent;
+	private final Locale locale;
 	
-	public CmsInputURIResolver(final IBundleRenderingContext ctx, final URI notFoundContent) {
+	public CmsInputURIResolver(final IBundleRenderingContext ctx, final Locale locale, final URI notFoundContent) {
 		this.ctx = ctx;
+		this.locale = locale;
 		this.notFoundContent = notFoundContent;
 	}
 	
@@ -28,12 +31,12 @@ public class CmsInputURIResolver implements URIResolver {
 		Node document;
 		
 		try {
-			document = ctx.getDocument(publicUri);
+			document = ctx.getDocument(publicUri, locale);
 		} catch(IllegalStateException e) {
 			if (notFoundContent == null)
 				throw e;
 			
-			document = ctx.getDocument(notFoundContent);
+			document = ctx.getDocument(notFoundContent, locale);
 			publicUri = notFoundContent;
 		}
 		

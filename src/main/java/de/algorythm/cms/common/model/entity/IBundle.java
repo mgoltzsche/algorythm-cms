@@ -18,13 +18,13 @@ public interface IBundle extends Comparable<IBundle> {
 	String getContextPath();
 	Locale getDefaultLocale();
 	Set<ISupportedLocale> getSupportedLocales();
-	String getDefaultTemplate();
 	Set<IParam> getParams();
 	Set<IDependency> getDependencies();
 	Set<IOutputConfig> getOutput();
 	IOutputConfig getOutput(String id);
 	boolean containsOutput(IOutputConfig cfg);
 	boolean addOutput(IOutputConfig cfg);
-	IPage getStartPage();
+	IPageConfig getStartPage();
+	void setStartPage(IPageConfig page);
 	IBundle copy();
 }
