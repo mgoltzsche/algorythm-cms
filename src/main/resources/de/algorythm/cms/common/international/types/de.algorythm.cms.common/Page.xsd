@@ -7,12 +7,12 @@
 
 	<element name="page">
 		<complexType>
-			<all minOccurs="0">
-				<element ref="c:abstract-content" />
-			</all>
+			<sequence minOccurs="0">
+				<any />
+			</sequence>
 			<attribute name="title" type="token" />
 			<attribute name="nav-title" type="token" use="optional" />
-			<attribute name="in-menu" type="boolean" default="true" />
+			<attribute name="nav-contained" type="boolean" default="true" />
 		</complexType>
 	</element>
 </schema>

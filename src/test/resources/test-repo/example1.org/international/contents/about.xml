@@ -2,11 +2,11 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 	title="About page">
-	<flow-layout>
+	<vbox>
 		<nav parent=".." />
 		<include href="/contents/article.xml" />
 		<grid columns="12">
 			<cell>Cell A</cell><cell span="10">Cell B</cell><cell>Cell C</cell>
 		</grid>
-	</flow-layout>
+	</vbox>
 </article>

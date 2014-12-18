@@ -5,13 +5,9 @@
 	elementFormDefault="qualified">
 	<include schemaLocation="Types.xsd" />
 
-	<element name="breadcrumbs" substitutionGroup="c:abstract-content">
+	<element name="breadcrumbs">
 		<complexType>
-			<complexContent>
-				<extension base="c:ContentType">
-					<attribute name="disable-last" type="boolean" default="true" />
-				</extension>
-			</complexContent>
+			<attribute name="disable-last" type="boolean" default="true" />
 		</complexType>
 	</element>
 </schema>

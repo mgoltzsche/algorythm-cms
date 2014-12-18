@@ -5,15 +5,11 @@
 	elementFormDefault="qualified">
 	<include schemaLocation="Types.xsd" />
 
-	<element name="flow-layout" substitutionGroup="c:abstract-content">
+	<element name="vbox">
 		<complexType>
-			<complexContent>
-				<extension base="c:ContentType">
-					<choice maxOccurs="unbounded">
-						<element ref="c:abstract-content" />
-					</choice>
-				</extension>
-			</complexContent>
+			<choice maxOccurs="unbounded">
+				<any />
+			</choice>
 		</complexType>
 	</element>
 </schema>

@@ -5,14 +5,10 @@
 	elementFormDefault="qualified">
 	<include schemaLocation="Types.xsd" />
 
-	<element name="nav" substitutionGroup="c:abstract-content">
+	<element name="nav">
 		<complexType>
-			<complexContent>
-				<extension base="c:ContentType">
-					<attribute name="parent" type="anyURI" default="." />
-					<attribute name="depth" type="nonNegativeInteger" default="1" />
-				</extension>
-			</complexContent>
+			<attribute name="parent" type="anyURI" default="." />
+			<attribute name="depth" type="nonNegativeInteger" default="1" />
 		</complexType>
 	</element>
 </schema>

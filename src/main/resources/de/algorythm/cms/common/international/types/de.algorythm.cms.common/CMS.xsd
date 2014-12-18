@@ -5,7 +5,7 @@
 	<include schemaLocation="Types.xsd" />
 	<include schemaLocation="Page.xsd" />
 	<include schemaLocation="Include.xsd" />
-	<include schemaLocation="FlowLayout.xsd" />
+	<include schemaLocation="Box.xsd" />
 	<include schemaLocation="Grid.xsd" />
 	<include schemaLocation="Navigation.xsd" />
 	<include schemaLocation="Breadcrumbs.xsd" />

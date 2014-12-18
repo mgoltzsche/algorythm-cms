@@ -4,28 +4,21 @@
 	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
 	
-	<complexType name="ContentType" />
-	
-	<element name="abstract-content" abstract="true" type="c:ContentType" />
-	
 	<complexType name="Markup" mixed="true">
-		<complexContent>
-			<extension base="c:ContentType">
-				<choice minOccurs="0" maxOccurs="unbounded">
-					<element ref="c:abstract-content" />
-					<element name="p" type="c:Markup" />
-					<element name="b" type="c:Markup" />
-					<element name="i" type="c:Markup" />
-					<element name="u" type="c:Markup" />
-					<element name="ul">
-						<complexType>
-							<sequence minOccurs="0" maxOccurs="unbounded">
-								<element name="li" type="c:Markup" />
-							</sequence>
-						</complexType>
-					</element>
-				</choice>
-			</extension>
-		</complexContent>
+		<choice minOccurs="0" maxOccurs="unbounded">
+			<any />
+		</choice>
 	</complexType>
+	
+	<element name="p" type="c:Markup" />
+	<element name="b" type="c:Markup" />
+	<element name="i" type="c:Markup" />
+	<element name="u" type="c:Markup" />
+	<element name="ul">
+		<complexType>
+			<sequence minOccurs="0" maxOccurs="unbounded">
+				<element name="li" type="c:Markup" />
+			</sequence>
+		</complexType>
+	</element>
 </schema>

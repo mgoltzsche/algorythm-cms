@@ -5,37 +5,29 @@
 	elementFormDefault="qualified">
 	<include schemaLocation="Types.xsd" />
     
-	<element name="include" substitutionGroup="c:abstract-content">
+	<element name="include">
 		<complexType>
-			<complexContent>
-				<extension base="c:ContentType">
-					<sequence minOccurs="0" maxOccurs="unbounded">
-						<element name="replace">
-							<complexType mixed="true">
-								<complexContent>
-									<extension base="c:Markup">
-										<attribute name="placeholder" type="token" use="required" />
-									</extension>
-								</complexContent>
-							</complexType>
-						</element>
-					</sequence>
-					<attribute name="href" type="anyURI" use="required" />
-				</extension>
-			</complexContent>
+			<sequence minOccurs="0" maxOccurs="unbounded">
+				<element name="replace">
+					<complexType mixed="true">
+						<complexContent>
+							<extension base="c:Markup">
+								<attribute name="placeholder" type="token" use="required" />
+							</extension>
+						</complexContent>
+					</complexType>
+				</element>
+			</sequence>
+			<attribute name="href" type="anyURI" use="required" />
 		</complexType>
 	</element>
 
-	<element name="customizable" substitutionGroup="c:abstract-content">
+	<element name="customizable">
 		<complexType mixed="true">
-			<complexContent>
-				<extension base="c:ContentType">
-					<sequence minOccurs="0" maxOccurs="unbounded">
-						<element ref="c:abstract-content" />
-					</sequence>
-					<attribute name="placeholder" type="token" use="required" />
-				</extension>
-			</complexContent>
+			<sequence minOccurs="0" maxOccurs="unbounded">
+				<any />
+			</sequence>
+			<attribute name="placeholder" type="token" use="required" />
 		</complexType>
 	</element>
 </schema>
