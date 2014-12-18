@@ -2,17 +2,17 @@
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:c="http://cms.algorythm.de/common/CMS"
-	exclude-result-prefixes="c">
+	xmlns:p="http://cms.algorythm.de/common/Pages"
+	exclude-result-prefixes="c p">
 	<xsl:param name="page.path" />
 	
 	<xsl:template match="c:nav">
-		<xsl:variable name="baseUri" select="concat('page:', $page.path, '/')" />
-		<xsl:variable name="parent" select="if (ends-with(./@parent, '/')) then ./@parent else concat(./@parent, '/')" />
-		<xsl:variable name="parentPath" select="resolve-uri($parent, $baseUri)" />
+		<xsl:variable name="absoluteRootPath" select="c:absolute-path(@parent)" />
+		
 		<nav class="pure-menu pure-menu-open pure-menu-vertical">
-			<xsl:call-template name="c:menu">
-				<xsl:with-param name="root" select="document('/pages.xml')//*[concat('page:', @path, '/')=$parentPath]" />
-				<xsl:with-param name="maxDepth" select="if (./@depth) then number(./@depth) else 0" />
+			<xsl:call-template name="c:menu-html">
+				<xsl:with-param name="root" select="$c:pages//*[@path=$absoluteRootPath]" />
+				<xsl:with-param name="maxDepth" select="if (@depth) then number(@depth) else 0" />
 			</xsl:call-template>
 		</nav>
 	</xsl:template>

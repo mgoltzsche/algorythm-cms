@@ -4,6 +4,7 @@ import java.net.URI;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 
 import de.algorythm.cms.common.model.entity.ISchemaLocation;
 
@@ -11,6 +12,7 @@ import de.algorythm.cms.common.model.entity.ISchemaLocation;
 public class SchemaLocation implements ISchemaLocation {
 
 	@XmlAttribute(name="src")
+	@XmlSchemaType(name = "anyURI")
 	private URI uri;
 
 	public SchemaLocation() {}

@@ -4,34 +4,34 @@
 	xmlns:c="http://cms.algorythm.de/common/CMS"
 	xmlns:p="http://cms.algorythm.de/common/Pages"
 	exclude-result-prefixes="c p">
+	<xsl:param name="relativeBaseUrl" />
 	<xsl:param name="page.path" />
 	
 	<xsl:template match="c:breadcrumbs">
-		<xsl:variable name="pages" select="document('/pages.xml')" />
-		<xsl:variable name="current" select="$pages//*[@path=$page.path]" />
-		<xsl:variable name="root" select="if (boolean(@ignore-root) = true()) then $pages/p:page else ''" />
-		<xsl:value-of select="boolean(@ignore-root)" />
-		<xsl:if test="$current/.. != $root">
-			<ul>
-				<xsl:call-template name="c:breadcrumbs">
-					<xsl:with-param name="current" select="$current" />
-					<xsl:with-param name="root" select="$root" />
-				</xsl:call-template>
-			</ul>
+		<xsl:variable name="current" select="$c:pages//*[@path=$page.path]" />
+		<xsl:if test="$current != $c:pages/p:page">
+			<nav class="breadcrumbs">
+				<ul>
+					<xsl:call-template name="c:breadcrumbs">
+						<xsl:with-param name="current" select="if (@disable-last = true()) then $current/.. else $current" />
+					</xsl:call-template>
+				</ul>
+			</nav>
 		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template name="c:breadcrumbs">
 		<xsl:param name="current" />
-		<xsl:param name="root" />
-		<xsl:if test="$current/.. != $root">
+		<xsl:if test="$current/../..">
 			<xsl:call-template name="c:breadcrumbs">
 				<xsl:with-param name="current" select="$current/.." />
-				<xsl:with-param name="root" select="$root" />
 			</xsl:call-template>
 		</xsl:if>
 		<li>
-			<xsl:value-of select="$current/@nav-title" />
+			<xsl:call-template name="c:link">
+				<xsl:with-param name="page" select="$current" />
+			</xsl:call-template>
+			<xsl:value-of select="' » '" />
 		</li>
 	</xsl:template>
 </xsl:stylesheet>

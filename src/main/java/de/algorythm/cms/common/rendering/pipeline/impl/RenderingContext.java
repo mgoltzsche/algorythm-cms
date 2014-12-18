@@ -128,7 +128,15 @@ public class RenderingContext implements IBundleRenderingContext {
 					.append(l.getColumnNumber()).append(" - ");
 			}
 			
-			sb.append(error.getCause());
+			sb.append(error);
+			
+			StringBuilder indent = new StringBuilder("\n\t");
+			Throwable cause = error;
+			
+			while((cause = cause.getCause()) != null) {
+				indent.append("\t");
+				sb.append(indent).append(cause);
+			}
 		}
 		
 		return sb.toString();

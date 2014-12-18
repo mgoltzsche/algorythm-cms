@@ -47,11 +47,11 @@
 							</ul>
 							<nav class="pure-menu pure-menu-open pure-menu-horizontal" cms-menu="pure-menu-selected">
 								<a href="{$relativeBaseURL}/index.html" class="pure-menu-heading"><xsl:value-of select="$site.name" /></a>
-								<xsl:call-template name="c:menu">
+								<xsl:call-template name="c:menu-html">
 									<xsl:with-param name="maxDepth" select="1" />
 								</xsl:call-template>
 							</nav>
-							<h1>
+							<h1 ng-bind="pageTitle">
 								<xsl:value-of select="$page.title" />
 							</h1>
 							<div>

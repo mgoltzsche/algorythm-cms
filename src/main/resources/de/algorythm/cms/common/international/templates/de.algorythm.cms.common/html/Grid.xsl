@@ -6,11 +6,11 @@
 
 	<xsl:template match="c:grid">
 		<div class="pure-g">
-			<xsl:variable name="columns" select="if (./@columns) then number(./@columns) else 1" />
-			<xsl:variable name="columnsSm" select="if (./@columns-sm) then number(./@columns-sm) else $columns" />
-			<xsl:variable name="columnsMd" select="if (./@columns-md) then number(./@columns-md) else $columnsSm" />
-			<xsl:variable name="columnsLg" select="if (./@columns-lg) then number(./@columns-lg) else $columnsMd" />
-			<xsl:variable name="columnsXl" select="if (./@columns-xl) then number(./@columns-xl) else $columnsLg" />
+			<xsl:variable name="columns" select="if (@columns) then number(@columns) else 1" />
+			<xsl:variable name="columnsSm" select="if (@columns-sm) then number(@columns-sm) else $columns" />
+			<xsl:variable name="columnsMd" select="if (@columns-md) then number(@columns-md) else $columnsSm" />
+			<xsl:variable name="columnsLg" select="if (@columns-lg) then number(@columns-lg) else $columnsMd" />
+			<xsl:variable name="columnsXl" select="if (@columns-xl) then number(@columns-xl) else $columnsLg" />
 			<xsl:apply-templates mode="grid">
 				<xsl:with-param name="columns" select="$columns" />
 				<xsl:with-param name="columnsSm" select="$columnsSm" />

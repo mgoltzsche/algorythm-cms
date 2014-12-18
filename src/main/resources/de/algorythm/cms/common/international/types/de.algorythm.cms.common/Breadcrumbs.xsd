@@ -9,7 +9,7 @@
 		<complexType>
 			<complexContent>
 				<extension base="c:ContentType">
-					<attribute name="ignore-root" type="boolean" default="true" />
+					<attribute name="disable-last" type="boolean" default="true" />
 				</extension>
 			</complexContent>
 		</complexType>

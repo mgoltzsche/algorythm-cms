@@ -7,6 +7,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 
 import de.algorythm.cms.common.model.entity.IPageConfig;
 
@@ -16,6 +17,7 @@ public class PageConfig implements IPageConfig {
 	@XmlAttribute(required = true)
 	private String name;
 	@XmlAttribute(required = true)
+	@XmlSchemaType(name = "anyURI")
 	private URI content;
 	@XmlAttribute
 	private String title;

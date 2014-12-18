@@ -2,7 +2,8 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 	title="My test page info">
-	<breadcrumbs ignore-root="false" />
+	<breadcrumbs disable-last="false" />
+	<breadcrumbs disable-last="true" />
 	<p>
 		Testinhalt
 		<b>fett</b>
