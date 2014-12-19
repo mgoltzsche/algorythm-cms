@@ -47,7 +47,7 @@ import org.xml.sax.SAXParseException;
 
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
-import de.algorythm.cms.common.model.entity.ISchemaLocation;
+import de.algorythm.cms.common.model.entity.ISchemaSource;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
 import de.algorythm.cms.common.resources.ISourceUriResolver;
@@ -160,15 +160,15 @@ public class RenderingContext implements IBundleRenderingContext {
 		this.sourceResolver = new ResourceResolver(bundle, tempDirectory);
 		this.targetResolver = new OutputResolver(outputDirectory, tempDirectory);
 		localizedPages = new HashMap<Locale, IPageConfig>();
-		final Set<ISchemaLocation> locations = new LinkedHashSet<ISchemaLocation>(bundle.getSchemaLocations());
+		final Set<ISchemaSource> locations = new LinkedHashSet<ISchemaSource>(bundle.getSchemaLocations());
 		final List<URI> schemaLocations = new LinkedList<URI>();
 		
-		for (ISchemaLocation location : locations)
+		for (ISchemaSource location : locations)
 			schemaLocations.add(location.getUri());
 		
 		try {
 			this.xmlLoader = new XmlDomLoader(schemaLocations, sourceResolver);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -273,8 +273,14 @@ public class RenderingContext implements IBundleRenderingContext {
 
 	@Override
 	public void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException {
-		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
 		final Node sourceNode = getDocument(sourceUri, locale);
+		
+		transform(sourceNode, sourceUri, targetUri, transformer, locale);
+	}
+	
+	@Override
+	public void transform(Node sourceNode, URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException {
+		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
 		final DOMSource source = new DOMSource(sourceNode, sourceUri.toString());
 		final Path outputFile = targetResolver.resolveUri(targetUri, locale);
 		Files.createDirectories(outputFile.getParent());

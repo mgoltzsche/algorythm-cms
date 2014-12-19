@@ -12,4 +12,6 @@
 	<include schemaLocation="Article.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Pages" schemaLocation="Pages.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Locales" schemaLocation="Locales.xsd" />
-</schema>
+	<import namespace="http://cms.algorythm.de/common/Sources" schemaLocation="Sources.xsd" />
+	<import namespace="http://www.w3.org/2000/svg" schemaLocation="Svg.xsd" />
+</schema> 

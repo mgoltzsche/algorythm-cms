@@ -21,7 +21,7 @@ import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
-import de.algorythm.cms.common.model.entity.ISchemaLocation;
+import de.algorythm.cms.common.model.entity.ISchemaSource;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
 
 @XmlRootElement(name="bundle", namespace="http://cms.algorythm.de/common/Bundle")
@@ -33,8 +33,8 @@ public class Bundle implements IBundle {
 	private Path location;
 	@XmlTransient
 	private List<Path> rootDirectories;
-	@XmlElementRef(type = SchemaLocation.class)
-	private final LinkedList<ISchemaLocation> schemaLocations = new LinkedList<ISchemaLocation>();
+	@XmlElementRef(type = SchemaSource.class)
+	private final LinkedList<ISchemaSource> schemaSources = new LinkedList<ISchemaSource>();
 	@XmlAttribute
 	private String title;
 	@XmlAttribute
@@ -76,8 +76,8 @@ public class Bundle implements IBundle {
 	}
 
 	@Override
-	public LinkedList<ISchemaLocation> getSchemaLocations() {
-		return schemaLocations;
+	public LinkedList<ISchemaSource> getSchemaLocations() {
+		return schemaSources;
 	}
 
 	@Override
@@ -208,8 +208,8 @@ public class Bundle implements IBundle {
 		r.params.addAll(params);
 		r.supportedLocales.addAll(supportedLocales);
 		
-		for (ISchemaLocation schemaLocation : schemaLocations)
-			r.schemaLocations.add(new SchemaLocation(schemaLocation.getUri().normalize()));
+		for (ISchemaSource schemaSource : schemaSources)
+			r.schemaSources.add(new SchemaSource(schemaSource.getUri().normalize()));
 		
 		for (IOutputConfig outputCfg : output)
 			r.output.add(outputCfg.copy());

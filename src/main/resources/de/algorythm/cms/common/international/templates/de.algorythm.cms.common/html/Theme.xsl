@@ -23,7 +23,7 @@
 					</xsl:next-match>
 				</xsl:variable>
 				<xsl:result-document href="content.html">
-					<div cms-page-path="{$page.path}" cms-page-title="{$page.title}">
+					<div cms-page-title="{$page.title}">
 						<xsl:copy-of select="$content" />
 					</div>
 				</xsl:result-document>

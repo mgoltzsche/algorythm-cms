@@ -12,17 +12,18 @@
 	<!-- <xsl:key name="pageIndex" match="p:page" use="concat(@path, '/')"/>-->
 	
 	<xsl:template name="c:menu-html">
-		<xsl:param name="root" select="$c:pages/p:page" />
+		<xsl:param name="root" select="$c:pages/*" />
 		<xsl:param name="depth" select="1" />
 		<xsl:param name="maxDepth" select="0" />
+		
 		<ul>
-			<xsl:for-each select="$root/p:page">
-				<xsl:if test="boolean(@nav-contained)=true()">
+			<xsl:for-each select="$root/*">
+				<xsl:if test="boolean(@nav-contained) = true()">
 					<li class="{if (@path = $page.path or starts-with($page.path, concat(@path, '/'))) then 'pure-menu-selected' else ''}">
 						<xsl:call-template name="c:link" />
 						<xsl:if test="* and ($maxDepth lt 1 or $depth lt $maxDepth)">
 							<xsl:call-template name="c:menu-html">
-								<xsl:with-param name="root" select="p:page" />
+								<xsl:with-param name="root" select="." />
 								<xsl:with-param name="depth" select="$depth + 1" />
 								<xsl:with-param name="maxDepth" select="$maxDepth" />
 							</xsl:call-template>

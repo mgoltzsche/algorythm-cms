@@ -10,7 +10,7 @@ public interface IBundle extends Comparable<IBundle> {
 
 	String getName();
 	Path getLocation();
-	LinkedList<ISchemaLocation> getSchemaLocations();
+	LinkedList<ISchemaSource> getSchemaLocations();
 	List<Path> getRootDirectories();
 	void setRootDirectories(List<Path> rootDirectories);
 	String getTitle();

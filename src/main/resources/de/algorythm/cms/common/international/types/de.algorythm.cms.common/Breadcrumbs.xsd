@@ -3,8 +3,6 @@
 	xmlns:c="http://cms.algorythm.de/common/CMS"
 	targetNamespace="http://cms.algorythm.de/common/CMS"
 	elementFormDefault="qualified">
-	<include schemaLocation="Types.xsd" />
-
 	<element name="breadcrumbs">
 		<complexType>
 			<attribute name="disable-last" type="boolean" default="true" />

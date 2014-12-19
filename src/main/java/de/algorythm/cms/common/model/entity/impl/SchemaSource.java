@@ -6,18 +6,18 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import de.algorythm.cms.common.model.entity.ISchemaLocation;
+import de.algorythm.cms.common.model.entity.ISchemaSource;
 
 @XmlRootElement(name="schema", namespace="http://cms.algorythm.de/common/Bundle")
-public class SchemaLocation implements ISchemaLocation {
+public class SchemaSource implements ISchemaSource {
 
 	@XmlAttribute(name="src")
 	@XmlSchemaType(name = "anyURI")
 	private URI uri;
 
-	public SchemaLocation() {}
+	public SchemaSource() {}
 
-	public SchemaLocation(final URI uri) {
+	public SchemaSource(final URI uri) {
 		this.uri = uri;
 	}
 
@@ -49,7 +49,7 @@ public class SchemaLocation implements ISchemaLocation {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SchemaLocation other = (SchemaLocation) obj;
+		SchemaSource other = (SchemaSource) obj;
 		if (uri == null) {
 			if (other.uri != null)
 				return false;

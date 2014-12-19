@@ -16,8 +16,8 @@ import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.IRenderingJobConfig;
-import de.algorythm.cms.common.model.entity.ISchemaLocation;
-import de.algorythm.cms.common.model.entity.impl.SchemaLocation;
+import de.algorythm.cms.common.model.entity.ISchemaSource;
+import de.algorythm.cms.common.model.entity.impl.SchemaSource;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IDependencyLoader;
 
@@ -79,14 +79,14 @@ public class BundleExpander implements IBundleExpander {
 	private void mergeBundle(final IBundle source, final IBundle target) {
 		target.getParams().addAll(source.getParams());
 		
-		final LinkedList<ISchemaLocation> schemas = target.getSchemaLocations();
-		final Iterator<ISchemaLocation> schemaIter = source.getSchemaLocations().descendingIterator();
+		final LinkedList<ISchemaSource> schemas = target.getSchemaLocations();
+		final Iterator<ISchemaSource> schemaIter = source.getSchemaLocations().descendingIterator();
 		
 		while (schemaIter.hasNext()) {
-			final ISchemaLocation next = schemaIter.next();
+			final ISchemaSource next = schemaIter.next();
 			final URI nextUri = next.getUri().normalize();
 			
-			schemas.addFirst(new SchemaLocation(nextUri));
+			schemas.addFirst(new SchemaSource(nextUri));
 		}
 		
 		for (IOutputConfig output : source.getOutput()) {

@@ -27,15 +27,21 @@
 			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
 		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM">
+			<param id="compress" value="true" />
 			<param id="sources" value="/css/default-theme/main.scss" />
 		</job>
 		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.FontConverter" phase="TRANSFORM">
 			<param id="source" value="/fonts/blaster.ttf" />
 		</job>-->
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor" phase="TRANSFORM">
-			<param id="sources" value="/scripts/angular.js" />
-			<param id="sources" value="/scripts/angular-route.js" />
+			<param id="compress" value="true" />
+			<param id="sources" value="/scripts/angular.min.js" />
+			<param id="sources" value="/scripts/angular-route.min.js" />
 			<param id="sources" value="/scripts/cms.js" />
+		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator" phase="TRANSFORM">
+			<param id="svg" value="/images/example.svg" />
+			<param id="svg" value="/images/example-adobe.svg" />
 		</job>
 	</output>
 	<output id="pdf">

@@ -7,7 +7,8 @@
 	<xsl:param name="page.path" />
 	
 	<xsl:template match="c:nav">
-		<xsl:variable name="absoluteRootPath" select="c:absolute-path(@parent)" />
+		<xsl:variable name="parent" select="if (@parent) then @parent else '.'" />
+		<xsl:variable name="absoluteRootPath" select="c:absolute-path($parent)" />
 		
 		<nav class="pure-menu pure-menu-open pure-menu-vertical">
 			<xsl:call-template name="c:menu-html">

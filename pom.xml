@@ -67,11 +67,16 @@
 									<uri>http://cms.algorythm.de/common/Locales</uri>
 									<toFile>Locales.xsd</toFile>
 								</transformSchema>
+								<transformSchema>
+									<uri>http://cms.algorythm.de/common/Sources</uri>
+									<toFile>Sources.xsd</toFile>
+								</transformSchema>
 							</transformSchemas>
 							<includes>
 								<include>de/algorythm/cms/common/model/entity/impl/Bundle.java</include>
 								<include>de/algorythm/cms/common/model/entity/impl/DerivedPageConfig.java</include>
 								<include>de/algorythm/cms/common/model/entity/impl/LocaleInfos.java</include>
+								<include>de/algorythm/cms/common/model/entity/impl/Sources.java</include>
 							</includes>
 						</configuration>
 					</execution>
@@ -93,15 +98,26 @@
 			<artifactId>guice</artifactId>
 			<version>3.0</version>
 		</dependency>
+		<!-- Saxon HE XSLT -->
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
 			<version>9.6.0-1</version>
 		</dependency>
-		<!-- Xerces, Xalan -->
-		<!--<dependency> <groupId>xerces</groupId> <artifactId>xercesImpl</artifactId> 
-			<version>2.11.0</version> </dependency> <dependency> <groupId>xalan</groupId> 
+		<!-- Apache Xerces schema validator-->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId> 
+			<version>2.11.0</version>
+		</dependency>
+		<!-- Xalan <dependency> <groupId>xalan</groupId> 
 			<artifactId>xalan</artifactId> <version>2.7.2</version> </dependency>-->
+		<!-- RelaxNG schema -->
+		<!--<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jing</artifactId>
+			<version>2.14.1</version>
+		</dependency>-->
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -142,6 +158,12 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-sass-compiler</artifactId>
 			<version>0.9.11</version>
+		</dependency>
+		<!-- YUI Compressor (Minifying JS/CSS) -->
+		<dependency>
+			<groupId>com.yahoo.platform.yui</groupId>
+			<artifactId>yuicompressor</artifactId>
+			<version>2.4.8</version>
 		</dependency>
 		<!-- wro4j -->
 		<dependency>

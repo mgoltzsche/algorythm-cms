@@ -12,6 +12,7 @@ import de.algorythm.cms.common.model.entity.impl.Bundle;
 import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.model.entity.impl.LocaleInfos;
 import de.algorythm.cms.common.model.entity.impl.PageConfig;
+import de.algorythm.cms.common.model.entity.impl.Sources;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.rendering.pipeline.impl.Renderer;
 import de.algorythm.cms.common.resources.IBundleExpander;
@@ -76,7 +77,7 @@ public class CmsCommonModule extends AbstractModule {
 	
 	protected void bindJAXBContext(AnnotatedBindingBuilder<JAXBContext> bind) {
 		try {
-			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageConfig.class, LocaleInfos.class, DerivedPageConfig.class));
+			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageConfig.class, LocaleInfos.class, DerivedPageConfig.class, Sources.class));
 		} catch (JAXBException e) {
 			throw new RuntimeException("Cannot initialize JAXB context", e);
 		}

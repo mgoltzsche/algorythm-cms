@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.w3.org/2000/svg" attributeFormDefault="unqualified"
+	elementFormDefault="qualified" version="1.0">
+	<xsd:element name="svg">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="defs">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="script">
+								<xsd:complexType mixed="true">
+									<xsd:attribute name="type" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="animateTransform">
+					<xsd:complexType>
+						<xsd:attribute name="attributeName" type="xsd:string" />
+						<xsd:attribute name="type" type="xsd:string" />
+						<xsd:attribute name="attributeType" type="xsd:string" />
+						<xsd:attribute name="fill" type="xsd:string" />
+						<xsd:attribute name="begin" type="xsd:string" />
+						<xsd:attribute name="dur" type="xsd:string" />
+						<xsd:attribute name="from" type="xsd:decimal" />
+						<xsd:attribute name="to" type="xsd:decimal" />
+						<xsd:attribute name="additive" type="xsd:string" />
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="path">
+					<xsd:complexType>
+						<xsd:attribute name="d" type="xsd:string" />
+						<xsd:attribute name="fill" type="xsd:string" />
+						<xsd:attribute name="transform" type="xsd:string" />
+						<xsd:attribute name="stroke" type="xsd:string" />
+						<xsd:attribute name="stroke-width" type="xsd:string" />
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="line">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="animateTransform">
+								<xsd:complexType>
+									<xsd:attribute name="attributeName" type="xsd:string" />
+									<xsd:attribute name="type" type="xsd:string" />
+									<xsd:attribute name="attributeType" type="xsd:string" />
+									<xsd:attribute name="fill" type="xsd:string" />
+									<xsd:attribute name="begin" type="xsd:string" />
+									<xsd:attribute name="dur" type="xsd:string" />
+									<xsd:attribute name="from" type="xsd:int" />
+									<xsd:attribute name="to" type="xsd:int" />
+									<xsd:attribute name="additive" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:attribute name="x1" type="xsd:int" />
+						<xsd:attribute name="y1" type="xsd:int" />
+						<xsd:attribute name="x2" type="xsd:int" />
+						<xsd:attribute name="y2" type="xsd:int" />
+						<xsd:attribute name="fill" type="xsd:string" />
+						<xsd:attribute name="stroke" type="xsd:string" />
+						<xsd:attribute name="stroke-width" type="xsd:string" />
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="rect">
+					<xsd:complexType>
+						<xsd:attribute name="x" type="xsd:int" />
+						<xsd:attribute name="y" type="xsd:int" />
+						<xsd:attribute name="width" type="xsd:int" />
+						<xsd:attribute name="height" type="xsd:int" />
+						<xsd:attribute name="rx" type="xsd:string" />
+						<xsd:attribute name="ry" type="xsd:string" />
+						<xsd:attribute name="fill" type="xsd:string" />
+						<xsd:attribute name="stroke" type="xsd:string" />
+						<xsd:attribute name="stroke-width" type="xsd:string" />
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="circle">
+					<xsd:complexType>
+						<xsd:attribute name="cx" type="xsd:int" />
+						<xsd:attribute name="cy" type="xsd:int" />
+						<xsd:attribute name="r" type="xsd:int" />
+						<xsd:attribute name="fill" type="xsd:string" />
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="g">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="path">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="animateTransform">
+											<xsd:complexType>
+												<xsd:attribute name="attributeName" type="xsd:string" />
+												<xsd:attribute name="type" type="xsd:string" />
+												<xsd:attribute name="attributeType" type="xsd:string" />
+												<xsd:attribute name="fill" type="xsd:string" />
+												<xsd:attribute name="begin" type="xsd:string" />
+												<xsd:attribute name="dur" type="xsd:string" />
+												<xsd:attribute name="from" type="xsd:decimal" />
+												<xsd:attribute name="to" type="xsd:decimal" />
+												<xsd:attribute name="additive" type="xsd:string" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+									<xsd:attribute name="d" type="xsd:string" />
+									<xsd:attribute name="fill" type="xsd:string" />
+									<xsd:attribute name="transform" type="xsd:string" />
+									<xsd:attribute name="stroke" type="xsd:string" />
+									<xsd:attribute name="stroke-width" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="rect">
+								<xsd:complexType>
+									<xsd:attribute name="x" type="xsd:int" />
+									<xsd:attribute name="y" type="xsd:int" />
+									<xsd:attribute name="width" type="xsd:int" />
+									<xsd:attribute name="height" type="xsd:int" />
+									<xsd:attribute name="rx" type="xsd:string" />
+									<xsd:attribute name="ry" type="xsd:string" />
+									<xsd:attribute name="fill" type="xsd:string" />
+									<xsd:attribute name="stroke" type="xsd:string" />
+									<xsd:attribute name="stroke-width" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="circle">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element name="animateTransform">
+											<xsd:complexType>
+												<xsd:attribute name="attributeName" type="xsd:string" />
+												<xsd:attribute name="type" type="xsd:string" />
+												<xsd:attribute name="attributeType" type="xsd:string" />
+												<xsd:attribute name="fill" type="xsd:string" />
+												<xsd:attribute name="begin" type="xsd:string" />
+												<xsd:attribute name="dur" type="xsd:string" />
+												<xsd:attribute name="from" type="xsd:decimal" />
+												<xsd:attribute name="to" type="xsd:decimal" />
+												<xsd:attribute name="additive" type="xsd:string" />
+											</xsd:complexType>
+										</xsd:element>
+									</xsd:sequence>
+									<xsd:attribute name="cx" type="xsd:int" />
+									<xsd:attribute name="cy" type="xsd:int" />
+									<xsd:attribute name="r" type="xsd:int" />
+									<xsd:attribute name="fill" type="xsd:string" />
+									<xsd:attribute name="stroke" type="xsd:string" />
+									<xsd:attribute name="stroke-width" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="line">
+								<xsd:complexType>
+									<xsd:attribute name="x1" type="xsd:int" />
+									<xsd:attribute name="y1" type="xsd:int" />
+									<xsd:attribute name="x2" type="xsd:int" />
+									<xsd:attribute name="y2" type="xsd:int" />
+									<xsd:attribute name="fill" type="xsd:string" />
+									<xsd:attribute name="stroke" type="xsd:string" />
+									<xsd:attribute name="stroke-width" type="xsd:string" />
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:attribute name="fill" type="xsd:string" />
+						<xsd:attribute name="transform" type="xsd:string" />
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="text">
+					<xsd:complexType>
+						<xsd:attribute name="x" type="xsd:int" />
+						<xsd:attribute name="y" type="xsd:int" />
+						<xsd:attribute name="fill" type="xsd:string" />
+						<xsd:attribute name="writing-mode" type="xsd:string" />
+						<xsd:attribute name="transform" type="xsd:string" />
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="version" type="xsd:decimal" />
+			<xsd:attribute name="baseProfile" type="xsd:string" />
+			<xsd:attribute name="width" type="xsd:int" />
+			<xsd:attribute name="height" type="xsd:int" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

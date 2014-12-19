@@ -1,6 +1,5 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
@@ -48,7 +47,7 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 	private final DocumentBuilderFactory factory;
 	private final Cache<Path, Document> domCache;
 	
-	public XmlDomLoader(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws IOException {
+	public XmlDomLoader(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws Exception {
 		final Schema schema = createSchema(schemaLocationUris, sourceUriResolver);
 		this.domCache = new Cache<Path, Document>();
 		factory = DocumentBuilderFactory.newInstance();
@@ -76,7 +75,7 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 		}
 	}
 
-	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws IOException {
+	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws Exception {
 		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		final Source[] sources = new Source[schemaLocationUris.size()];
 		int i = 0;

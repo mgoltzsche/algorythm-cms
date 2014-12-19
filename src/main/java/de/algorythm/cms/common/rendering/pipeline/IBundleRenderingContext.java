@@ -12,6 +12,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
@@ -35,4 +36,5 @@ public interface IBundleRenderingContext {
 	Templates compileTemplates(Collection<URI> xslSourceUris);
 	Transformer createTransformer(Templates templates, URI notFoundContent, Locale locale) throws TransformerConfigurationException;
 	void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException;
+	void transform(Node sourceNode, URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException;
 }

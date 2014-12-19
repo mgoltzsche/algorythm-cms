@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import com.google.inject.Injector;
 
@@ -177,6 +178,13 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	public Transformer createTransformer(Templates templates,
 			URI notFoundContent, Locale locale) throws TransformerConfigurationException {
 		return context.createTransformer(templates, notFoundContent, locale);
+	}
+
+	@Override
+	public void transform(Node sourceNode, URI sourceUri, URI targetUri,
+			Transformer transformer, Locale locale) throws IOException,
+			TransformerException {
+		context.transform(sourceNode, sourceUri, targetUri, transformer, locale);
 	}
 
 	@Override
