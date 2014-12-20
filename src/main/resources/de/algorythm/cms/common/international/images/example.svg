@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<svg version='1.1' baseProfile='full' xmlns='http://www.w3.org/2000/svg'
+		xmlns:xlink='http://www.w3.org/1999/xlink'
+		xmlns:ev='http://www.w3.org/2001/xml-events'
+		width="800" height="600">
+<defs>
+<script type="text/ecmascript">
+<![CDATA[
+]]></script>
+</defs>
+
+<animateTransform attributeName='transform' type='scale' attributeType='XML' fill='freeze' begin='1.5s' dur='0.3s' from='1,1' to='1,.4' additive='sum' />
+<path d='M0,0 L100,30 L0,60 z' fill='#000099' transform='translate(36,90),rotate(17)' stroke='black' stroke-width='2px'>
+</path>
+<line x1='183' y1='555' x2='380' y2='555' fill='black'  stroke='black'	stroke-width='3px'>
+	<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='7s' dur='0.25s' from='0' to='90' additive='sum' />
+</line>
+<rect x='0' y='150' width='250' height='15' rx='' ry='' fill='#996600'  stroke='#663300' stroke-width='2px'>
+</rect>
+<circle cx='540' cy='270' r='2' fill='black'>
+</circle>
+
+<g fill='black' transform='translate(5,-60)'>
+<path d='M0,0 L100,30 L0,60 z' fill='#000099' transform='translate(36,90),rotate(17)' stroke='black' stroke-width='2px'>
+<animateTransform attributeName='transform' type='scale' attributeType='XML' fill='freeze' begin='1.5s' dur='0.3s' from='1,1' to='1,.4' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='1.5s' dur='0.3s' from='1' to='.4' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='1.5s' dur='0.3s' from='0,0' to='0,80' additive='sum' />
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='1.5s' dur='0.3s' from='0' to='-17' additive='sum' />
+</path>
+<!-- Error: %% El triangulo que hecha aire -->
+<rect x='0' y='150' width='250' height='15' rx='' ry='' fill='#996600'  stroke='#663300' stroke-width='2px'>
+</rect>
+<!-- Error: %% tabla ariba izquierda -->
+<rect x='10' y='30' width='20' height='100' rx='4' ry='4' fill='#660000' transform='translate(0,140),rotate(180)' stroke='black' stroke-width='2px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='1s' dur='0.7s' from='0' to='98' additive='sum' />
+</rect>
+<!-- Error: %% Libro -->
+<rect x='500' y='180' width='200' height='15' rx='' ry='' fill='#996600'  stroke='#663300' stroke-width='2px'>
+</rect>
+<!-- Error: %% tabla arriba derecha -->
+<path d='M20,4 L125,19 L0,57 L5,34 L13,30 L9,25 z M9,25 L125,19 L5,34 M13,30 L125,19 L98,32 L67,37' fill='white' transform='translate(120,90)' stroke='black' stroke-width='2px'>
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='1.7s' dur='1s' from='0,0' to='400,40' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='2.7s' dur='0.5s' from='0,0' to='40,0' additive='sum' />
+</path>
+<!-- Error: %% Avion -->
+<circle cx='670' cy='150' r='30' fill='#000066'  stroke='black' stroke-width='2px'>
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='2.7s' dur='0.3s' from='0,0' to='40,0' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='3s' dur='0.2s' from='0,0' to='22,22' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='3.2s' dur='0.7s' from='0,0' to='20,240' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='3.9s' dur='0.3s' from='0,0' to='0,60' additive='sum' />
+</circle>
+<!-- Error: %% Pelota azul oscuro -->
+<circle cx='641' cy='492' r='15' fill='#666666'  stroke='black' stroke-width='2px'>
+</circle>
+<!-- Error: %% La base redonda para el trampolin -->
+<path d='M-150,-5 L150,-5 L150,5 L-150,5 z' fill='#996600' transform='translate(640,470),rotate(-10)' stroke='#663300' stroke-width='2px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='3.9s' dur='0.3s' from='0' to='30' additive='sum' />
+</path>
+<!-- Error: %% Trampolin -->
+<circle cx='500' cy='481' r='7' fill='#006600'  stroke='black' stroke-width='2px'>
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='3.9s' dur='0.3s' from='0,0' to='40,-180' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='4.2s' dur='0.4s' from='0,0' to='40,380' additive='sum' />
+</circle>
+<!-- Error: %% Pelota verde del trampolin -->
+<rect x='0' y='0' width='550' height='15' rx='' ry='' fill='#996600' transform='translate(40,360),rotate(-10)' stroke='#663300' stroke-width='2px'>
+</rect>
+<!-- Error: %% Tabla central -->
+<circle cx='540' cy='270' r='2' fill='black'>
+</circle>
+<!-- Error: %% La trampa de la tabla central -->
+<rect x='0' y='400' width='5' height='100' rx='' ry='' fill='#996600'  stroke='#663300' stroke-width='2px'>
+</rect>
+<!-- Error: %% Tabla vertical para rebote de bola naranja, abajo izquierda -->
+<circle cx='546' cy='260' r='10' fill='#cc9900'  stroke='black' stroke-width='2px'>
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='4.25s' dur='0.1s' from='0,0' to='-9,-5' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='4.35s' dur='0.1s' from='0,0' to='-9,8' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='4.45s' dur='1.5s' from='0,0' to='-495,88' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='5.95s' dur='0.05s' from='0,0' to='-5,5' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='6s' dur='0.2s' from='0,0' to='-11,60' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='6.2s' dur='0.2s' from='0,0' to='12,55' additive='sum' />
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='6.4s' dur='0.8s' from='0,0' to='-40,200' additive='sum' />
+</circle>
+<!-- Error: %% Bola Naranja -->
+<rect x='40' y='480' width='150' height='15' rx='' ry='' fill='#996600'  stroke='#663300' stroke-width='2px'>
+</rect>
+<!-- Error: %% Tabla para dominos abajo izquierda -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#444444' transform='translate(50,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='6.4s' dur='0.2s' from='0' to='70' additive='sum' />
+</rect>
+<!-- Error: %% Ficha 1 -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#444444' transform='translate(70,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='6.5s' dur='0.2s' from='0' to='70' additive='sum' />
+</rect>
+<!-- Error: %% Ficha 2 -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#444444' transform='translate(90,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='6.6s' dur='0.2s' from='0' to='70' additive='sum' />
+</rect>
+<!-- Error: %% Ficha 3 -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#444444' transform='translate(110,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='6.7s' dur='0.2s' from='0' to='70' additive='sum' />
+</rect>
+<!-- Error: %% Ficha 4 -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#444444' transform='translate(130,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='6.8s' dur='0.2s' from='0' to='70' additive='sum' />
+</rect>
+<!-- Error: %% Ficha 5 -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#444444' transform='translate(150,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='6.9s' dur='0.2s' from='0' to='70' additive='sum' />
+</rect>
+<!-- Error: %% Ficha 6 -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#444444' transform='translate(170,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='7s' dur='0.25s' from='0' to='90' additive='sum' />
+</rect>
+<!-- Error: %% Ficha 7 -->
+<rect x='0' y='0' width='8' height='28' rx='3' ry='3' fill='#999999' transform='translate(190,480),rotate(180)' stroke='black' stroke-width='1px'>
+<animateTransform attributeName='transform' type='translate' attributeType='XML' fill='freeze' begin='7.1s' dur='0.2s' from='0,0' to='-10,-5' additive='sum' />
+<animateTransform attributeName='transform' type='rotate' attributeType='XML' fill='freeze' begin='7.1s' dur='0.2s' from='0' to='180' additive='sum' />
+<animate attributeName='y' attributeType='XML' fill='freeze' begin='7.4s' dur='0.2s' from='0' to='46' />
+</rect>
+<!-- Error: %% Ficha 8 (de aluminio) -->
+<rect x='170' y='560' width='300' height='15' rx='' ry='' fill='#996600'  stroke='#663300' stroke-width='2px'>
+</rect>
+<!-- Error: %% Mesa de la lampara -->
+<line x1='183' y1='555' x2='380' y2='555' fill='black'  stroke='black'	stroke-width='3px'>
+</line>
+<!-- Error: %% Cable de la lampara -->
+<rect x='183' y='540' width='15' height='20' rx='' ry='' fill='#999999'  stroke='black' stroke-width='2px'>
+</rect>
+<!-- Error: %% Conector 1 de la lampara -->
+<rect x='210' y='540' width='15' height='20' rx='' ry='' fill='#999999'  stroke='black' stroke-width='2px'>
+</rect>
+<!-- Error: %% Conector 2 de la lampara -->
+<rect x='380' y='480' width='50' height='80' rx='6' ry='6' fill='#33cc99'  stroke='black' stroke-width='2px'>
+</rect>
+<!-- Error: %% Cuerpo de la lampara -->
+<rect x='400' y='470' width='10' height='10' rx='3' ry='3' fill='black'>
+</rect>
+<!-- Error: %% Base del foco de la lampara -->
+<circle cx='405' cy='460' r='12' fill='#ffff00'>
+</circle>
+<!-- Error: %% El foco de la lampara -->
+<path d='M40,0 L100,0 L140,80 L0,80 z' fill='#333399' opacity='0.7' transform='translate(335,420)' stroke='black' stroke-width='2px'>
+<animate attributeName='opacity' attributeType='XML' fill='freeze' begin='7.6s' dur='0.2s' from='0.7' to='0.6' />
+<animateColor attributeName='fill' attributeType='CSS' fill='freeze' begin='7.6s' dur='0.2s' from='#333399' to='#6666cc' />
+</path>
+<!-- Error: %% La pantalla de la lampara -->
+</g>
+<text x='15' y='20' fill='silver' writing-mode='tb'
+	transform='scale(0.2)'>SLOGO ver 0.9, Alberto Pacheco, alberto@acm.org, 2007</text>
+<!-- t=5:-60![!c000099!bblack,2!t36:90!r17!asy=1@.4,1.5@0.3!at=0:0@0:80,1.5@0.3!arot=0@-17,1.5@0.3!P M0,0 L100,30 L0,60 z!%% El triangulo que hecha aire!c996600!b663300,2!R0:150,250:15!%% tabla ariba izquierda!c660000!bblack,2!t0:140!r180!arot=0@98,1@0.7!R10:30,20:100,4!%% Libro!c996600!b663300,2!R500:180,200:15!%% tabla arriba derecha!cwhite!bblack,2!t120:90!at=0:0@400:40,1.7@1!at=0:0@40:0,2.7@0.5!P M20,4 L125,19 L0,57 L5,34 L13,30 L9,25 z M9,25 L125,19 L5,34 M13,30 L125,19 L98,32 L67,37!%% Avion!c000066!bblack,2!at=0:0@40:0,2.7@0.3!at=0:0@22:22,3@0.2!at=0:0@20:240,3.2@0.7!at=0:0@0:60,3.9@0.3!C670:150,30!%% Pelota azul oscuro!c666666!bblack,2!C641:492,15!%% La base redonda para el trampolin!c996600!b663300,2!t640:470!r-10!arot=0@30,3.9@0.3!P M-150,-5 L150,-5 L150,5 L-150,5 z!%% Trampolin!c006600!bblack,2!at=0:0@40:-180,3.9@0.3!at=0:0@40:380,4.2@0.4!C500:481,7!%% Pelota verde del trampolin!c996600!b663300,2!t40:360!r-10!R0:0,550:15!%% Tabla central!cblack!C540:270,2!%% La trampa de la tabla central!c996600!b663300,2!R0:400,5@100!%% Tabla vertical para rebote de bola naranja, abajo izquierda!ccc9900!bblack,2!at=0:0@-9:-5,4.25@0.1!at=0:0@-9:8,4.35@0.1!at=0:0@-495:88,4.45@1.5!at=0:0@-5:5,5.95@0.05!at=0:0@-11:60,6@0.2!at=0:0@12:55,6.2@0.2!at=0:0@-40:200,6.4@0.8!C546:260,10!%% Bola Naranja!c996600!b663300,2!R40:480,150:15!%% Tabla para dominos abajo izquierda!c444444!bblack,1!t50:480!r180!arot=0@70,6.4@0.2!R0:0,8:28,3!%% Ficha 1!c444444!bblack,1!t70:480!r180!arot=0@70,6.5@0.2!R0:0,8:28,3!%% Ficha 2!c444444!bblack,1!t90:480!r180!arot=0@70,6.6@0.2!R0:0,8:28,3!%% Ficha 3!c444444!bblack,1!t110:480!r180!arot=0@70,6.7@0.2!R0:0,8:28,3!%% Ficha 4!c444444!bblack,1!t130:480!r180!arot=0@70,6.8@0.2!R0:0,8:28,3!%% Ficha 5!c444444!bblack,1!t150:480!r180!arot=0@70,6.9@0.2!R0:0,8:28,3!%% Ficha 6!c444444!bblack,1!t170:480!r180!arot=0@90,7@0.25!R0:0,8:28,3!%% Ficha 7!c999999!bblack,1!t190:480!r180!at=0:0@-10:-5,7.1@0.2!arot=0@180,7.1@0.2!ay=0@46,7.4@0.2!R0:0,8:28,3!%% Ficha 8 (de aluminio)!c996600!b663300,2!R170:560,300:15!%% Mesa de la lampara!cblack!L183:555,380:555!%% Cable de la lampara!c999999!bblack,2!R183:540,15:20!%% Conector 1 de la lampara!c999999!bblack,2!R210:540,15:20!%% Conector 2 de la lampara!c33cc99!bblack,2!R 380:480,50:80,6!%% Cuerpo de la lampara!cblack!R400:470,10:10,3!%% Base del foco de la lampara!cffff00!C405:460,12!%% El foco de la lampara!c333399!bblack,2!o0.7!t335:420!ao=0.7@0.6,7.6@0.2!ac=333399@6666cc,7.6@0.2!P M40,0 L100,0 L140,80 L0,80 z!%% La pantalla de la lampara!]!  -->
+</svg>

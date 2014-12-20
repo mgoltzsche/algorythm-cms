@@ -40,8 +40,9 @@
 			<param id="sources" value="/scripts/cms.js" />
 		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator" phase="TRANSFORM">
-			<param id="svg" value="/images/example.svg" />
-			<param id="svg" value="/images/example-adobe.svg" />
+			<!--<param id="svg" value="/images/example.svg" />-->
+			<param id="svg" value="/images/adobe-example.svg" />
+			<param id="svg" value="/images/logo.svg" />
 		</job>
 	</output>
 	<output id="pdf">

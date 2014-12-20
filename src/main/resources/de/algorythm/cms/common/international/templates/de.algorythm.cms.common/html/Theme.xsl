@@ -45,6 +45,14 @@
 									<li><a href="{$relativeBaseURL}/../{@id}{$page.path}/index.html" cms-language="{@id}"><xsl:value-of select="@id" /> - <xsl:value-of select="@title" /></a></li>
 								</xsl:for-each>
 							</ul>
+							<img src="{$resourceBaseURL}/sprites.svg#logo" />
+							<img src="{$resourceBaseURL}/sprites.svg#example" />
+							<svg class="icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+								<use xlink:href="{$resourceBaseURL}/sprites.svg#example" />
+							</svg>
+							<svg class="icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+								<use xlink:href="{$resourceBaseURL}/sprites.svg#logo" />
+							</svg>
 							<nav class="pure-menu pure-menu-open pure-menu-horizontal" cms-menu="pure-menu-selected">
 								<a href="{$relativeBaseURL}/index.html" class="pure-menu-heading"><xsl:value-of select="$site.name" /></a>
 								<xsl:call-template name="c:menu-html">

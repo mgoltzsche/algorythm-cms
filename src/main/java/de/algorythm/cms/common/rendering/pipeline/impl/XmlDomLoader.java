@@ -48,12 +48,12 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 	private final Cache<Path, Document> domCache;
 	
 	public XmlDomLoader(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws Exception {
-		final Schema schema = createSchema(schemaLocationUris, sourceUriResolver);
+		//final Schema schema = createSchema(schemaLocationUris, sourceUriResolver);
 		this.domCache = new Cache<Path, Document>();
 		factory = DocumentBuilderFactory.newInstance();
 		
 		factory.setNamespaceAware(true);
-		factory.setSchema(schema);
+		//factory.setSchema(schema);
 	}
 	
 	@Override
