@@ -9,23 +9,19 @@ import de.algorythm.cms.common.model.entity.ISupportedLocale;
 
 @XmlRootElement(name="locale", namespace="http://cms.algorythm.de/common/Bundle")
 public class SupportedLocale implements ISupportedLocale {
-	
+
 	@XmlAttribute(required = true)
 	private Locale locale;
 
 	public SupportedLocale() {}
-	
+
 	public SupportedLocale(final Locale locale) {
 		this.locale = locale;
 	}
-	
+
 	@Override
 	public Locale getLocale() {
 		return locale;
-	}
-
-	public void setLocale(Locale locale) {
-		this.locale = locale;
 	}
 
 	@Override
@@ -48,5 +44,10 @@ public class SupportedLocale implements ISupportedLocale {
 		} else if (!locale.equals(other.locale))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return locale.toLanguageTag();
 	}
 }

@@ -39,19 +39,16 @@ public class ScssCompiler implements IRenderingJob {
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
 		final List<URI> uris = new LinkedList<URI>(config);
-		
-		uris.addAll(sources);
-		
-		compileSource(createIncludingSCSS(uris), ctx);
-	}
-	
-	private String createIncludingSCSS(final List<URI> uris) {
 		final StringBuilder scss = new StringBuilder();
 		
+		uris.addAll(sources);
+		createIncludingSCSS(uris, scss);
+		compileSource(scss.toString(), ctx);
+	}
+	
+	private void createIncludingSCSS(final List<URI> uris, final StringBuilder scss) {
 		for (URI uri : uris)
 			scss.append("@import \"").append(StringEscapeUtils.escapeJava(uri.getPath())).append("\";\n");
-		
-		return scss.toString();
 	}
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {

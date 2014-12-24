@@ -40,9 +40,18 @@
 					</head>
 					<body>
 						<div id="container">
-							<ul>
+							<ul class="locale-switch">
 								<xsl:for-each select="document('/supported-locales.xml')/l:locales/l:locale">
-									<li><a href="{$relativeBaseURL}/../{@id}{$page.path}/index.html" cms-language="{@id}"><xsl:value-of select="@id" /> - <xsl:value-of select="@title" /></a></li>
+									<li>
+										<xsl:if test="@active = true()">
+											<xsl:attribute name="class" select="'active'" />
+										</xsl:if>
+										<a href="{$relativeBaseURL}/../{@id}{$page.path}/index.html" cms-language="{@language}" lang="{@language}" title="{@title}">
+											<svg xmlns:xlink="http://www.w3.org/1999/xlink">
+												<use xlink:href="{$resourceBaseURL}/sprites.svg#{@country}" />
+											</svg>
+										</a>
+									</li>
 								</xsl:for-each>
 							</ul>
 							<img src="{$resourceBaseURL}/sprites.svg#logo" />
@@ -53,7 +62,7 @@
 							<svg class="icon" xmlns:xlink="http://www.w3.org/1999/xlink">
 								<use xlink:href="{$resourceBaseURL}/sprites.svg#logo" />
 							</svg>
-							<nav class="pure-menu pure-menu-open pure-menu-horizontal" cms-menu="pure-menu-selected">
+							<nav class="pure-menu pure-menu-open pure-menu-horizontal" cms-menu="pure-menu-selected" role="menubar">
 								<a href="{$relativeBaseURL}/index.html" class="pure-menu-heading"><xsl:value-of select="$site.name" /></a>
 								<xsl:call-template name="c:menu-html">
 									<xsl:with-param name="maxDepth" select="1" />

@@ -49,7 +49,7 @@ public class BundleLoader implements IBundleLoader {
 			bundle.setTitle(bundle.getName());
 		
 		if (bundle.getDefaultLocale() == null)
-			bundle.setDefaultLocale(Locale.ENGLISH);
+			bundle.setDefaultLocale(Locale.UK);
 		
 		if (bundle.getContextPath() == null)
 			bundle.setContextPath("");
@@ -59,11 +59,26 @@ public class BundleLoader implements IBundleLoader {
 		
 		mergedSupportedLocales.add(new SupportedLocale(bundle.getDefaultLocale()));
 		mergedSupportedLocales.addAll(supportedLocales);
+		
 		bundle.setSupportedLocales(mergedSupportedLocales);
+		
+		validateSupportedLocales(bundle);
 		
 		return bundle;
 	}
-	
+
+	private void validateSupportedLocales(final IBundle bundle) {
+		for (ISupportedLocale supportedLocale : bundle.getSupportedLocales()) {
+			final Locale locale = supportedLocale.getLocale();
+			
+			if (locale.getLanguage().isEmpty())
+				throw new IllegalStateException(bundle.getName() + " locale '" + locale.toLanguageTag() + "' does not define a language");
+			
+			if (locale.getCountry().isEmpty())
+				throw new IllegalStateException(bundle.getName() + " locale '" + locale.toLanguageTag() + "' does not define a country");
+		}
+	}
+
 	private Bundle readBundle(final Path siteCfgFile) throws JAXBException {
 		final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 		final Source source = new StreamSource(siteCfgFile.toString());

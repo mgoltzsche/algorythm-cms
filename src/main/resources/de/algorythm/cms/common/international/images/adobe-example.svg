@@ -5,6 +5,5 @@
 	 width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
 <g>
 	<path d="M50.049,0.3c14.18,0.332,25.969,5.307,35.366,14.923S99.675,36.9,100,51.409c-0.195,11.445-3.415,21.494-9.658,30.146 - yadda yadda yadda"/>
-	<path d='M0,0 L100,30 L0,60 z' fill='#000099' transform='translate(36,90),rotate(17)' stroke='black' stroke-width='2px' />
 </g>
 </svg>

@@ -16,10 +16,11 @@
 		<xsl:param name="depth" select="1" />
 		<xsl:param name="maxDepth" select="0" />
 		
-		<ul>
+		<ul role="menu">
 			<xsl:for-each select="$root/*">
 				<xsl:if test="boolean(@nav-contained) = true()">
-					<li class="{if (@path = $page.path or starts-with($page.path, concat(@path, '/'))) then 'pure-menu-selected' else ''}">
+					<xsl:variable name="active" select="@path = $page.path or starts-with($page.path, concat(@path, '/'))" />
+					<li class="{if ($active) then 'pure-menu-selected' else ''}" role="menuitem">
 						<xsl:call-template name="c:link" />
 						<xsl:if test="* and ($maxDepth lt 1 or $depth lt $maxDepth)">
 							<xsl:call-template name="c:menu-html">

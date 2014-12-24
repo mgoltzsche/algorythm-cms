@@ -1,9 +1,9 @@
 <bundle xmlns="http://cms.algorythm.de/common/Bundle"
 		name="example.org"
 		title="My example site"
-		default-locale="en"
+		default-locale="en-GB"
 		context-path="/site1">
-	<locale locale="de" />
+	<locale locale="de-DE" />
 	<param id="testparam" value="overwritten" />
 	<dependency name="common.cms.algorythm.de" />
 	<page content="/contents/welcome.xml">

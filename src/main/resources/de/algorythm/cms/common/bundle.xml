@@ -1,7 +1,7 @@
 <bundle xmlns="http://cms.algorythm.de/common/Bundle"
 		name="common.cms.algorythm.de"
 		title="My example site library"
-		default-locale="en"
+		default-locale="en-GB"
 		context-path="/site1">
 	<param id="testparam" value="paramvalue" />
 	<schema src="/types/de.algorythm.cms.common/CMS.xsd" />

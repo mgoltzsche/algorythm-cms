@@ -24,6 +24,7 @@ public class SupportedLocalesXmlGenerator implements IRenderingJob {
 
 	@Inject
 	private JAXBContext jaxbContext;
+	private boolean localizeTitle = false;
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
@@ -54,8 +55,14 @@ public class SupportedLocalesXmlGenerator implements IRenderingJob {
 		
 		for (ISupportedLocale supportedLocale : bundle.getSupportedLocales()) {
 			final Locale l = supportedLocale.getLocale();
+			final String lang = l.getLanguage();
+			final String country = l.getCountry().toLowerCase();
+			final String title = localizeTitle
+					? l.getDisplayLanguage(inLocale)
+					: l.getDisplayLanguage(l);
+			final boolean active = inLocale.equals(l);
 			
-			locales.add(new LocaleInfo(l.getLanguage(), l.getDisplayLanguage(inLocale)));
+			locales.add(new LocaleInfo(lang, country, title, active));
 		}
 		
 		return localeInfos;

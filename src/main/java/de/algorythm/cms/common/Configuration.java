@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
 import java.util.Properties;
 
 import javax.inject.Singleton;
@@ -13,7 +12,6 @@ import javax.inject.Singleton;
 @Singleton
 public class Configuration {
 
-	static private final LocaleResolver localeResolver = new LocaleResolver();
 	static private InputStream getPropertiesStream() {
 		final InputStream stream = Configuration.class.getResourceAsStream("/algorythm-cms.properties");
 		
@@ -23,7 +21,6 @@ public class Configuration {
 		return stream;
 	}
 	
-	public final Locale defaultLanguage;
 	public final Path outputDirectory;
 	
 	public Configuration() {
@@ -39,7 +36,6 @@ public class Configuration {
 			throw new RuntimeException("Cannot read properties", e);
 		}
 		
-		final String defaultLangStr = properties.getProperty("defaultLanguage");
 		final String outputDirectoryStr = properties.getProperty("output.directory");
 		
 		if (outputDirectoryStr == null)
@@ -49,9 +45,5 @@ public class Configuration {
 		
 		if (Files.isRegularFile(outputDirectory))
 			throw new IllegalStateException("outputDirectory " + outputDirectory + " is an existing file");
-		
-		defaultLanguage = defaultLangStr == null
-				? Locale.ENGLISH
-				: localeResolver.getLocale(defaultLangStr);
 	}
 }
