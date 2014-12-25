@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.LocaleInfo;
@@ -28,6 +29,7 @@ public class SupportedLocalesXmlGenerator implements IRenderingJob {
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final IBundle bundle = ctx.getBundle();
 		final Path outputDirectory = ctx.getTempDirectory();
 		final Marshaller marshaller = jaxbContext.createMarshaller();
@@ -47,6 +49,8 @@ public class SupportedLocalesXmlGenerator implements IRenderingJob {
 			Files.createDirectories(localizedOutputDirectory);
 			marshaller.marshal(locales, Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8));
 		}
+		
+		meter.finish();
 	}
 
 	private LocaleInfos createLocaleInfos(final IBundle bundle, final Locale inLocale) {

@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -17,8 +18,7 @@ import javax.xml.transform.TransformerException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import com.google.inject.Injector;
 
@@ -54,7 +54,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	private final Iterator<PipelinePhase> phaseIter;
 	private PipelinePhase currentPhase;
 	private final IProgressObserver<Void> observer;
-	private final long startTime = new Date().getTime();
+	private final long startTime = System.currentTimeMillis();
 
 	public RenderingProcess(final IBundleRenderingContext context, final List<Collection<IRenderingJob>> jobPhases, final Injector injector, final IProgressObserver<Void> observer) {
 		if (jobPhases.isEmpty())
@@ -99,7 +99,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 					if (phaseIter.hasNext()) {
 						currentPhase = phaseIter.next();
 					} else {
-						log.info("Finished " + this + " in " + (new Date().getTime() - startTime) + "ms");
+						log.info("Finished " + this + " in " + (System.currentTimeMillis() - startTime) + "ms");
 						processObserver.terminateProcess();
 						observer.finished();
 					}
@@ -164,8 +164,8 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public Document getDocument(URI uri, Locale locale) {
-		return context.getDocument(uri, locale);
+	public Source getSource(URI uri, Locale locale) throws SAXException, ParserConfigurationException, IOException {
+		return context.getSource(uri, locale);
 	}
 
 	@Override
@@ -181,10 +181,10 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public void transform(Node sourceNode, URI sourceUri, URI targetUri,
+	public void transform(Source source, URI targetUri,
 			Transformer transformer, Locale locale) throws IOException,
 			TransformerException {
-		context.transform(sourceNode, sourceUri, targetUri, transformer, locale);
+		context.transform(source, targetUri, transformer, locale);
 	}
 
 	@Override

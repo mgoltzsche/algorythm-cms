@@ -24,6 +24,7 @@ import com.vaadin.sass.internal.parser.Parser;
 import com.vaadin.sass.internal.resolver.ScssStylesheetResolver;
 import com.yahoo.platform.yui.compressor.CssCompressor;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.resources.ITargetUriResolver;
@@ -31,19 +32,21 @@ import de.algorythm.cms.common.resources.ITargetUriResolver;
 public class ScssCompiler implements IRenderingJob {
 
 	static private final URI MAIN_CSS = URI.create("main.css");
-	
+
 	private List<URI> config = new LinkedList<URI>();
 	private List<URI> sources = new LinkedList<URI>();
 	private boolean compress = false;
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final List<URI> uris = new LinkedList<URI>(config);
 		final StringBuilder scss = new StringBuilder();
 		
 		uris.addAll(sources);
 		createIncludingSCSS(uris, scss);
 		compileSource(scss.toString(), ctx);
+		meter.finish();
 	}
 	
 	private void createIncludingSCSS(final List<URI> uris, final StringBuilder scss) {

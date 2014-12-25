@@ -6,13 +6,14 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Locale;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
@@ -32,9 +33,9 @@ public interface IBundleRenderingContext {
 	URI getResourcePrefix();
 	String getProperty(String name);
 	void setProperty(String name, String value);
-	Document getDocument(URI uri, Locale locale);
+	Source getSource(URI uri, Locale locale) throws SAXException, ParserConfigurationException, IOException;
 	Templates compileTemplates(Collection<URI> xslSourceUris);
 	Transformer createTransformer(Templates templates, URI notFoundContent, Locale locale) throws TransformerConfigurationException;
 	void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException;
-	void transform(Node sourceNode, URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException;
+	void transform(Source source, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException;
 }

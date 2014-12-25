@@ -1,9 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -11,19 +8,19 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.Source;
 import de.algorythm.cms.common.model.entity.impl.Sources;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.ISourceUriResolver;
 
 public class SvgSpriteGenerator implements IRenderingJob {
 
@@ -38,6 +35,8 @@ public class SvgSpriteGenerator implements IRenderingJob {
 	
 	@Override
 	public void run(IRenderingContext ctx) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
+		
 		if (includeLocaleFlags) {
 			for (ISupportedLocale supportedLocale : ctx.getBundle().getSupportedLocales()) {
 				final Locale locale = supportedLocale.getLocale();
@@ -63,7 +62,16 @@ public class SvgSpriteGenerator implements IRenderingJob {
 			
 			marshaller.marshal(sources, sourcesXml);
 			
-			ctx.transform(sourcesXml.getNode(), URI.create("/"), spriteUri, transformer, Locale.ROOT);
+			final javax.xml.transform.Source xsltSource = new DOMSource(sourcesXml.getNode(), "/sprites.svg");
+			
+			ctx.transform(xsltSource, spriteUri, transformer, Locale.ROOT);
 		}
+		
+		meter.finish();
+	}
+
+	@Override
+	public String toString() {
+		return "SvgSpriteGenerator";
 	}
 }

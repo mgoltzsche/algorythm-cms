@@ -12,7 +12,4 @@
 		</page>
 		<page name="about" content="/contents/about.xml" />
 	</page>
-	<output id="html">
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM"/>
-	</output>
 </bundle>

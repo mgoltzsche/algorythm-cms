@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
 import javax.xml.transform.SourceLocator;
@@ -28,7 +29,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -39,12 +40,11 @@ import net.sf.saxon.lib.OutputURIResolver;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.ISchemaSource;
@@ -167,7 +167,7 @@ public class RenderingContext implements IBundleRenderingContext {
 			schemaLocations.add(location.getUri());
 		
 		try {
-			this.xmlLoader = new XmlDomLoader(schemaLocations, sourceResolver);
+			this.xmlLoader = new XmlLoader(schemaLocations, sourceResolver);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -229,16 +229,15 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public Document getDocument(URI uri, Locale locale) {
-		final Path path = sourceResolver.resolve(uri, locale);
-		
-		return xmlLoader.getDocument(path);
+	public Source getSource(URI uri, Locale locale) throws SAXException, ParserConfigurationException, IOException {
+		return xmlLoader.getSource(uri, locale);
 	}
 
 	@Override
 	public Templates compileTemplates(final Collection<URI> xslSourceUris) {
+		final TimeMeter meter = TimeMeter.meter(bundle.getName() + " template compilation");
 		final Source xslSource = createMergedXslSource(xslSourceUris);
-		final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		final TransformerFactory transformerFactory = SAXTransformerFactory.newInstance();
 		final TemplateErrorListener errorListener = new TemplateErrorListener();
 		final Templates templates;
 		
@@ -254,6 +253,7 @@ public class RenderingContext implements IBundleRenderingContext {
 		}
 		
 		errorListener.evaluateErrors();
+		meter.finish();
 		
 		return templates;
 	}
@@ -273,15 +273,21 @@ public class RenderingContext implements IBundleRenderingContext {
 
 	@Override
 	public void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException {
-		final Node sourceNode = getDocument(sourceUri, locale);
+		final Source source;
 		
-		transform(sourceNode, sourceUri, targetUri, transformer, locale);
+		try {
+			source = getSource(sourceUri, locale);
+		} catch (SAXException | ParserConfigurationException e) {
+			throw new TransformerException("Cannot load " + sourceUri, e);
+		}
+		
+		transform(source, targetUri, transformer, locale);
 	}
 	
 	@Override
-	public void transform(Node sourceNode, URI sourceUri, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException {
+	public void transform(Source source, URI targetUri, Transformer transformer, Locale locale) throws IOException, TransformerException {
+		final TimeMeter meter = TimeMeter.meter(bundle.getName() + " transform " + source.getSystemId());
 		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
-		final DOMSource source = new DOMSource(sourceNode, sourceUri.toString());
 		final Path outputFile = targetResolver.resolveUri(targetUri, locale);
 		Files.createDirectories(outputFile.getParent());
 		final Writer writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8);
@@ -294,6 +300,7 @@ public class RenderingContext implements IBundleRenderingContext {
 		transformer.setErrorListener(errorListener);
 		transformer.transform(source, result);
 		errorListener.evaluateErrors();
+		meter.finish();
 	}
 
 	private Source createMergedXslSource(final Collection<URI> xslSourceUris) {

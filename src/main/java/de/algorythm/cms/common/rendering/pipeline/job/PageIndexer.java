@@ -22,13 +22,14 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.ITargetUriResolver;
 import de.algorythm.cms.common.resources.ISourceUriResolver;
+import de.algorythm.cms.common.resources.ITargetUriResolver;
 
 public class PageIndexer implements IRenderingJob {
 
@@ -42,6 +43,7 @@ public class PageIndexer implements IRenderingJob {
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final String name = ctx.getBundle().getName();
 		final ISourceUriResolver sourceResolver = ctx.getResourceResolver();
 		final ITargetUriResolver targetResolver = ctx.getOutputResolver();
@@ -61,6 +63,8 @@ public class PageIndexer implements IRenderingJob {
 			ctx.setStartPage(locale, localizedStartPage);
 			writePageXml(localizedStartPage, targetResolver, locale);
 		}
+		
+		meter.finish();
 	}
 	
 	private void writePageXml(final IPageConfig page, final ITargetUriResolver resolver, final Locale locale) throws Exception {

@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
@@ -8,24 +9,25 @@ import java.util.Collection;
 import java.util.Locale;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.w3c.dom.Document;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 
 import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
-import de.algorythm.cms.common.rendering.pipeline.impl.Cache.IValueLoader;
 import de.algorythm.cms.common.resources.ISourceUriResolver;
 import de.algorythm.cms.common.resources.adapter.impl.CmsSchemaResolver;
 
-public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
+public class XmlLoader implements IXmlLoader {
 
 	static final private ErrorHandler ERROR_HANDLER = new ErrorHandler() {
 		@Override
@@ -43,36 +45,32 @@ public class XmlDomLoader implements IXmlLoader, IValueLoader<Path, Document> {
 			throw exception;
 		}
 	};
+
+	private final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+	private final ISourceUriResolver uriResolver;
 	
-	private final DocumentBuilderFactory factory;
-	private final Cache<Path, Document> domCache;
-	
-	public XmlDomLoader(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws Exception {
+	public XmlLoader(final Collection<URI> schemaLocationUris, final ISourceUriResolver uriResolver) throws Exception {
+		this.uriResolver = uriResolver;
 		//final Schema schema = createSchema(schemaLocationUris, sourceUriResolver);
-		this.domCache = new Cache<Path, Document>();
-		factory = DocumentBuilderFactory.newInstance();
 		
-		factory.setNamespaceAware(true);
 		//factory.setSchema(schema);
+		parserFactory.setNamespaceAware(true);
+		parserFactory.setValidating(false);
+		parserFactory.setXIncludeAware(false);
 	}
 	
 	@Override
-	public Document getDocument(final Path path) {
-		return domCache.get(path, this);
-	}
-	
-	@Override
-	public Document populate(final Path systemPath) {
-		try {
-			final DocumentBuilder builder = factory.newDocumentBuilder();
-			final InputStream stream = Files.newInputStream(systemPath);
-			
-			builder.setErrorHandler(ERROR_HANDLER);
-			
-			return builder.parse(stream);
-		} catch(Exception e) {
-			throw new RuntimeException("Cannot load " + systemPath + ". " + e, e);
-		}
+	public Source getSource(final URI publicUri, final Locale locale) throws SAXException, ParserConfigurationException, IOException {
+		final Path path = uriResolver.resolve(publicUri, locale);
+		final XMLReader reader = parserFactory.newSAXParser().getXMLReader();
+		final InputStream stream = Files.newInputStream(path);
+		final InputSource inputSource = new InputSource(stream);
+		final Source source = new SAXSource(reader, inputSource);
+		
+		reader.setErrorHandler(ERROR_HANDLER);
+		source.setSystemId(publicUri.toString());
+		
+		return source;
 	}
 
 	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws Exception {

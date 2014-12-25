@@ -18,6 +18,7 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
@@ -30,13 +31,14 @@ public class PageTransformer implements IRenderingJob {
 	static private final String BACK_SLASH = "../";
 	static private final String BACK = "..";
 	static private final String DOT = ".";
-	
+
 	private List<URI> templates = new LinkedList<URI>();
 	private URI theme;
 	private URI notFoundContent;
 	
 	@Override
 	public void run(final IRenderingContext ctx) {
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this + " initialization");
 		final LinkedList<URI> templateLocations = new LinkedList<URI>();
 		
 		templateLocations.addAll(templates);
@@ -61,6 +63,8 @@ public class PageTransformer implements IRenderingJob {
 			
 			renderPages(startPage, templates, ctx, locale, localizedResourceBasePath);
 		}
+		
+		meter.finish();
 	}
 	
 	private void renderPages(final IPageConfig pageConfig, final Templates compiledTemplates, final IRenderingContext ctx, final Locale locale, final String resourceBasePath) {

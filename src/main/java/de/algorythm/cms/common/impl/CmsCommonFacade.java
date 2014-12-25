@@ -20,18 +20,21 @@ import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IBundleLoader;
 import de.algorythm.cms.common.scheduling.IFuture;
+import de.algorythm.cms.common.scheduling.IProcessScheduler;
 
 public class CmsCommonFacade implements ICmsCommonFacade {
 
 	private final IBundleLoader bundleLoader;
 	private final IBundleExpander expander;
 	private final IRenderer renderer;
+	private final IProcessScheduler scheduler;
 	
 	@Inject
-	public CmsCommonFacade(final IBundleLoader bundleLoader, final IBundleExpander expander, final IRenderer renderer) throws IOException {
+	public CmsCommonFacade(final IBundleLoader bundleLoader, final IBundleExpander expander, final IRenderer renderer, final IProcessScheduler scheduler) throws IOException {
 		this.bundleLoader = bundleLoader;
 		this.expander = expander;
 		this.renderer = renderer;
+		this.scheduler = scheduler;
 	}
 	
 	@Override
@@ -92,5 +95,10 @@ public class CmsCommonFacade implements ICmsCommonFacade {
 				return FileVisitResult.CONTINUE;
 			}
 		});
+	}
+
+	@Override
+	public void shutdown() {
+		scheduler.shutdown();
 	}
 }

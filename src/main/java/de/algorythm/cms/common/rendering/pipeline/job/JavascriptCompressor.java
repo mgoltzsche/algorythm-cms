@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.resources.ITargetUriResolver;
@@ -83,6 +84,7 @@ public class JavascriptCompressor implements IRenderingJob {
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final ITargetUriResolver outResolver = ctx.getOutputResolver();
 		final URI jsUri = ctx.getResourcePrefix().resolve(MAIN_JS);
 		final Path jsSystemPath = outResolver.resolveUri(URI.create("../" + jsUri.getPath()), Locale.ROOT);
@@ -111,6 +113,7 @@ public class JavascriptCompressor implements IRenderingJob {
 		
 		Files.createDirectories(jsSystemPath.getParent());
 		Files.write(jsSystemPath, scripts.getBytes(StandardCharsets.UTF_8));
+		meter.finish();
 	}
 	
 	@Override

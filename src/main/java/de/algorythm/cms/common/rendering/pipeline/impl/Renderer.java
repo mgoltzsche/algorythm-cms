@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import com.google.inject.Injector;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
@@ -48,9 +49,12 @@ public class Renderer implements IRenderer {
 
 	@Override
 	public IFuture<Void> render(final IBundle bundle, final Path tmpDirectory, final Path outputDirectory) {
+		final TimeMeter meter = TimeMeter.meter(bundle.getName() + " process initialization");
 		final URI resourceOutputPath = URI.create("/r/" + new Date().getTime() + '/');
 		final IBundleRenderingContext ctx = new RenderingContext(bundle, tmpDirectory, outputDirectory, resourceOutputPath);
 		final Map<RenderingPhase, Set<IRenderingJob>> phaseMap = new HashMap<RenderingPhase, Set<IRenderingJob>>();
+		final LinkedList<Collection<IRenderingJob>> processJobs = new LinkedList<Collection<IRenderingJob>>();
+		final Future<Void> future = new Future<Void>();
 		
 		for (IOutputConfig outputCfg : bundle.getOutput()) {
 			for (IRenderingJobConfig jobCfg : outputCfg.getJobs()) {
@@ -68,8 +72,6 @@ public class Renderer implements IRenderer {
 			}
 		}
 		
-		final LinkedList<Collection<IRenderingJob>> processJobs = new LinkedList<Collection<IRenderingJob>>();
-		
 		for (RenderingPhase phase : RenderingPhase.values()) {
 			final Set<IRenderingJob> jobs = phaseMap.get(phase);
 			
@@ -77,10 +79,9 @@ public class Renderer implements IRenderer {
 				processJobs.add(jobs);
 		}
 		
-		final Future<Void> future = new Future<Void>();
-		
 		scheduler.execute(new RenderingProcess(ctx, processJobs, injector, future));
-		
+		meter.finish();
+	
 		return future;
 	}
 

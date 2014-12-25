@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.inject.Guice;
 import com.google.inject.Module;
 
+import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
 
 public class CmsCommonMain {
@@ -37,6 +38,7 @@ public class CmsCommonMain {
 			final CmsCommonMain main = new CmsCommonMain(module);
 			
 			main.generate(bundleXmlFile, outputDirectory);
+			main.shutdown();
 		} catch(Throwable e) {
 			log.error("XML transformation failed", e);
 			System.exit(3);
@@ -48,7 +50,9 @@ public class CmsCommonMain {
 	private ICmsCommonFacade facade;
 	
 	public CmsCommonMain(final Module module) {
+		final TimeMeter meter = TimeMeter.meter("Framework initialization");
 		Guice.createInjector(module).injectMembers(this);
+		meter.finish();
 	}
 	
 	public void generate(final Path bundleXml, final Path outputDirectory) throws Throwable {
@@ -68,5 +72,9 @@ public class CmsCommonMain {
 		//facade.generatePagesXml(bundle, tmpDirectory);
 		//facade.generateSite(bundle, tmpDirectory, outputDirectory);
 		facade.render(bundle, outputDirectory).sync();
+	}
+	
+	public void shutdown() {
+		facade.shutdown();
 	}
 }

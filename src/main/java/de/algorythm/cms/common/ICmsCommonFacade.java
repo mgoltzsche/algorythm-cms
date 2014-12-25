@@ -9,4 +9,5 @@ public interface ICmsCommonFacade {
 
 	IBundle loadBundle(Path bundleXml);
 	IFuture<Void> render(IBundle bundle, Path outputDirectory);
+	void shutdown();
 }

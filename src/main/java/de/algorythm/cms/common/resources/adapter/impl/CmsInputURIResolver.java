@@ -1,14 +1,15 @@
 package de.algorythm.cms.common.resources.adapter.impl;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Locale;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.dom.DOMSource;
 
-import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 
@@ -27,19 +28,19 @@ public class CmsInputURIResolver implements URIResolver {
 	@Override
 	public Source resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);
-		URI publicUri = baseUri.resolve(href);
-		Node document;
+		final URI publicUri = baseUri.resolve(href);
 		
 		try {
-			document = ctx.getDocument(publicUri, locale);
-		} catch(IllegalStateException e) {
-			if (notFoundContent == null)
-				throw e;
-			
-			document = ctx.getDocument(notFoundContent, locale);
-			publicUri = notFoundContent;
+			try {
+				return ctx.getSource(publicUri, locale);
+			} catch(IllegalStateException e) {
+				if (notFoundContent == null)
+					throw e;
+				
+				return ctx.getSource(notFoundContent, locale);
+			}
+		} catch(SAXException | ParserConfigurationException | IOException e) {
+			throw new TransformerException("Cannot load " + publicUri, e);
 		}
-		
-		return new DOMSource(document, publicUri.toString());
 	}
 }
