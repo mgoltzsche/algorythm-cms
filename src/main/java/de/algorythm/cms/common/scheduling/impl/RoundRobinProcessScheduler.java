@@ -85,7 +85,7 @@ public class RoundRobinProcessScheduler implements IProcessScheduler {
 		final ThreadGroup threadGroup = new ThreadGroup("scheduler-workers");
 		
 		for (int i = 0; i < workerCount; i++) {
-			final String workerName = "scheduler-worker-" + i;
+			final String workerName = "sw-" + i;
 			final Worker worker = new Worker(threadGroup, workerName);
 			
 			worker.start();
@@ -97,7 +97,8 @@ public class RoundRobinProcessScheduler implements IProcessScheduler {
 	public void execute(final IProcess process) {
 		processes.add(process);
 	}
-	
+
+	@Override
 	public void shutdown() {
 		execute = false;
 		

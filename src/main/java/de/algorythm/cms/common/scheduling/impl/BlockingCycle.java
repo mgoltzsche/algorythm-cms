@@ -117,7 +117,7 @@ public class BlockingCycle<V> {
 		try {
 			currentNode.add(value);
 			size++;
-			condition.signal();
+			condition.signalAll();
 		} finally {
 			lock.unlock();
 		}

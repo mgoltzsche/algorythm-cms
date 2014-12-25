@@ -11,23 +11,34 @@ public class TestRoundRobinProcessScheduler {
 
 	static private final Logger log = LoggerFactory.getLogger(TestRoundRobinProcessScheduler.class);
 	
+	private volatile boolean concurrent = false;
+	
 	private class ProcessMock implements IProcess {
 
-		public int runCount;
+		public volatile int runCount;
 		
 		@Override
 		public void runProcess(IProcessObserver observer) {
-			increaseRunCount();
+			final int increasedRunCount = increaseRunCount();
+			
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
+			
+			if (runCount != increasedRunCount)
+				concurrent = true;
 		}
 		
-		private synchronized void increaseRunCount() {
-			runCount++;
+		private synchronized int increaseRunCount() {
+			return ++runCount;
 		}
 	}
 	
 	@Test
 	public void testRoundRobinProcessScheduler() throws Exception {
-		final int workerCount = Runtime.getRuntime().availableProcessors();
+		final int workerCount = Math.max(2, Runtime.getRuntime().availableProcessors());
 		final RoundRobinProcessScheduler testee = new RoundRobinProcessScheduler(workerCount);
 		final ProcessMock[] processMocks = new ProcessMock[workerCount * 2];
 		
@@ -42,10 +53,12 @@ public class TestRoundRobinProcessScheduler {
 		for (int i = 0; i < processMocks.length; i++) {
 			int runCount = processMocks[i].runCount;
 			
-			assertTrue("Process run count > 1000", runCount > 100);
+			assertTrue("Process run count > 10", runCount > 10);
 			
 			log.info(String.format("Process %d has been run %d times", i, runCount));
 		}
+		
+		assertTrue("IProcess.run() should be executed concurrently", concurrent);
 	}
 	
 	/*private IProcess createProcessMock() {
