@@ -1,8 +1,10 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
-import java.util.Collection;
-import java.util.Collections;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -11,21 +13,25 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
-import de.algorythm.cms.common.model.entity.impl.Source;
 import de.algorythm.cms.common.model.entity.impl.Sources;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.rendering.pipeline.impl.TemplateErrorListener;
+import de.algorythm.cms.common.resources.ISourceUriResolver;
+import de.algorythm.cms.common.resources.adapter.impl.CmsTemplateURIResolver;
 
 public class SvgSpriteGenerator implements IRenderingJob {
 
-	static private final Collection<URI> TEMPLATES = Collections.singleton(URI.create("/templates/de.algorythm.cms.common/SvgSprites.xsl"));
+	static private final URI XSL_URI = URI.create("/templates/de.algorythm.cms.common/SvgSprites.xsl");
 	static private final URI FLAG_DIRECTORY = URI.create("/images/flags/");
+
 	@Inject
 	private JAXBContext jaxbContext;
 	private final List<URI> svg = new LinkedList<URI>();
@@ -50,21 +56,25 @@ public class SvgSpriteGenerator implements IRenderingJob {
 		}
 		
 		if (!svg.isEmpty()) {
-			final URI spriteUri = URI.create("/.." + ctx.getResourcePrefix() + "/sprites.svg");
-			final Templates templates = ctx.compileTemplates(TEMPLATES);
-			final Transformer transformer = ctx.createTransformer(templates, null, Locale.ROOT);
-			final Marshaller marshaller = jaxbContext.createMarshaller();
-			final DOMResult sourcesXml = new DOMResult();
-			final Sources sources = new Sources();
+			final URI outputUri = URI.create(".." + ctx.getResourcePrefix() + "/sprites.svg");
+			final Path outputPath = ctx.getOutputResolver().resolveUri(outputUri, Locale.ROOT);
+			Files.createDirectories(outputPath.getParent());
+			final OutputStream outputStream = Files.newOutputStream(outputPath);
+			final ISourceUriResolver resolver = ctx.getResourceResolver();
+			final Path xslPath = resolver.resolve(XSL_URI, Locale.ROOT);
+			final InputStream xslStream = Files.newInputStream(xslPath);
+			final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+			final TemplateErrorListener errorListener = new TemplateErrorListener();
+			transformerFactory.setErrorListener(errorListener);
+			transformerFactory.setURIResolver(new CmsTemplateURIResolver(resolver));
+			final Templates templates = transformerFactory.newTemplates(new StreamSource(xslStream, XSL_URI.toString()));
+			final TransformerHandler handler = transformerFactory.newTransformerHandler(templates);
+			final StreamResult result = new StreamResult(outputStream);
+			result.setSystemId(outputUri.toString());
+			handler.setSystemId("/sprites.svg");
+			handler.setResult(result);
 			
-			for (URI uri : svg)
-				sources.getSources().add(new Source(uri));
-			
-			marshaller.marshal(sources, sourcesXml);
-			
-			final javax.xml.transform.Source xsltSource = new DOMSource(sourcesXml.getNode(), "/sprites.svg");
-			
-			ctx.transform(xsltSource, spriteUri, transformer, Locale.ROOT);
+			jaxbContext.createMarshaller().marshal(new Sources(svg), handler);
 		}
 		
 		meter.finish();

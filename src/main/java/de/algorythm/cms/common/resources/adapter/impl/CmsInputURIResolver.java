@@ -11,16 +11,16 @@ import javax.xml.transform.URIResolver;
 
 import org.xml.sax.SAXException;
 
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
 
 public class CmsInputURIResolver implements URIResolver {
 
-	private final IBundleRenderingContext ctx;
+	private final IXmlLoader loader;
 	private final URI notFoundContent;
 	private final Locale locale;
 	
-	public CmsInputURIResolver(final IBundleRenderingContext ctx, final Locale locale, final URI notFoundContent) {
-		this.ctx = ctx;
+	public CmsInputURIResolver(final IXmlLoader loader, final Locale locale, final URI notFoundContent) {
+		this.loader = loader;
 		this.locale = locale;
 		this.notFoundContent = notFoundContent;
 	}
@@ -32,12 +32,12 @@ public class CmsInputURIResolver implements URIResolver {
 		
 		try {
 			try {
-				return ctx.getSource(publicUri, locale);
+				return loader.getSource(publicUri, locale);
 			} catch(IllegalStateException e) {
 				if (notFoundContent == null)
 					throw e;
 				
-				return ctx.getSource(notFoundContent, locale);
+				return loader.getSource(notFoundContent, locale);
 			}
 		} catch(SAXException | ParserConfigurationException | IOException e) {
 			throw new TransformerException("Cannot load " + publicUri, e);

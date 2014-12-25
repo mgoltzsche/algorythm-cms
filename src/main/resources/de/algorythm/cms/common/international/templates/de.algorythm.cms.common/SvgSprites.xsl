@@ -8,26 +8,19 @@
 	<xsl:template match="/">
 		<svg id="icon-sprite" version="1.1">
 			<xsl:for-each select="*/*">
+				<xsl:variable name="svg" select="document(@uri)/*" />
 				<xsl:variable name="fileName" select="tokenize(@uri,'/')[last()]" />
-				<xsl:call-template name="c:svg-symbol">
-					<xsl:with-param name="id" select="substring($fileName, 0, string-length($fileName) - 3)" />
-					<xsl:with-param name="svg" select="document(@uri)/*" />
-				</xsl:call-template>
+				<xsl:variable name="id" select="substring($fileName, 0, string-length($fileName) - 3)" />
+				<xsl:variable name="viewBox" select="if ($svg/@viewBox) then $svg/@viewBox else concat('0 0 ', c:strip-unit($svg/@width), ' ', c:strip-unit($svg/@height))" />
+				<symbol id="{$id}" viewBox="{$viewBox}">
+					<xsl:for-each select="$svg/*">
+						<xsl:if test="local-name() != 'metadata' and (local-name() != 'defs' or *)">
+							<xsl:call-template name="c:copy-svg" />
+						</xsl:if>
+					</xsl:for-each>
+				</symbol>
 			</xsl:for-each>
 		</svg>
-	</xsl:template>
-	
-	<xsl:template name="c:svg-symbol">
-		<xsl:param name="id" />
-		<xsl:param name="svg" />
-		<xsl:variable name="viewBox" select="if ($svg/@viewBox) then $svg/@viewBox else concat('0 0 ', c:strip-unit($svg/@width), ' ', c:strip-unit($svg/@height))" />
-		<symbol id="{$id}" viewBox="{$viewBox}">
-			<xsl:for-each select="$svg/*">
-				<xsl:if test="local-name() != 'metadata' and (local-name() != 'defs' or *)">
-					<xsl:call-template name="c:copy-svg" />
-				</xsl:if>
-			</xsl:for-each>
-		</symbol>
 	</xsl:template>
 	
 	<xsl:template name="c:copy-svg">

@@ -2,9 +2,8 @@
 package de.algorythm.cms.common.resources.adapter.impl;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
@@ -29,18 +28,14 @@ public class CmsTemplateURIResolver implements URIResolver {
 		final URI baseUri = URI.create(base);
 		final URI publicUri = baseUri.resolve(href);
 		final Path filePath = resolver.resolve(publicUri, Locale.ROOT);
-		final Reader reader;
+		final InputStream stream;
 		
 		try {
-			reader = Files.newBufferedReader(filePath, StandardCharsets.UTF_8);
+			stream = Files.newInputStream(filePath);
 		} catch (IOException e) {
-			throw new TransformerException("Cannot read content " + filePath, e);
+			throw new TransformerException("Cannot read file " + filePath, e);
 		}
 		
-		final Source source = new StreamSource(reader);
-		
-		source.setSystemId(publicUri.toString());
-		
-		return source;
+		return new StreamSource(stream, publicUri.toString());
 	}
 }

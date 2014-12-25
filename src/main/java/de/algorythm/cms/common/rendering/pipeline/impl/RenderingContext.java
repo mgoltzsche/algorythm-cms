@@ -20,9 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Source;
-import javax.xml.transform.SourceLocator;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -38,11 +36,7 @@ import net.sf.saxon.jaxp.TransformerImpl;
 import net.sf.saxon.lib.OutputURIResolver;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
@@ -60,88 +54,6 @@ import de.algorythm.cms.common.resources.impl.ResourceResolver;
 
 public class RenderingContext implements IBundleRenderingContext {
 
-	static private final Logger log = LoggerFactory.getLogger(RenderingContext.class);
-	
-	static public ErrorHandler ERROR_HANDLER = new ErrorHandler() {
-
-		@Override
-		public void warning(final SAXParseException exception) throws SAXException {
-			throw exception;
-		}
-
-		@Override
-		public void error(final SAXParseException exception) throws SAXException {
-			throw new SAXException(exception.toString(), exception);
-		}
-
-		@Override
-		public void fatalError(final SAXParseException exception) throws SAXException {
-			throw new SAXException(exception.toString(), exception);
-		}
-	};
-	
-	static private final class TemplateErrorListener implements ErrorListener {
-		
-		private List<TransformerException> warnings = new LinkedList<TransformerException>();
-		private List<TransformerException> errors = new LinkedList<TransformerException>();
-		
-		@Override
-		public void warning(TransformerException exception)
-				throws TransformerException {
-			warnings.add(exception);
-		}
-		
-		@Override
-		public void fatalError(TransformerException exception)
-				throws TransformerException {
-			errors.add(exception);
-		}
-		
-		@Override
-		public void error(TransformerException exception)
-				throws TransformerException {
-			errors.add(exception);
-		}
-		
-		public void evaluateErrors() {
-			if (!errors.isEmpty()) {
-				final String msg = errorsToString("Errors:", errors);
-				
-				throw new IllegalStateException("Cannot load XSL templates: " + msg);
-			} else if (!warnings.isEmpty()) {
-				final String msg = errorsToString("Warnings:", warnings);
-				
-				log.warn(msg);
-			}
-		}
-	};
-	
-	static private String errorsToString(final String label, final Iterable<TransformerException> errors) {
-		final StringBuilder sb = new StringBuilder(label);
-		
-		for (TransformerException error : errors) {
-			SourceLocator l = error.getLocator();
-			
-			if (l != null) {
-				sb.append("\n\t").append(l.getSystemId()).append(':')
-					.append(l.getLineNumber()).append(':')
-					.append(l.getColumnNumber()).append(" - ");
-			}
-			
-			sb.append(error);
-			
-			StringBuilder indent = new StringBuilder("\n\t");
-			Throwable cause = error;
-			
-			while((cause = cause.getCause()) != null) {
-				indent.append("\t");
-				sb.append(indent).append(cause);
-			}
-		}
-		
-		return sb.toString();
-	}
-	
 	private final IBundle bundle;
 	private final URI resourcePrefix;
 	private final Path outputDirectory;
@@ -247,9 +159,7 @@ public class RenderingContext implements IBundleRenderingContext {
 		try {
 			templates = transformerFactory.newTemplates(xslSource);
 		} catch (TransformerConfigurationException e) {
-			final String msg = errorsToString("Errors:", errorListener.errors);
-			
-			throw new IllegalStateException("Cannot load XSL templates. " + msg, e);
+			throw new IllegalStateException("Cannot load XSL templates. " + errorListener, e);
 		}
 		
 		errorListener.evaluateErrors();
