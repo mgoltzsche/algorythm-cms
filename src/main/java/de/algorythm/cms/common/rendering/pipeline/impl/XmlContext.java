@@ -124,15 +124,11 @@ public class XmlContext implements IXmlContext, URIResolver {
 	}
 	
 	@Override
-	public Source getSource(final URI publicUri) throws SAXException, ParserConfigurationException, IOException {
-		final InputSource inputSource = createInputSource(publicUri);
-		final XMLReader reader = XMLReaderFactory.createXMLReader();
-		final Source source = new SAXSource(reader, inputSource);
+	public Source getSource(final URI publicUri) throws IOException {
+		final Path filePath = sourceResolver.resolve(publicUri);
+		final InputStream stream = Files.newInputStream(filePath);
 		
-		reader.setErrorHandler(ERROR_HANDLER);
-//		source.setSystemId(publicUri.toString());
-		
-		return source;
+		return new StreamSource(stream, publicUri.toString());
 	}
 	
 	@Override
@@ -146,6 +142,16 @@ public class XmlContext implements IXmlContext, URIResolver {
 		reader.parse(source);
 	}
 	
+	private InputSource createInputSource(final URI publicUri) throws IOException {
+		final Path path = sourceResolver.resolve(publicUri);
+		final InputStream stream = Files.newInputStream(path);
+		final InputSource source = new InputSource(stream);
+		
+		source.setSystemId(publicUri.toString());
+		
+		return source;
+	}
+	
 	@Override
 	public Templates compileTemplates(final Collection<URI> xslSourceUris) throws TransformerConfigurationException {
 		return compileTemplates(createMergedXslSource(xslSourceUris));
@@ -155,7 +161,7 @@ public class XmlContext implements IXmlContext, URIResolver {
 	public Templates compileTemplates(final URI xslSourceUri) throws TransformerConfigurationException {
 		try {
 			return compileTemplates(getSource(xslSourceUri));
-		} catch (SAXException | ParserConfigurationException | IOException e) {
+		} catch (IOException e) {
 			throw new TransformerConfigurationException(e);
 		}
 	}
@@ -237,16 +243,6 @@ public class XmlContext implements IXmlContext, URIResolver {
 		return new StreamSource(new StringReader(xslt.toString()));
 	}
 
-	private InputSource createInputSource(final URI publicUri) throws IOException {
-		final Path path = sourceResolver.resolve(publicUri);
-		final InputStream stream = Files.newInputStream(path);
-		final InputSource source = new InputSource(stream);
-		
-		source.setSystemId(publicUri.toString());
-		
-		return source;
-	}
-
 	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws Exception {
 		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		final Source[] sources = new Source[schemaLocationUris.size()];
@@ -272,23 +268,12 @@ public class XmlContext implements IXmlContext, URIResolver {
 	
 	@Override
 	public Source resolve(final String href, final String base) throws TransformerException {
-		final URI baseUri = URI.create(base);
-		final URI publicUri = baseUri.resolve(href);
-		final Path filePath;
-		final InputStream stream;
-		
 		try {
-			filePath = sourceResolver.resolve(publicUri);
+			return getSource(URI.create(base).resolve(href));
 		} catch(IllegalStateException e) {
 			return null;
-		}
-		
-		try {
-			stream = Files.newInputStream(filePath);
 		} catch (IOException e) {
-			throw new TransformerException("Cannot read file " + filePath, e);
+			throw new TransformerException(e);
 		}
-		
-		return new StreamSource(stream, publicUri.toString());
 	}
 }
