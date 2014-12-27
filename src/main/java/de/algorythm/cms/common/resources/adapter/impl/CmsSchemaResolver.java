@@ -7,7 +7,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
 
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
@@ -27,7 +26,7 @@ public class CmsSchemaResolver implements LSResourceResolver {
 			String publicId, String systemId, String baseURI) {
 		final URI base = URI.create(baseURI);
 		final URI publicUri = base.resolve(systemId);
-		final Path systemPath = sourceUriResolver.resolve(publicUri, Locale.ROOT);
+		final Path systemPath = sourceUriResolver.resolve(publicUri);
 		
 		return new XsdInput(publicUri, systemPath);
 	}

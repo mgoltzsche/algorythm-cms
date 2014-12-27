@@ -12,13 +12,15 @@ import java.util.Locale;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.TransformerHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLFilter;
+import org.xml.sax.XMLReader;
 
 import com.google.inject.Injector;
 
@@ -27,7 +29,7 @@ import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.rendering.pipeline.IXmlLoader;
+import de.algorythm.cms.common.rendering.pipeline.IXmlContext;
 import de.algorythm.cms.common.resources.ISourceUriResolver;
 import de.algorythm.cms.common.resources.ITargetUriResolver;
 import de.algorythm.cms.common.scheduling.IProcess;
@@ -149,7 +151,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public IXmlLoader getXmlLoader() {
+	public IXmlContext getXmlLoader() {
 		return context.getXmlLoader();
 	}
 
@@ -164,32 +166,30 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public Source getSource(URI uri, Locale locale) throws SAXException, ParserConfigurationException, IOException {
-		return context.getSource(uri, locale);
+	public Source getSource(URI uri) throws SAXException, ParserConfigurationException, IOException {
+		return context.getSource(uri);
 	}
 
-	@Override
+	/*@Override
 	public void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale)
 			throws IOException, TransformerException {
 		context.transform(sourceUri, targetUri, transformer, locale);
+	}*/
+
+	@Override
+	public TransformerHandler createTransformerHandler(Templates templates, URI outputUri)
+			throws IOException, TransformerConfigurationException {
+		return context.createTransformerHandler(templates, outputUri);
 	}
 
 	@Override
-	public Transformer createTransformer(Templates templates,
-			URI notFoundContent, Locale locale) throws TransformerConfigurationException {
-		return context.createTransformer(templates, notFoundContent, locale);
-	}
-
-	@Override
-	public void transform(Source source, URI targetUri,
-			Transformer transformer, Locale locale) throws IOException,
-			TransformerException {
-		context.transform(source, targetUri, transformer, locale);
-	}
-
-	@Override
-	public Templates compileTemplates(Collection<URI> xslSourceUris) {
+	public Templates compileTemplates(Collection<URI> xslSourceUris) throws TransformerConfigurationException {
 		return context.compileTemplates(xslSourceUris);
+	}
+	
+	@Override
+	public Templates compileTemplates(URI xslSourceUri) throws TransformerConfigurationException {
+		return context.compileTemplates(xslSourceUri);
 	}
 
 	@Override
@@ -205,5 +205,28 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	@Override
 	public String toString() {
 		return "RenderingProcess [" + context.getBundle().getName() + ']';
+	}
+
+	@Override
+	public void parse(URI publicUri, ContentHandler handler)
+			throws IOException, SAXException, ParserConfigurationException {
+		context.parse(publicUri, handler);
+	}
+
+	@Override
+	public XMLReader createXMLReader() throws SAXException {
+		return context.createXMLReader();
+	}
+
+	@Override
+	public ContentHandler createXMLWriter(URI publicUri)
+			throws IOException, TransformerConfigurationException {
+		return context.createXMLWriter(publicUri);
+	}
+
+	@Override
+	public XMLFilter createXMLFilter(Templates templates, XMLReader parent)
+			throws TransformerConfigurationException {
+		return context.createXMLFilter(templates, parent);
 	}
 }

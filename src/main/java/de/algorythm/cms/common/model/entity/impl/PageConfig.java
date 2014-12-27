@@ -27,28 +27,32 @@ public class PageConfig implements IPageConfig {
 	private boolean inNavigation;
 	@XmlElementRef(type=PageConfig.class)
 	private List<IPageConfig> pages = new LinkedList<IPageConfig>();
-	
+
 	public PageConfig() {}
-	
+
 	public PageConfig(final String path, final String name) {
 		this.name = name;
 	}
-	
+
 	@Override
 	public String getName() {
 		return name;
 	}
-	
+
 	@Override
 	public String getPath() {
 		throw new UnsupportedOperationException("Path cannot be derived. Transform to DerivedPageConfig");
 	}
-	
+
 	@Override
 	public URI getContent() {
 		return content;
 	}
-	
+
+	public void setContent(URI content) {
+		this.content = content;
+	}
+
 	public String getTitle() {
 		return title;
 	}

@@ -4,7 +4,8 @@
 		xmlns:xlink="http://www.w3.org/1999/xlink"
 		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 		xmlns:c="http://cms.algorythm.de/common/CMS"
-		exclude-result-prefixes="c">
+		xmlns:s="http://cms.algorythm.de/common/Sources"
+		exclude-result-prefixes="c s">
 	<xsl:template match="/">
 		<svg id="icon-sprite" version="1.1">
 			<xsl:for-each select="*/*">

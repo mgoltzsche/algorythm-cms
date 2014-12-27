@@ -2,7 +2,6 @@ package de.algorythm.cms.common.resources.impl;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.Locale;
 
 import de.algorythm.cms.common.resources.ITargetUriResolver;
 
@@ -24,16 +23,14 @@ public class OutputResolver implements ITargetUriResolver {
 	}
 
 	@Override
-	public Path resolveUri(final URI publicUri, final Locale locale) {
+	public Path resolveUri(final URI publicUri) {
 		final String scheme = publicUri.getScheme();
 		final Path directory = scheme != null && scheme.toLowerCase().equals("tmp")
 				? tmpDirectory : outputDirectory;
 		final String path = publicUri.normalize().getPath();
-		String lang = locale.getLanguage();
-		lang = lang.isEmpty() ? "international" : lang;
-		final String relativePath = path.isEmpty() || path.charAt(0) == '/'
-			? lang + path
-			: lang + '/' + path;
+		final String relativePath = !path.isEmpty() && path.charAt(0) == '/'
+			? path.substring(1)
+			: path;
 		
 		final Path resolvedDirectory = directory.resolve(relativePath);
 		

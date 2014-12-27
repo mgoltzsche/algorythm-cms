@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
@@ -37,24 +36,19 @@ public class ResourceResolver implements ISourceUriResolver {
 	}
 
 	@Override
-	public Path resolve(final URI publicUri, final Locale locale) {
+	public Path resolve(final URI publicUri) {
 		final String path = publicUri.normalize().getPath();
-		final String absolutePath = path.isEmpty() || path.charAt(0) == '/'
-			? path : '/' + path;
-		final String[] localePrefixes = locale == Locale.ROOT
-				? new String[] {"international"} : new String[] {locale.getLanguage(), "international"};
+		final String relativePath = !path.isEmpty() && path.charAt(0) == '/'
+			? path.substring(1) : path;
 		
 		for (Path rootPath : rootPathes) {
-			for (String localePrefix : localePrefixes) {
-				final String relativePath = localePrefix + absolutePath;
-				final Path systemPath = rootPath.resolve(relativePath);
+			final Path systemPath = rootPath.resolve(relativePath);
+			
+			if (Files.exists(systemPath)) {
+				if (!systemPath.toString().startsWith(rootPath.toString()))
+					throw new IllegalAccessError("Bundle parent directory access denied: " + publicUri);
 				
-				if (Files.exists(systemPath)) {
-					if (!systemPath.toString().startsWith(rootPath.toString()))
-						throw new IllegalAccessError("Bundle parent directory access denied: " + publicUri);
-					
-					return systemPath;
-				}
+				return systemPath;
 			}
 		}
 		

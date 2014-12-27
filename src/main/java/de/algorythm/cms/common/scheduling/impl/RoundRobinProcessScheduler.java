@@ -91,6 +91,8 @@ public class RoundRobinProcessScheduler implements IProcessScheduler {
 			worker.start();
 			workers.add(worker);
 		}
+		
+		log.info("Process scheduler started with " + workerCount + " worker(s)");
 	}
 	
 	@Override

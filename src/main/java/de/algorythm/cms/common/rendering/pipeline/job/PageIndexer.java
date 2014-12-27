@@ -34,7 +34,6 @@ import de.algorythm.cms.common.resources.ITargetUriResolver;
 public class PageIndexer implements IRenderingJob {
 
 	static private final Logger log = LoggerFactory.getLogger(PageIndexer.class);
-	static private final URI PAGES_XML_FILE = URI.create("tmp:///pages.xml");
 	
 	@Inject
 	private XMLInputFactory xmlInputFactory;
@@ -43,7 +42,7 @@ public class PageIndexer implements IRenderingJob {
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
-		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this + " initialization");
 		final String name = ctx.getBundle().getName();
 		final ISourceUriResolver sourceResolver = ctx.getResourceResolver();
 		final ITargetUriResolver targetResolver = ctx.getOutputResolver();
@@ -54,14 +53,20 @@ public class PageIndexer implements IRenderingJob {
 		
 		for (ISupportedLocale supportedLocale : ctx.getBundle().getSupportedLocales()) {
 			final Locale locale = supportedLocale.getLocale();
-			final DerivedPageConfig localizedStartPage = deriveLocalizedPage(unlocalizedStartPage, StringUtils.EMPTY, sourceResolver, locale);
-			localizedStartPage.setName(name);
 			
-			for (IPageConfig child : unlocalizedStartPage.getPages())
-				deriveLocalizedChildren(localizedStartPage, child, sourceResolver, locale);
-			
-			ctx.setStartPage(locale, localizedStartPage);
-			writePageXml(localizedStartPage, targetResolver, locale);
+			ctx.execute(new IRenderingJob() {
+				@Override
+				public void run(IRenderingContext context) throws Exception {
+					final DerivedPageConfig localizedStartPage = deriveLocalizedPage(unlocalizedStartPage, StringUtils.EMPTY, sourceResolver, locale);
+					localizedStartPage.setName(name);
+					
+					for (IPageConfig child : unlocalizedStartPage.getPages())
+						deriveLocalizedChildren(localizedStartPage, child, sourceResolver, locale);
+					
+					ctx.setStartPage(locale, localizedStartPage);
+					writePageXml(localizedStartPage, targetResolver, locale);
+				}
+			});
 		}
 		
 		meter.finish();
@@ -69,7 +74,7 @@ public class PageIndexer implements IRenderingJob {
 	
 	private void writePageXml(final IPageConfig page, final ITargetUriResolver resolver, final Locale locale) throws Exception {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
-		final Path pagesXmlFile = resolver.resolveUri(PAGES_XML_FILE, locale);
+		final Path pagesXmlFile = resolver.resolveUri(URI.create("tmp:///" + locale.toLanguageTag() + "/pages.xml"));
 		Files.createDirectories(pagesXmlFile.getParent());
 		
 		try (Writer writer = Files.newBufferedWriter(pagesXmlFile, StandardCharsets.UTF_8)) {
@@ -95,7 +100,13 @@ public class PageIndexer implements IRenderingJob {
 
 	private DerivedPageConfig deriveLocalizedPage(final IPageConfig page, final String path, final ISourceUriResolver resolver, final Locale locale) throws Exception {
 		final DerivedPageConfig p = new DerivedPageConfig(page, path);
-		final Path contentFile = resolver.resolve(page.getContent(), locale);
+		Path contentFile;
+		
+		try {
+			contentFile = resolver.resolve(URI.create('/' + locale.toLanguageTag() + page.getContent().getPath()));
+		} catch(IllegalStateException e) {
+			contentFile = resolver.resolve(URI.create(page.getContent().getPath()));
+		}
 		
 		try (InputStream stream = Files.newInputStream(contentFile)) {
 			final XMLEventReader reader = xmlInputFactory.createXMLEventReader(stream);

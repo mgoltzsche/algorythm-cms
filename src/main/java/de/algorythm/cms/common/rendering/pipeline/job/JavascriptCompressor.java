@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import org.mozilla.javascript.ErrorReporter;
@@ -87,7 +86,7 @@ public class JavascriptCompressor implements IRenderingJob {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final ITargetUriResolver outResolver = ctx.getOutputResolver();
 		final URI jsUri = ctx.getResourcePrefix().resolve(MAIN_JS);
-		final Path jsSystemPath = outResolver.resolveUri(URI.create("../" + jsUri.getPath()), Locale.ROOT);
+		final Path jsSystemPath = outResolver.resolveUri(jsUri);
 		final StringBuilder scriptBuilder = new StringBuilder();
 		
 		for (Path source : sources) {

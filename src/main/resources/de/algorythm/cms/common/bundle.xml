@@ -7,16 +7,9 @@
 	<schema src="/types/de.algorythm.cms.common/CMS.xsd" />
 	<page content="/contents/default-welcome-page.xml" />
 	<output id="html">
-		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE">
-			<param id="notFoundContent" value="/contents/not-found.xml" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/Copy.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
-		</job>-->
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>
-		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />-->
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageTransformer" phase="TRANSFORM">
-			<param id="notFoundContent" value="/contents/not-found.xml" />
 			<param id="theme" value="/templates/de.algorythm.cms.common/html/Theme.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Article.xsl" />
 			<param id="templates" value="/templates/de.algorythm.cms.common/html/Markup.xsl" />
@@ -30,9 +23,6 @@
 			<param id="compress" value="true" />
 			<param id="sources" value="/css/default-theme/main.scss" />
 		</job>
-		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.FontConverter" phase="TRANSFORM">
-			<param id="source" value="/fonts/blaster.ttf" />
-		</job>-->
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor" phase="TRANSFORM">
 			<param id="compress" value="true" />
 			<param id="sources" value="/scripts/angular.min.js" />
@@ -40,10 +30,10 @@
 			<param id="sources" value="/scripts/cms.js" />
 		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator" phase="TRANSFORM">
-			<!--<param id="svg" value="/images/example.svg" />-->
 			<param id="svg" value="/images/adobe-example.svg" />
 			<param id="svg" value="/images/logo.svg" />
 		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.OdtTransformer" phase="TRANSFORM" />
 	</output>
 	<output id="pdf">
 		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE">

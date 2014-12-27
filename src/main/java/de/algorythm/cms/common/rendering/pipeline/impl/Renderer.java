@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -155,7 +154,7 @@ public class Renderer implements IRenderer {
 		} else if (Integer.class == fieldType || int.class == fieldType) {
 			return Integer.parseInt(param.getValue());
 		} else if (Path.class == fieldType) {
-			return sourceUriResolver.resolve(URI.create(param.getValue()).normalize(), Locale.ROOT);
+			return sourceUriResolver.resolve(URI.create(param.getValue()).normalize());
 		} else if (URI.class == fieldType) {
 			return URI.create(param.getValue()).normalize();
 		} else {

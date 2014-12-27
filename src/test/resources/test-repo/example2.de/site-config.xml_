@@ -1,6 +1,0 @@
-<site xmlns="http://cms.algorythm.de/common/Site"
-		title="Testseite"
-		default-locale="de"
-		default-template="http://cms.algorythm.de/common/theme/default-theme"
-		context-path="/site2">
-</site>

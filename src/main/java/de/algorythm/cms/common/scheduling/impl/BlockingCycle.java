@@ -102,7 +102,7 @@ public class BlockingCycle<V> {
 	private final INodeRemoveStrategy<V> REMOVED_NODE = new INodeRemoveStrategy<V>() {
 		@Override
 		public void remove(final Node<V> node) {
-			throw new IllegalStateException("Node value '" + node.value + "' has already been removed");
+			//throw new IllegalStateException("Node value '" + node.value + "' has already been removed");
 		}
 	};
 	

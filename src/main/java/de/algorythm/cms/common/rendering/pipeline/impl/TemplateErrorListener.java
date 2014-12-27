@@ -39,7 +39,7 @@ public class TemplateErrorListener implements ErrorListener {
 		if (!errors.isEmpty()) {
 			final String msg = errorsToString("Errors:", errors);
 			
-			throw new IllegalStateException("Cannot load XSL templates: " + msg);
+			throw new IllegalStateException(msg);
 		} else if (!warnings.isEmpty()) {
 			final String msg = errorsToString("Warnings:", warnings);
 			

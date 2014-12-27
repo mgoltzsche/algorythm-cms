@@ -1,12 +1,10 @@
 package de.algorythm.cms.common.resources.adapter.impl;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.io.OutputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Locale;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.TransformerException;
@@ -18,27 +16,25 @@ import de.algorythm.cms.common.resources.ITargetUriResolver;
 public class CmsOutputURIResolver implements OutputURIResolver {
 
 	private final ITargetUriResolver resolver;
-	private final Locale locale;
 	
-	public CmsOutputURIResolver(final ITargetUriResolver resolver, final Locale locale) {
+	public CmsOutputURIResolver(final ITargetUriResolver resolver) {
 		this.resolver = resolver;
-		this.locale = locale;
 	}
 	
 	@Override
 	public Result resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);
 		final URI publicUri = baseUri.resolve(href);
-		final Path systemPath = resolver.resolveUri(publicUri, locale);
-		final Writer writer;
+		final Path outputPath = resolver.resolveUri(publicUri);
+		final OutputStream outputStream;
 		
 		try {
-			writer = Files.newBufferedWriter(systemPath, StandardCharsets.UTF_8);
+			outputStream = Files.newOutputStream(outputPath);
 		} catch (IOException e) {
-			throw new TransformerException("Cannot write " + systemPath, e);
+			throw new TransformerException("Cannot write " + outputPath, e);
 		}
 		
-		final Result result = new StreamResult(writer);
+		final Result result = new StreamResult(outputStream);
 		
 		result.setSystemId(publicUri.toString());
 		

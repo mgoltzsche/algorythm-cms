@@ -53,7 +53,7 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
-							<outputDirectory>${project.build.outputDirectory}/de/algorythm/cms/common/international/types/de.algorythm.cms.common</outputDirectory>
+							<outputDirectory>${project.build.outputDirectory}/de/algorythm/cms/common/types/de.algorythm.cms.common</outputDirectory>
 							<transformSchemas>
 								<transformSchema>
 									<uri>http://cms.algorythm.de/common/Bundle</uri>
@@ -102,7 +102,7 @@
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
-			<version>9.6.0-1</version>
+			<version>9.6.0-3</version>
 		</dependency>
 		<!-- Apache Xerces schema validator-->
 		<dependency>

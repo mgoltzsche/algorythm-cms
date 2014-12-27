@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.css.sac.InputSource;
@@ -57,7 +56,7 @@ public class ScssCompiler implements IRenderingJob {
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
 		final ITargetUriResolver outResolver = ctx.getOutputResolver();
 		final URI cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS);
-		final Path cssSystemPath = outResolver.resolveUri(URI.create("../" + cssPath.getPath()), Locale.ROOT);
+		final Path cssSystemPath = outResolver.resolveUri(cssPath);
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
 		final ScssStylesheet stylesheet = docHandler.getStyleSheet();
@@ -94,7 +93,7 @@ public class ScssCompiler implements IRenderingJob {
 				final URI href = URI.create(identifier);
 				final URI base = URI.create(parentStylesheet.getFileName());
 				final URI publicUri = base.resolve(href);
-				final Path resolvedPath = ctx.getResourceResolver().resolve(publicUri, Locale.ROOT);
+				final Path resolvedPath = ctx.getResourceResolver().resolve(publicUri);
 				final Reader reader;
 				
 				try {
