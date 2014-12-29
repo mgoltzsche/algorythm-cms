@@ -1,5 +1,8 @@
 package de.algorythm.cms.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLInputFactory;
@@ -9,18 +12,22 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 
 import de.algorythm.cms.common.impl.CmsCommonFacade;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
-import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.model.entity.impl.LocaleInfos;
-import de.algorythm.cms.common.model.entity.impl.PageConfig;
+import de.algorythm.cms.common.model.entity.impl.Metadata;
+import de.algorythm.cms.common.model.entity.impl.PageFeed;
 import de.algorythm.cms.common.model.entity.impl.Sources;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.rendering.pipeline.impl.Renderer;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IBundleLoader;
 import de.algorythm.cms.common.resources.IDependencyLoader;
+import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.impl.BundleExpander;
 import de.algorythm.cms.common.resources.impl.BundleLoader;
 import de.algorythm.cms.common.resources.impl.ClasspathDependencyLoader;
+import de.algorythm.cms.common.resources.impl.DefaultXmlSourceResolver;
+import de.algorythm.cms.common.resources.impl.OdtXmlSourceResolver;
+import de.algorythm.cms.common.resources.impl.XmlSourceResolverDelegator;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler;
 
@@ -38,6 +45,7 @@ public class CmsCommonModule extends AbstractModule {
 			bindIDependencyLoader(bind(IDependencyLoader.class));
 			bindXMLInputFactory(bind(XMLInputFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
+			bindIXmlSourceResolver(bind(IXmlSourceResolver.class));
 		} catch(Exception e) {
 			throw new RuntimeException("Cannot initialize module", e);
 		}
@@ -77,9 +85,21 @@ public class CmsCommonModule extends AbstractModule {
 	
 	protected void bindJAXBContext(AnnotatedBindingBuilder<JAXBContext> bind) {
 		try {
-			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageConfig.class, LocaleInfos.class, DerivedPageConfig.class, Sources.class));
+			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageFeed.class, LocaleInfos.class, Sources.class, Metadata.class));
 		} catch (JAXBException e) {
 			throw new RuntimeException("Cannot initialize JAXB context", e);
 		}
+	}
+	
+	protected void bindIXmlSourceResolver(AnnotatedBindingBuilder<IXmlSourceResolver> bind) {
+		final Map<String, IXmlSourceResolver> extensionMap = new HashMap<String, IXmlSourceResolver>();
+		final IXmlSourceResolver xmlResolver = new DefaultXmlSourceResolver();
+		
+		extensionMap.put("xml", xmlResolver);
+		extensionMap.put("xsl", xmlResolver);
+		extensionMap.put("xsd", xmlResolver);
+		extensionMap.put("svg", xmlResolver);
+		extensionMap.put("odt", new OdtXmlSourceResolver());
+		bind.toInstance(new XmlSourceResolverDelegator(extensionMap));
 	}
 }

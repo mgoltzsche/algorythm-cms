@@ -4,17 +4,15 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import com.google.common.base.Joiner;
-
 import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.resources.ISourceUriResolver;
+import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
-public class ResourceResolver implements ISourceUriResolver {
+public class ResourceResolver implements ISourcePathResolver {
 
 	private final Collection<Path> rootPathes;
 	
@@ -27,16 +25,11 @@ public class ResourceResolver implements ISourceUriResolver {
 		for (Path rootPath : bundle.getRootDirectories())
 			rootPathSet.add(rootPath);
 		
-		rootPathes = Collections.unmodifiableList(new LinkedList<Path>(rootPathSet));
+		rootPathes = new LinkedList<Path>(rootPathSet);
 	}
 
 	@Override
-	public Collection<Path> getRootPathes() {
-		return rootPathes;
-	}
-
-	@Override
-	public Path resolve(final URI publicUri) {
+	public Path resolveSource(final URI publicUri) throws ResourceNotFoundException {
 		final String path = publicUri.normalize().getPath();
 		final String relativePath = !path.isEmpty() && path.charAt(0) == '/'
 			? path.substring(1) : path;
@@ -52,9 +45,7 @@ public class ResourceResolver implements ISourceUriResolver {
 			}
 		}
 		
-		throw new IllegalStateException("Cannot resolve resource URI "
-				+ publicUri + ". Pathes: \n\t"
-				+ Joiner.on("\n\t").join(rootPathes));
+		throw new ResourceNotFoundException("Cannot resolve " + publicUri);
 	}
 
 	/*private Path toPublicPath(Path systemPath) {

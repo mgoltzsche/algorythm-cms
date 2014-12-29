@@ -60,8 +60,12 @@
 									<toFile>Bundle.xsd</toFile>
 								</transformSchema>
 								<transformSchema>
-									<uri>http://cms.algorythm.de/common/Pages</uri>
-									<toFile>Pages.xsd</toFile>
+									<uri>http://cms.algorythm.de/common/Page</uri>
+									<toFile>Page.xsd</toFile>
+								</transformSchema>
+								<transformSchema>
+									<uri>http://cms.algorythm.de/common/Metadata</uri>
+									<toFile>Metadata.xsd</toFile>
 								</transformSchema>
 								<transformSchema>
 									<uri>http://cms.algorythm.de/common/Locales</uri>
@@ -74,9 +78,10 @@
 							</transformSchemas>
 							<includes>
 								<include>de/algorythm/cms/common/model/entity/impl/Bundle.java</include>
-								<include>de/algorythm/cms/common/model/entity/impl/DerivedPageConfig.java</include>
 								<include>de/algorythm/cms/common/model/entity/impl/LocaleInfos.java</include>
 								<include>de/algorythm/cms/common/model/entity/impl/Sources.java</include>
+								<include>de/algorythm/cms/common/model/entity/impl/PageFeed.java</include>
+								<include>de/algorythm/cms/common/model/entity/impl/Metadata.java</include>
 							</includes>
 						</configuration>
 					</execution>

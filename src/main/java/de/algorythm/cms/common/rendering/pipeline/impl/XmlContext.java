@@ -11,6 +11,9 @@ import java.util.Collection;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -19,7 +22,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
@@ -44,11 +46,11 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import de.algorythm.cms.common.impl.TimeMeter;
+import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlContext;
-import de.algorythm.cms.common.resources.ISourceUriResolver;
-import de.algorythm.cms.common.resources.ITargetUriResolver;
-import de.algorythm.cms.common.resources.adapter.impl.CmsOutputURIResolver;
-import de.algorythm.cms.common.resources.adapter.impl.CmsSchemaResolver;
+import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
+import de.algorythm.cms.common.resources.impl.XmlSource;
 
 public class XmlContext implements IXmlContext, URIResolver {
 
@@ -91,13 +93,12 @@ public class XmlContext implements IXmlContext, URIResolver {
 		}
 	};
 
+	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 	private final SAXTransformerFactory writerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
-	private final ISourceUriResolver sourceResolver;
-	private final ITargetUriResolver targetResolver;
+	private final IBundleRenderingContext ctx;
 	
-	public XmlContext(final ISourceUriResolver sourceResolver, final ITargetUriResolver targetResolver) throws Exception {
-		this.sourceResolver = sourceResolver;
-		this.targetResolver = targetResolver;
+	public XmlContext(final IBundleRenderingContext ctx) throws Exception {
+		this.ctx = ctx;
 		//final Schema schema = createSchema(schemaLocationUris, sourceUriResolver);
 		
 		//factory.setSchema(schema);
@@ -107,13 +108,18 @@ public class XmlContext implements IXmlContext, URIResolver {
 	}
 
 	@Override
+	public XMLEventReader createXMLEventReader(final InputStream stream) throws XMLStreamException {
+		return xmlInputFactory.createXMLEventReader(stream);
+	}
+
+	@Override
 	public XMLReader createXMLReader() throws SAXException {
 		return XMLReaderFactory.createXMLReader();
 	}
 	
 	@Override
 	public ContentHandler createXMLWriter(final URI publicUri) throws IOException, TransformerConfigurationException {
-		final Path outputFile = targetResolver.resolveUri(publicUri);
+		final Path outputFile = ctx.resolveDestination(publicUri);
 		Files.createDirectories(outputFile.getParent());
 		final OutputStream outputStream = Files.newOutputStream(outputFile);
 		final TransformerHandler handler = writerFactory.newTransformerHandler();
@@ -124,15 +130,7 @@ public class XmlContext implements IXmlContext, URIResolver {
 	}
 	
 	@Override
-	public Source getSource(final URI publicUri) throws IOException {
-		final Path filePath = sourceResolver.resolve(publicUri);
-		final InputStream stream = Files.newInputStream(filePath);
-		
-		return new StreamSource(stream, publicUri.toString());
-	}
-	
-	@Override
-	public void parse(final URI publicUri, final ContentHandler handler) throws IOException, SAXException, ParserConfigurationException {
+	public void parse(final URI publicUri, final ContentHandler handler) throws IOException, SAXException, ParserConfigurationException, ResourceNotFoundException {
 		final InputSource source = createInputSource(publicUri);
 		final XMLReader reader = XMLReaderFactory.createXMLReader();
 		
@@ -142,8 +140,8 @@ public class XmlContext implements IXmlContext, URIResolver {
 		reader.parse(source);
 	}
 	
-	private InputSource createInputSource(final URI publicUri) throws IOException {
-		final Path path = sourceResolver.resolve(publicUri);
+	private InputSource createInputSource(final URI publicUri) throws IOException, ResourceNotFoundException {
+		final Path path = ctx.resolveSource(publicUri);
 		final InputStream stream = Files.newInputStream(path);
 		final InputSource source = new InputSource(stream);
 		
@@ -158,9 +156,14 @@ public class XmlContext implements IXmlContext, URIResolver {
 	}
 	
 	@Override
-	public Templates compileTemplates(final URI xslSourceUri) throws TransformerConfigurationException {
+	public Templates compileTemplates(final URI xslSourceUri) throws TransformerConfigurationException, ResourceNotFoundException {
+		final Path path = ctx.resolveSource(xslSourceUri);
+		
+		if (path == null)
+			throw new TransformerConfigurationException("Cannot resolve " + xslSourceUri);
+		
 		try {
-			return compileTemplates(getSource(xslSourceUri));
+			return compileTemplates(new XmlSource(xslSourceUri, path));
 		} catch (IOException e) {
 			throw new TransformerConfigurationException(e);
 		}
@@ -204,7 +207,7 @@ public class XmlContext implements IXmlContext, URIResolver {
 	@Override
 	public TransformerHandler createTransformerHandler(final Templates templates, final URI outputUri) throws IOException, TransformerConfigurationException {
 		final TransformerHandler transformerHandler = createTransformerHandler(templates);
-		final Path outputFile = targetResolver.resolveUri(outputUri);
+		final Path outputFile = ctx.resolveDestination(outputUri);
 		Files.createDirectories(outputFile.getParent());
 		final OutputStream outputStream = Files.newOutputStream(outputFile);
 		final Result result = new StreamResult(outputStream);
@@ -222,7 +225,7 @@ public class XmlContext implements IXmlContext, URIResolver {
 		final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler(templates);
 		final Transformer transformer = transformerHandler.getTransformer();
 		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
-		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(targetResolver);
+		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(ctx);
 		
 		trnsfrmCtrl.setOutputURIResolver(outputUriResolverAdapter);
 		
@@ -243,15 +246,15 @@ public class XmlContext implements IXmlContext, URIResolver {
 		return new StreamSource(new StringReader(xslt.toString()));
 	}
 
-	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourceUriResolver sourceUriResolver) throws Exception {
+	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourcePathResolver sourcePathResolver) throws Exception {
 		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		final Source[] sources = new Source[schemaLocationUris.size()];
 		int i = 0;
 		
-		schemaFactory.setResourceResolver(new CmsSchemaResolver(sourceUriResolver));
+		schemaFactory.setResourceResolver(new CmsSchemaResolver(sourcePathResolver));
 		
 		for (URI schemaLocationUri : schemaLocationUris) {
-			final Path schemaLocation = sourceUriResolver.resolve(schemaLocationUri);
+			final Path schemaLocation = sourcePathResolver.resolveSource(schemaLocationUri);
 			final InputStream stream = Files.newInputStream(schemaLocation);
 			final Source source = new StreamSource(stream);
 			sources[i++] = source;
@@ -268,11 +271,12 @@ public class XmlContext implements IXmlContext, URIResolver {
 	
 	@Override
 	public Source resolve(final String href, final String base) throws TransformerException {
+		final URI baseUri = URI.create(base);
+		final URI uri = href.isEmpty() ? baseUri : baseUri.resolve(href);
+		
 		try {
-			return getSource(URI.create(base).resolve(href));
-		} catch(IllegalStateException e) {
-			return null;
-		} catch (IOException e) {
+			return ctx.createXmlSource(uri);
+		} catch(ResourceNotFoundException | IOException e) {
 			throw new TransformerException(e);
 		}
 	}

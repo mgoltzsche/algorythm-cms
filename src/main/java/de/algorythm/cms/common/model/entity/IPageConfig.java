@@ -7,7 +7,6 @@ public interface IPageConfig {
 
 	String getName();
 	URI getContent();
-	String getPath();
 	String getTitle();
 	String getNavigationTitle();
 	List<IPageConfig> getPages();

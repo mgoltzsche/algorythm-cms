@@ -1,15 +1,19 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -25,13 +29,10 @@ import org.xml.sax.XMLReader;
 import com.google.inject.Injector;
 
 import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.rendering.pipeline.IXmlContext;
-import de.algorythm.cms.common.resources.ISourceUriResolver;
-import de.algorythm.cms.common.resources.ITargetUriResolver;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.scheduling.IProcess;
 import de.algorythm.cms.common.scheduling.IProcessObserver;
 import de.algorythm.cms.common.scheduling.IProgressObserver;
@@ -131,31 +132,6 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public Path getTempDirectory() {
-		return context.getTempDirectory();
-	}
-
-	@Override
-	public Path getOutputDirectory() {
-		return context.getOutputDirectory();
-	}
-
-	@Override
-	public ISourceUriResolver getResourceResolver() {
-		return context.getResourceResolver();
-	}
-	
-	@Override
-	public ITargetUriResolver getOutputResolver() {
-		return context.getOutputResolver();
-	}
-
-	@Override
-	public IXmlContext getXmlLoader() {
-		return context.getXmlLoader();
-	}
-
-	@Override
 	public String getProperty(String name) {
 		return context.getProperty(name);
 	}
@@ -164,17 +140,6 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	public void setProperty(String name, String value) {
 		context.setProperty(name, value);
 	}
-
-	@Override
-	public Source getSource(URI uri) throws SAXException, ParserConfigurationException, IOException {
-		return context.getSource(uri);
-	}
-
-	/*@Override
-	public void transform(URI sourceUri, URI targetUri, Transformer transformer, Locale locale)
-			throws IOException, TransformerException {
-		context.transform(sourceUri, targetUri, transformer, locale);
-	}*/
 
 	@Override
 	public TransformerHandler createTransformerHandler(Templates templates, URI outputUri)
@@ -188,18 +153,8 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 	
 	@Override
-	public Templates compileTemplates(URI xslSourceUri) throws TransformerConfigurationException {
+	public Templates compileTemplates(URI xslSourceUri) throws TransformerConfigurationException, ResourceNotFoundException {
 		return context.compileTemplates(xslSourceUri);
-	}
-
-	@Override
-	public IPageConfig getStartPage(Locale locale) {
-		return context.getStartPage(locale);
-	}
-
-	@Override
-	public void setStartPage(Locale locale, IPageConfig page) {
-		context.setStartPage(locale, page);
 	}
 
 	@Override
@@ -209,7 +164,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 
 	@Override
 	public void parse(URI publicUri, ContentHandler handler)
-			throws IOException, SAXException, ParserConfigurationException {
+			throws IOException, SAXException, ParserConfigurationException, ResourceNotFoundException {
 		context.parse(publicUri, handler);
 	}
 
@@ -228,5 +183,41 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	public XMLFilter createXMLFilter(Templates templates, XMLReader parent)
 			throws TransformerConfigurationException {
 		return context.createXMLFilter(templates, parent);
+	}
+
+	@Override
+	public Path unzip(URI uri) throws ResourceNotFoundException, IOException {
+		return context.unzip(uri);
+	}
+
+	@Override
+	public Source createXmlSource(URI uri) throws ResourceNotFoundException, IOException {
+		return context.createXmlSource(uri);
+	}
+
+	@Override
+	public Path resolveSource(URI publicUri) throws ResourceNotFoundException {
+		return context.resolveSource(publicUri);
+	}
+
+	@Override
+	public Path resolveDestination(URI publicUri) {
+		return context.resolveDestination(publicUri);
+	}
+
+	@Override
+	public XMLEventReader createXMLEventReader(InputStream stream)
+			throws XMLStreamException {
+		return context.createXMLEventReader(stream);
+	}
+
+	@Override
+	public Marshaller createMarshaller() throws JAXBException {
+		return context.createMarshaller();
+	}
+
+	@Override
+	public Path getTempDirectory() {
+		return context.getTempDirectory();
 	}
 }

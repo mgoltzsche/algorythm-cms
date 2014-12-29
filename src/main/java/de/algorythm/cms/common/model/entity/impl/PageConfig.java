@@ -30,18 +30,13 @@ public class PageConfig implements IPageConfig {
 
 	public PageConfig() {}
 
-	public PageConfig(final String path, final String name) {
+	public PageConfig(final String name) {
 		this.name = name;
 	}
 
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public String getPath() {
-		throw new UnsupportedOperationException("Path cannot be derived. Transform to DerivedPageConfig");
 	}
 
 	@Override
@@ -88,6 +83,6 @@ public class PageConfig implements IPageConfig {
 	
 	@Override
 	public String toString() {
-		return "Page [" + getPath() + "]";
+		return "Page [" + name + "]";
 	}
 }

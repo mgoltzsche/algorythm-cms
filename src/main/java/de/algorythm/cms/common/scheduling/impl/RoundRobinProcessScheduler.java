@@ -78,7 +78,7 @@ public class RoundRobinProcessScheduler implements IProcessScheduler {
 	private boolean execute = true;
 	
 	public RoundRobinProcessScheduler() {
-		this(Runtime.getRuntime().availableProcessors());
+		this(1);
 	}
 	
 	public RoundRobinProcessScheduler(final int workerCount) {

@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.resources.adapter.impl;
+package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,14 +11,15 @@ import java.nio.file.Path;
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
-import de.algorythm.cms.common.resources.ISourceUriResolver;
+import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class CmsSchemaResolver implements LSResourceResolver {
 
-	private final ISourceUriResolver sourceUriResolver;
+	private final ISourcePathResolver sourcePathResolver;
 	
-	public CmsSchemaResolver(final ISourceUriResolver sourceUriResolver) {
-		this.sourceUriResolver = sourceUriResolver;
+	public CmsSchemaResolver(final ISourcePathResolver sourcePathResolver) {
+		this.sourcePathResolver = sourcePathResolver;
 	}
 	
 	@Override
@@ -26,7 +27,13 @@ public class CmsSchemaResolver implements LSResourceResolver {
 			String publicId, String systemId, String baseURI) {
 		final URI base = URI.create(baseURI);
 		final URI publicUri = base.resolve(systemId);
-		final Path systemPath = sourceUriResolver.resolve(publicUri);
+		final Path systemPath;
+		
+		try {
+			systemPath = sourcePathResolver.resolveSource(publicUri);
+		} catch (ResourceNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 		
 		return new XsdInput(publicUri, systemPath);
 	}

@@ -11,5 +11,6 @@
 			<page name="info" content="/contents/info.xml" />
 		</page>
 		<page name="about" content="/contents/about.xml" />
+		<page name="odt" content="/contents/odtinclude.xml" />
 	</page>
 </bundle>

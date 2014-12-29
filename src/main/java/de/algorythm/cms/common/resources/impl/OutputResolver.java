@@ -3,12 +3,10 @@ package de.algorythm.cms.common.resources.impl;
 import java.net.URI;
 import java.nio.file.Path;
 
-import de.algorythm.cms.common.resources.ITargetUriResolver;
+import de.algorythm.cms.common.resources.IDestinationPathResolver;
 
-public class OutputResolver implements ITargetUriResolver {
+public class OutputResolver implements IDestinationPathResolver {
 
-	//static private final Path ROOT_PATH = Paths.get("/");
-	
 	private final Path outputDirectory;
 	private final Path tmpDirectory;
 
@@ -18,12 +16,7 @@ public class OutputResolver implements ITargetUriResolver {
 	}
 
 	@Override
-	public Path getOutputDirectory() {
-		return outputDirectory;
-	}
-
-	@Override
-	public Path resolveUri(final URI publicUri) {
+	public Path resolveDestination(final URI publicUri) {
 		final String scheme = publicUri.getScheme();
 		final Path directory = scheme != null && scheme.toLowerCase().equals("tmp")
 				? tmpDirectory : outputDirectory;

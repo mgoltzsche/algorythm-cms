@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.rendering.pipeline.job;
+/*package de.algorythm.cms.common.rendering.pipeline.job;
 
 import java.io.InputStream;
 import java.io.Writer;
@@ -28,8 +28,8 @@ import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.ISourceUriResolver;
-import de.algorythm.cms.common.resources.ITargetUriResolver;
+import de.algorythm.cms.common.resources.IDestinationPathResolver;
+import de.algorythm.cms.common.resources.ISourcePathResolver;
 
 public class PageIndexer implements IRenderingJob {
 
@@ -44,8 +44,6 @@ public class PageIndexer implements IRenderingJob {
 	public void run(final IRenderingContext ctx) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this + " initialization");
 		final String name = ctx.getBundle().getName();
-		final ISourceUriResolver sourceResolver = ctx.getResourceResolver();
-		final ITargetUriResolver targetResolver = ctx.getOutputResolver();
 		final IPageConfig unlocalizedStartPage = ctx.getBundle().getStartPage();
 		
 		if (unlocalizedStartPage == null)
@@ -57,14 +55,14 @@ public class PageIndexer implements IRenderingJob {
 			ctx.execute(new IRenderingJob() {
 				@Override
 				public void run(IRenderingContext context) throws Exception {
-					final DerivedPageConfig localizedStartPage = deriveLocalizedPage(unlocalizedStartPage, StringUtils.EMPTY, sourceResolver, locale);
+					final DerivedPageConfig localizedStartPage = deriveLocalizedPage(unlocalizedStartPage, StringUtils.EMPTY, ctx, locale);
 					localizedStartPage.setName(name);
 					
 					for (IPageConfig child : unlocalizedStartPage.getPages())
-						deriveLocalizedChildren(localizedStartPage, child, sourceResolver, locale);
+						deriveLocalizedChildren(localizedStartPage, child, ctx, locale);
 					
 					ctx.setStartPage(locale, localizedStartPage);
-					writePageXml(localizedStartPage, targetResolver, locale);
+					writePageXml(localizedStartPage, ctx, locale);
 				}
 			});
 		}
@@ -72,9 +70,9 @@ public class PageIndexer implements IRenderingJob {
 		meter.finish();
 	}
 	
-	private void writePageXml(final IPageConfig page, final ITargetUriResolver resolver, final Locale locale) throws Exception {
+	private void writePageXml(final IPageConfig page, final IDestinationPathResolver resolver, final Locale locale) throws Exception {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
-		final Path pagesXmlFile = resolver.resolveUri(URI.create("tmp:///" + locale.toLanguageTag() + "/pages.xml"));
+		final Path pagesXmlFile = resolver.resolveDestination(URI.create("tmp:///" + locale.toLanguageTag() + "/pages.xml"));
 		Files.createDirectories(pagesXmlFile.getParent());
 		
 		try (Writer writer = Files.newBufferedWriter(pagesXmlFile, StandardCharsets.UTF_8)) {
@@ -83,7 +81,7 @@ public class PageIndexer implements IRenderingJob {
 		}
 	}
 
-	private void deriveLocalizedChildren(final IPageConfig localizedParent, final IPageConfig unlocalizedChild, final ISourceUriResolver resolver, final Locale locale) throws Exception {
+	private void deriveLocalizedChildren(final IPageConfig localizedParent, final IPageConfig unlocalizedChild, final ISourcePathResolver resolver, final Locale locale) throws Exception {
 		final String name = unlocalizedChild.getName();
 		
 		if (name == null || name.isEmpty())
@@ -98,14 +96,14 @@ public class PageIndexer implements IRenderingJob {
 			deriveLocalizedChildren(localizedPage, child, resolver, locale);
 	}
 
-	private DerivedPageConfig deriveLocalizedPage(final IPageConfig page, final String path, final ISourceUriResolver resolver, final Locale locale) throws Exception {
+	private DerivedPageConfig deriveLocalizedPage(final IPageConfig page, final String path, final ISourcePathResolver resolver, final Locale locale) throws Exception {
 		final DerivedPageConfig p = new DerivedPageConfig(page, path);
 		Path contentFile;
 		
 		try {
-			contentFile = resolver.resolve(URI.create('/' + locale.toLanguageTag() + page.getContent().getPath()));
+			contentFile = resolver.resolveSource(URI.create('/' + locale.toLanguageTag() + page.getContent().getPath()));
 		} catch(IllegalStateException e) {
-			contentFile = resolver.resolve(URI.create(page.getContent().getPath()));
+			contentFile = resolver.resolveSource(URI.create(page.getContent().getPath()));
 		}
 		
 		try (InputStream stream = Files.newInputStream(contentFile)) {
@@ -165,4 +163,4 @@ public class PageIndexer implements IRenderingJob {
 	public String toString() {
 		return getClass().getSimpleName();
 	}
-}
+}*/

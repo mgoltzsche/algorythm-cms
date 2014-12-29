@@ -7,7 +7,7 @@
 	<schema src="/types/de.algorythm.cms.common/CMS.xsd" />
 	<page content="/contents/default-welcome-page.xml" />
 	<output id="html">
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>-->
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageTransformer" phase="TRANSFORM">
 			<param id="theme" value="/templates/de.algorythm.cms.common/html/Theme.xsl" />
@@ -32,8 +32,8 @@
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator" phase="TRANSFORM">
 			<param id="svg" value="/images/adobe-example.svg" />
 			<param id="svg" value="/images/logo.svg" />
-		</job>
-		<job type="de.algorythm.cms.common.rendering.pipeline.job.OdtTransformer" phase="TRANSFORM" />
+		</job>-->
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.OdtTransformer" phase="TRANSFORM" />-->
 	</output>
 	<output id="pdf">
 		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE">

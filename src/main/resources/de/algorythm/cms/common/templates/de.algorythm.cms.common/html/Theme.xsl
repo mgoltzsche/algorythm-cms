@@ -2,8 +2,7 @@
 <xsl:stylesheet version="2.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:c="http://cms.algorythm.de/common/CMS"
-	xmlns:p="http://cms.algorythm.de/common/Pages"
-	xmlns:b="http://cms.algorythm.de/common/Bundle"
+	xmlns:p="http://cms.algorythm.de/common/Page"
 	xmlns:l="http://cms.algorythm.de/common/Locales"
 	exclude-result-prefixes="c p l">
 	<xsl:param name="relativeBaseURL" />
@@ -14,7 +13,7 @@
 	<xsl:param name="page.locale" />
 	<xsl:param name="site.param.testparam" />
 	
-	<xsl:template match="b:page">
+	<xsl:template match="p:page">
 		<xsl:variable name="content">
 			<xsl:variable name="includedContent">
 				<xsl:call-template name="c:include-localized">

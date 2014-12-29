@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.xml.bind.JAXBContext;
 
 import com.google.inject.Injector;
 
@@ -29,7 +30,9 @@ import de.algorythm.cms.common.model.entity.IRenderingJobConfig.RenderingPhase;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.ISourceUriResolver;
+import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.IXmlSourceResolver;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.scheduling.IFuture;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.Future;
@@ -39,18 +42,22 @@ public class Renderer implements IRenderer {
 
 	private final IProcessScheduler scheduler;
 	private final Injector injector;
+	private final IXmlSourceResolver xmlSourceResolver;
+	private final JAXBContext jaxbContext;
 
 	@Inject
-	public Renderer(final IProcessScheduler scheduler, final Injector injector) {
+	public Renderer(final IProcessScheduler scheduler, final Injector injector, final IXmlSourceResolver xmlSourceResolver, final JAXBContext jaxbContext) {
 		this.scheduler = scheduler;
 		this.injector = injector;
+		this.xmlSourceResolver = xmlSourceResolver;
+		this.jaxbContext = jaxbContext;
 	}
 
 	@Override
 	public IFuture<Void> render(final IBundle bundle, final Path tmpDirectory, final Path outputDirectory) {
 		final TimeMeter meter = TimeMeter.meter(bundle.getName() + " process initialization");
 		final URI resourceOutputPath = URI.create("/r/" + new Date().getTime() + '/');
-		final IBundleRenderingContext ctx = new RenderingContext(bundle, tmpDirectory, outputDirectory, resourceOutputPath);
+		final IBundleRenderingContext ctx = new RenderingContext(bundle, jaxbContext, xmlSourceResolver, tmpDirectory, outputDirectory, resourceOutputPath);
 		final Map<RenderingPhase, Set<IRenderingJob>> phaseMap = new HashMap<RenderingPhase, Set<IRenderingJob>>();
 		final LinkedList<Collection<IRenderingJob>> processJobs = new LinkedList<Collection<IRenderingJob>>();
 		final Future<Void> future = new Future<Void>();
@@ -67,7 +74,7 @@ public class Renderer implements IRenderer {
 					phaseMap.put(jobCfg.getPhase(), phaseJobs);
 				}
 				
-				phaseJobs.add(initializeJob(jobCfg, ctx.getResourceResolver()));
+				phaseJobs.add(initializeJob(jobCfg, ctx));
 			}
 		}
 		
@@ -84,7 +91,7 @@ public class Renderer implements IRenderer {
 		return future;
 	}
 
-	private IRenderingJob initializeJob(final IRenderingJobConfig jobCfg, final ISourceUriResolver sourceUriResolver) {
+	private IRenderingJob initializeJob(final IRenderingJobConfig jobCfg, final ISourcePathResolver sourcePathResolver) {
 		final Class<?> jobType = jobCfg.getJobType();
 		final IRenderingJob job;
 		
@@ -103,12 +110,12 @@ public class Renderer implements IRenderer {
 		final Set<String> finalParams = new HashSet<String>();
 		
 		for (IParam param : jobCfg.getParams())
-			addParam(job, param, finalParams, sourceUriResolver);
+			addParam(job, param, finalParams, sourcePathResolver);
 		
 		return job;
 	}
 
-	public void addParam(final IRenderingJob job, final IParam param, final Set<String> finalParams, final ISourceUriResolver sourceUriResolver) {
+	public void addParam(final IRenderingJob job, final IParam param, final Set<String> finalParams, final ISourcePathResolver sourcePathResolver) {
 		final Class<?> jobType = job.getClass();
 		
 		try {
@@ -123,16 +130,16 @@ public class Renderer implements IRenderer {
 				if (list == null)
 					throw new IllegalStateException("Collection field is null");
 				
-				addListValue(list, param, field, sourceUriResolver);
+				addListValue(list, param, field, sourcePathResolver);
 			} else if (finalParams.add(param.getId())) {
-				field.set(job, convertParamValue(param, fieldType, sourceUriResolver));
+				field.set(job, convertParamValue(param, fieldType, sourcePathResolver));
 			}
 		} catch(Exception e) {
 			throw new RuntimeException("Cannot set parameter " + jobType.getName() + '.' + param.getId() + " due to " + e.getClass().getName() + ": " + e.getMessage(), e);
 		}
 	}
 
-	private <V> void addListValue(final Collection<V> list, final IParam param, final Field field, final ISourceUriResolver sourceUriResolver) throws FileNotFoundException {
+	private <V> void addListValue(final Collection<V> list, final IParam param, final Field field, final ISourcePathResolver sourcePathResolver) throws FileNotFoundException, ResourceNotFoundException {
 		final Type[] typeArguments = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
 		
 		if (typeArguments == null || typeArguments.length == 0)
@@ -141,12 +148,12 @@ public class Renderer implements IRenderer {
 		@SuppressWarnings("unchecked")
 		final Class<V> itemType = (Class<V>) typeArguments[0];
 		@SuppressWarnings("unchecked")
-		final V value = (V) convertParamValue(param, itemType, sourceUriResolver);
+		final V value = (V) convertParamValue(param, itemType, sourcePathResolver);
 		
 		list.add(value);
 	}
 
-	private Object convertParamValue(final IParam param, final Class<?> fieldType, final ISourceUriResolver sourceUriResolver) throws FileNotFoundException {
+	private Object convertParamValue(final IParam param, final Class<?> fieldType, final ISourcePathResolver sourcePathResolver) throws FileNotFoundException, ResourceNotFoundException {
 		if (fieldType == String.class) {
 			return param.getValue();
 		} else if (Boolean.class == fieldType || boolean.class == fieldType) {
@@ -154,7 +161,7 @@ public class Renderer implements IRenderer {
 		} else if (Integer.class == fieldType || int.class == fieldType) {
 			return Integer.parseInt(param.getValue());
 		} else if (Path.class == fieldType) {
-			return sourceUriResolver.resolve(URI.create(param.getValue()).normalize());
+			return sourcePathResolver.resolveSource(URI.create(param.getValue()).normalize());
 		} else if (URI.class == fieldType) {
 			return URI.create(param.getValue()).normalize();
 		} else {

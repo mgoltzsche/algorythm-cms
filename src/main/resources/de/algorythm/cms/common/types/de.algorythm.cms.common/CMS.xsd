@@ -10,7 +10,8 @@
 	<include schemaLocation="Navigation.xsd" />
 	<include schemaLocation="Breadcrumbs.xsd" />
 	<include schemaLocation="Article.xsd" />
-	<import namespace="http://cms.algorythm.de/common/Pages" schemaLocation="Pages.xsd" />
+	<import namespace="http://cms.algorythm.de/common/Page" schemaLocation="Page.xsd" />
+	<import namespace="http://cms.algorythm.de/common/Metadata" schemaLocation="Metadata.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Locales" schemaLocation="Locales.xsd" />
 	<import namespace="http://cms.algorythm.de/common/Sources" schemaLocation="Sources.xsd" />
 	<import namespace="http://www.w3.org/2000/svg" schemaLocation="Svg.xsd" />

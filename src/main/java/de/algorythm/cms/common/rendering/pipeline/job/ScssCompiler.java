@@ -26,7 +26,7 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.ITargetUriResolver;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class ScssCompiler implements IRenderingJob {
 
@@ -54,9 +54,8 @@ public class ScssCompiler implements IRenderingJob {
 	}
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
-		final ITargetUriResolver outResolver = ctx.getOutputResolver();
 		final URI cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS);
-		final Path cssSystemPath = outResolver.resolveUri(cssPath);
+		final Path cssSystemPath = ctx.resolveDestination(cssPath);
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
 		final ScssStylesheet stylesheet = docHandler.getStyleSheet();
@@ -93,12 +92,12 @@ public class ScssCompiler implements IRenderingJob {
 				final URI href = URI.create(identifier);
 				final URI base = URI.create(parentStylesheet.getFileName());
 				final URI publicUri = base.resolve(href);
-				final Path resolvedPath = ctx.getResourceResolver().resolve(publicUri);
 				final Reader reader;
 				
 				try {
+					final Path resolvedPath = ctx.resolveSource(publicUri);
 					reader = Files.newBufferedReader(resolvedPath, StandardCharsets.UTF_8);
-				} catch (IOException e) {
+				} catch (ResourceNotFoundException | IOException e) {
 					throw new RuntimeException(e);
 				}
 				

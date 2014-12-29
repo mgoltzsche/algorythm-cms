@@ -16,7 +16,8 @@ public class OdtTransformer implements IRenderingJob {
 	@Override
 	public void run(IRenderingContext ctx) throws Exception {
 		final TimeMeter meter = TimeMeter.meter("ODT transformation");
-		final Templates templates = ctx.compileTemplates(Collections.singleton(URI.create("/templates/odt2xhtml/export/xhtml/opendoc2xhtml.xsl")));
+		//final Templates templates = ctx.compileTemplates(Collections.singleton(URI.create("/templates/odt2xhtml/export/xhtml/opendoc2xhtml.xsl")));
+		final Templates templates = ctx.compileTemplates(Collections.singleton(URI.create("/templates/de.algorythm.cms.common/SvgSprites.xsl")));
 		final TransformerHandler handler = ctx.createTransformerHandler(templates, URI.create("/odt/index.html"));
 		final Transformer transformer = handler.getTransformer();
 		

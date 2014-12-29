@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
+import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -7,8 +8,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Inject;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
 import de.algorythm.cms.common.impl.TimeMeter;
@@ -21,25 +20,23 @@ import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 
 public class SupportedLocalesXmlGenerator implements IRenderingJob {
 
-	@Inject
-	private JAXBContext jaxbContext;
 	private boolean localizeTitle = false;
 
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final IBundle bundle = ctx.getBundle();
-		final Marshaller marshaller = jaxbContext.createMarshaller();
-		
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		final Marshaller marshaller = ctx.createMarshaller();
 		
 		for (ISupportedLocale supportedLocale : bundle.getSupportedLocales()) {
 			final Locale locale = supportedLocale.getLocale();
 			final LocaleInfos locales = createLocaleInfos(bundle, locale);
-			final Path outputFile = ctx.getOutputResolver().resolveUri(URI.create("tmp:///" + locale.toLanguageTag() + "/supported-locales.xml"));
-			
+			final Path outputFile = ctx.resolveDestination(URI.create("tmp:///" + locale.toLanguageTag() + "/supported-locales.xml"));
 			Files.createDirectories(outputFile.getParent());
-			marshaller.marshal(locales, Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8));
+			
+			try (Writer writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8)) {
+				marshaller.marshal(locales, writer);
+			}
 		}
 		
 		meter.finish();

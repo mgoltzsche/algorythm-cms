@@ -4,7 +4,6 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_COUNTRY
 import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_LANGUAGE;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_LOCALE;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_PATH;
-import static de.algorythm.cms.common.ParameterNameConstants.Render.PAGE_TITLE;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.RELATIVE_BASE_URL;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.RESOURCE_BASE_URL;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_INTERNATIONALIZED;
@@ -12,7 +11,10 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_NAME;
 import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_PARAM_PREFIX;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -22,28 +24,40 @@ import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
+import com.google.inject.spi.Element;
 
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
-import de.algorythm.cms.common.model.entity.impl.PageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.rendering.pipeline.impl.TemplateErrorListener;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
+import de.algorythm.cms.common.resources.impl.SimpleLocator;
+import de.algorythm.cms.common.resources.impl.XmlSource;
 
 public class PageTransformer implements IRenderingJob {
 
-	static private final String BACK_SLASH = "../";
-	static private final String BACK = "..";
 	static private final String DOT = ".";
 
 	@Inject
@@ -71,52 +85,51 @@ public class PageTransformer implements IRenderingJob {
 				? "/.." + resourceBasePath
 				: resourceBasePath;
 		final Templates templates = ctx.compileTemplates(templateLocations);
+		final IPageConfig startPage = bundle.getStartPage();
 		
 		for (ISupportedLocale supportedLocale : supportedLocales) {
 			final Locale locale = supportedLocale.getLocale();
-			final IPageConfig startPage = ctx.getStartPage(locale);
 			
-			renderPages(startPage, templates, ctx, locale, localizedResourceBasePath);
+			renderPages(startPage, StringUtils.EMPTY, DOT, templates, ctx, locale, localizedResourceBasePath);
 		}
 		
 		meter.finish();
 	}
 	
-	private void renderPages(final IPageConfig pageConfig, final Templates compiledTemplates, final IRenderingContext ctx, final Locale locale, final String resourceBasePath) {
+	private void renderPages(final IPageConfig pageConfig, final String path, final String relativeRootPath, final Templates compiledTemplates, final IRenderingContext ctx, final Locale locale, final String resourceBasePath) {
 		ctx.execute(new IRenderingJob() {
 			@Override
 			public void run(final IRenderingContext ctx) throws Exception {
-				render(ctx, pageConfig, compiledTemplates, locale, resourceBasePath);
+				render(ctx, pageConfig, path, relativeRootPath, compiledTemplates, locale, resourceBasePath);
 			}
 			@Override
 			public String toString() {
-				return pageConfig.getPath() + "/page.xml";
+				return path + '/';
 			}
 		});
 		
 		// Render sub pages
 		for (IPageConfig child : pageConfig.getPages())
-			renderPages(child, compiledTemplates, ctx, locale, resourceBasePath);
+			renderPages(child, path + '/' + child.getName(), relativeRootPath + "/..", compiledTemplates, ctx, locale, resourceBasePath);
 	}
 	
-	private void render(final IRenderingContext ctx, final IPageConfig pageCfg, final Templates compiledTemplates, final Locale locale, final String resourceBasePath) throws IOException, TransformerException, SAXException, ParserConfigurationException, JAXBException {
+	private void render(final IRenderingContext ctx, final IPageConfig pageCfg, final String path, final String relativeRootPath, final Templates compiledTemplates, final Locale locale, final String resourceBasePath) throws IOException, TransformerException, SAXException, ParserConfigurationException, JAXBException, ResourceNotFoundException {
 		final IBundle bundle = ctx.getBundle();
-		final String pagePath = pageCfg.getPath();
 		final URI targetUri = ctx.getBundle().getSupportedLocales().size() > 1
-				? URI.create('/' + locale.getLanguage() + pageCfg.getPath() + "/index.html")
-				: URI.create(pageCfg.getPath() + "/index.html");
-		final String relativeBaseUrl = relativeBaseUrl(pagePath);
-		final String resourceBaseUrl = URI.create(relativeBaseUrl + resourceBasePath).normalize().toString();
+				? URI.create('/' + locale.getLanguage() + path + "/index.html")
+				: URI.create(path + "/index.html");
+		final String resourceBaseUrl = URI.create(relativeRootPath + resourceBasePath).normalize().toString();
 		final TransformerHandler transformerHandler = ctx.createTransformerHandler(compiledTemplates, targetUri);
 		final Transformer transformer = transformerHandler.getTransformer();
-		final Marshaller marshaller = jaxbContext.createMarshaller();
+		final TemplateErrorListener errorListener = new TemplateErrorListener();
+		//final Marshaller marshaller = jaxbContext.createMarshaller();
 		
-		transformer.setParameter(RELATIVE_BASE_URL, relativeBaseUrl);
+		transformer.setErrorListener(errorListener);
+		transformer.setParameter(RELATIVE_BASE_URL, relativeRootPath);
 		transformer.setParameter(RESOURCE_BASE_URL, resourceBaseUrl);
 		transformer.setParameter(SITE_NAME, bundle.getName());
 		transformer.setParameter(SITE_INTERNATIONALIZED, bundle.getSupportedLocales().size() > 1);
-		transformer.setParameter(PAGE_PATH, pagePath);
-		transformer.setParameter(PAGE_TITLE, pageCfg.getTitle());
+		transformer.setParameter(PAGE_PATH, path);
 		transformer.setParameter(PAGE_LANGUAGE, locale.getLanguage());
 		transformer.setParameter(PAGE_COUNTRY, locale.getCountry());
 		transformer.setParameter(PAGE_LOCALE, locale.toLanguageTag());
@@ -124,45 +137,42 @@ public class PageTransformer implements IRenderingJob {
 		for (IParam param : bundle.getParams())
 			transformer.setParameter(SITE_PARAM_PREFIX + param.getId(), param.getValue());
 		
-		marshaller.marshal(createPageFeed(pageCfg), transformerHandler);
-	}
-	
-	private IPageConfig createPageFeed(final IPageConfig page) {
-		PageConfig p = new PageConfig(page.getPath(), page.getName());
-		p.setTitle(page.getTitle());
-		p.setNavigationTitle(page.getNavigationTitle());
-		p.setInNavigation(page.isInNavigation());
-		p.setContent(page.getContent());
-		return p;
-	}
-	
-	private String relativeBaseUrl(final String path) {
-		final int depth = pathDepth(path + '/');
+		transformerHandler.setSystemId("file:///pages/" + path);
 		
-		if (depth == 0)
-			return DOT;
-
-		final StringBuilder sb = new StringBuilder((depth - 1) * 3 + 2);
-
-		for (int i = 1; i < depth; i++)
-			sb.append(BACK_SLASH);
-
-		sb.append(BACK);
-
-		return sb.toString();
+		//transformPage(pageCfg.getContent(), transformerHandler);
+		
+		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+		final org.w3c.dom.Element element = doc.createElementNS("http://cms.algorythm.de/common/Page", "page");
+		element.setAttribute("content", pageCfg.getContent().toString());
+		final StringWriter writer = new StringWriter();
+		final Source source = ctx.createXmlSource(pageCfg.getContent());
+		
+		transformer.transform(new DOMSource(element), new StreamResult(writer));
+		//System.out.println(writer.getBuffer());
+		
+		//marshaller.marshal(pageFeed, transformerHandler);
+		
+		//errorListener.evaluateErrors();
 	}
 
-	private int pathDepth(final String path) {
-		final int pathLength = path.length();
-		int depth = 0;
-
-		for (int i = 2; i < pathLength; i++)
-			if (path.charAt(i) == '/')
-				depth++;
-
-		return depth;
+	private void transformPage(final URI uri, final TransformerHandler transformerHandler) throws SAXException {
+		final String ns = "http://cms.algorythm.de/common/Page";
+		final String lName = "page";
+		final String qName = "p:page";
+		final String prefix = "p";
+		final AttributesImpl atts = new AttributesImpl();
+		
+		atts.addAttribute(null, "content", "content", "anyUri", uri.toString());
+		
+		transformerHandler.setDocumentLocator(SimpleLocator.INSTANCE);
+		transformerHandler.startDocument();
+		transformerHandler.startPrefixMapping(prefix, ns);
+		transformerHandler.startElement(ns, lName, qName, atts);
+		transformerHandler.endElement(ns, lName, qName);
+		transformerHandler.endPrefixMapping(prefix);
+		transformerHandler.endDocument();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "XsltRenderer";
