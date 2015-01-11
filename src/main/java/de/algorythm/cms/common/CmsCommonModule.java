@@ -12,11 +12,13 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 
 import de.algorythm.cms.common.impl.CmsCommonFacade;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
+import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.model.entity.impl.LocaleInfos;
 import de.algorythm.cms.common.model.entity.impl.Metadata;
 import de.algorythm.cms.common.model.entity.impl.PageFeed;
 import de.algorythm.cms.common.model.entity.impl.Sources;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
+import de.algorythm.cms.common.rendering.pipeline.impl.MetadataExtractor;
 import de.algorythm.cms.common.rendering.pipeline.impl.Renderer;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IBundleLoader;
@@ -28,6 +30,9 @@ import de.algorythm.cms.common.resources.impl.ClasspathDependencyLoader;
 import de.algorythm.cms.common.resources.impl.DefaultXmlSourceResolver;
 import de.algorythm.cms.common.resources.impl.OdtXmlSourceResolver;
 import de.algorythm.cms.common.resources.impl.XmlSourceResolverDelegator;
+import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
+import de.algorythm.cms.common.resources.meta.impl.CmsMetadataExtractor;
+import de.algorythm.cms.common.resources.meta.impl.OdtMetadataExtractor;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler;
 
@@ -46,6 +51,7 @@ public class CmsCommonModule extends AbstractModule {
 			bindXMLInputFactory(bind(XMLInputFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
 			bindIXmlSourceResolver(bind(IXmlSourceResolver.class));
+			bindIMetadataExtractor(bind(IMetadataExtractor.class));
 		} catch(Exception e) {
 			throw new RuntimeException("Cannot initialize module", e);
 		}
@@ -85,7 +91,7 @@ public class CmsCommonModule extends AbstractModule {
 	
 	protected void bindJAXBContext(AnnotatedBindingBuilder<JAXBContext> bind) {
 		try {
-			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageFeed.class, LocaleInfos.class, Sources.class, Metadata.class));
+			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageFeed.class, LocaleInfos.class, Sources.class, Metadata.class, DerivedPageConfig.class));
 		} catch (JAXBException e) {
 			throw new RuntimeException("Cannot initialize JAXB context", e);
 		}
@@ -101,5 +107,16 @@ public class CmsCommonModule extends AbstractModule {
 		extensionMap.put("svg", xmlResolver);
 		extensionMap.put("odt", new OdtXmlSourceResolver());
 		bind.toInstance(new XmlSourceResolverDelegator(extensionMap));
+	}
+	
+	protected void bindIMetadataExtractor(AnnotatedBindingBuilder<IMetadataExtractor> bind) {
+		final Map<String, IMetadataExtractor> extensionMap = new HashMap<String, IMetadataExtractor>();
+		final IMetadataExtractor xmlExtractor = new CmsMetadataExtractor();
+		final IMetadataExtractor odtExtractor = new OdtMetadataExtractor();
+		
+		extensionMap.put("xml", xmlExtractor);
+		extensionMap.put("odt", odtExtractor);
+		
+		bind.toInstance(new MetadataExtractor(extensionMap));
 	}
 }

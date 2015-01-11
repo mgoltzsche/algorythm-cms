@@ -7,13 +7,14 @@
 	exclude-result-prefixes="c p l">
 	<xsl:param name="relativeBaseURL" />
 	<xsl:param name="resourceBaseURL" />
+	<xsl:param name="site.internationalized" />
 	<xsl:param name="site.name" />
 	<xsl:param name="page.path" />
-	<xsl:param name="page.title" />
 	<xsl:param name="page.locale" />
 	<xsl:param name="site.param.testparam" />
 	
 	<xsl:template match="p:page">
+		<xsl:variable name="page.title" select="document(concat('metadata:', @content))/*/@title" />
 		<xsl:variable name="content">
 			<xsl:variable name="includedContent">
 				<xsl:call-template name="c:include-localized">
@@ -42,20 +43,22 @@
 			</head>
 			<body>
 				<div id="container">
-					<ul class="locale-switch">
-						<xsl:for-each select="document(concat('/', $page.locale, '/supported-locales.xml'))/l:locales/l:locale">
-							<li>
-								<xsl:if test="@active = true()">
-									<xsl:attribute name="class" select="'active'" />
-								</xsl:if>
-								<a href="{$relativeBaseURL}/../{@id}{$page.path}/index.html" cms-language="{@language}" lang="{@language}" title="{@title}">
-									<svg xmlns:xlink="http://www.w3.org/1999/xlink">
-										<use xlink:href="{$resourceBaseURL}/sprites.svg#{@country}" />
-									</svg>
-								</a>
-							</li>
-						</xsl:for-each>
-					</ul>
+					<xsl:if test="$site.internationalized">
+						<ul class="locale-switch">
+							<xsl:for-each select="document(concat('/', $page.locale, '/supported-locales.xml'))/l:locales/l:locale">
+								<li>
+									<xsl:if test="@active = true()">
+										<xsl:attribute name="class" select="'active'" />
+									</xsl:if>
+									<a href="{$relativeBaseURL}/../{@id}{$page.path}/index.html" cms-language="{@language}" lang="{@language}" title="{@title}">
+										<svg xmlns:xlink="http://www.w3.org/1999/xlink">
+											<use xlink:href="{$resourceBaseURL}/sprites.svg#{@country}" />
+										</svg>
+									</a>
+								</li>
+							</xsl:for-each>
+						</ul>
+					</xsl:if>
 					<img src="{$resourceBaseURL}/sprites.svg#logo" />
 					<img src="{$resourceBaseURL}/sprites.svg#example" />
 					<svg class="icon" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -64,8 +67,12 @@
 					<svg class="icon" xmlns:xlink="http://www.w3.org/1999/xlink">
 						<use xlink:href="{$resourceBaseURL}/sprites.svg#logo" />
 					</svg>
-					<nav class="pure-menu pure-menu-open pure-menu-horizontal" cms-menu="pure-menu-selected" role="menubar">
-						<a href="{$relativeBaseURL}/index.html" class="pure-menu-heading"><xsl:value-of select="$site.name" /></a>
+					<nav id="nav" class="menu horizontal" cms-menu="selected" role="menubar">
+						<a href="{$relativeBaseURL}/index.html" title="{$site.name}" class="logo">
+							<svg xmlns:xlink="http://www.w3.org/1999/xlink">
+								<use xlink:href="{$resourceBaseURL}/sprites.svg#logo" />
+							</svg>
+						</a>
 						<xsl:call-template name="c:menu-html">
 							<xsl:with-param name="maxDepth" select="1" />
 						</xsl:call-template>

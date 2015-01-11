@@ -24,7 +24,7 @@ public class PageConfig implements IPageConfig {
 	@XmlAttribute(name="nav-title")
 	private String navigationTitle;
 	@XmlAttribute(name="nav-contained")
-	private boolean inNavigation;
+	private boolean inNavigation = true;
 	@XmlElementRef(type=PageConfig.class)
 	private List<IPageConfig> pages = new LinkedList<IPageConfig>();
 

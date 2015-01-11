@@ -29,10 +29,12 @@ import org.xml.sax.XMLReader;
 import com.google.inject.Injector;
 
 import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
+import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 import de.algorythm.cms.common.scheduling.IProcess;
 import de.algorythm.cms.common.scheduling.IProcessObserver;
 import de.algorythm.cms.common.scheduling.IProgressObserver;
@@ -219,5 +221,11 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	@Override
 	public Path getTempDirectory() {
 		return context.getTempDirectory();
+	}
+
+	@Override
+	public IMetadata extractMetadata(URI uri) throws ResourceNotFoundException,
+			MetadataExtractionException {
+		return context.extractMetadata(uri);
 	}
 }

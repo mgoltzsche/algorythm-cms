@@ -34,36 +34,41 @@ public abstract class AbstractXmlSourceResolver implements IXmlSourceResolver {
 	@Override
 	public final Source createXmlSource(URI uri, final IBundleRenderingContext ctx)
 			throws ResourceNotFoundException, IOException {
+		final String scheme = uri.getScheme();
 		uri = uri.normalize();
 		
-		if ("metadata".equals(uri.getScheme())) {
+		if ("metadata".equals(scheme)) {
 			final Path metadataFile = ctx.resolveDestination(URI.create("tmp:///meta" + uri.getPath()));
 			
-			synchronizer.synchronize(uri, new Function<URI, Void>() {
-				@Override
-				public Void apply(URI uri) {
-					if (!Files.exists(metadataFile)) {
-						try {
-							final IMetadata metadata;
-							
+			if (!Files.exists(metadataFile)) {
+				synchronizer.synchronize(uri, new Function<URI, Void>() {
+					@Override
+					public Void apply(URI uri) {
+						if (!Files.exists(metadataFile)) {
 							try {
-								metadata = metadataExtractor.extractMetadata(uri, ctx);
-							} catch (ResourceNotFoundException e) {
+								final IMetadata metadata;
+								
+								try {
+									metadata = metadataExtractor.extractMetadata(uri, ctx);
+								} catch (ResourceNotFoundException e) {
+									throw new RuntimeException(e);
+								}
+								
+								final Marshaller marshaller = ctx.createMarshaller();
+								
+								Files.createDirectories(metadataFile.getParent());
+								
+								try (Writer writer = Files.newBufferedWriter(metadataFile, StandardCharsets.UTF_8)) {
+									marshaller.marshal(metadata, new StreamResult(writer));
+								}
+							} catch(MetadataExtractionException |JAXBException | IOException e) {
 								throw new RuntimeException(e);
 							}
-							
-							final Marshaller marshaller = ctx.createMarshaller();
-							
-							try (Writer writer = Files.newBufferedWriter(metadataFile, StandardCharsets.UTF_8)) {
-								marshaller.marshal(metadata, new StreamResult(writer));
-							}
-						} catch(MetadataExtractionException |JAXBException | IOException e) {
-							throw new RuntimeException(e);
 						}
+						return null;
 					}
-					return null;
-				}
-			});
+				});
+			}
 			
 			try {
 				return new XmlSource(uri, metadataFile);

@@ -1,0 +1,44 @@
+.menu {
+	border: 1px solid $lightColor;
+
+	a {
+		text-decoration: none;
+	}
+
+	ul, li {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+		display: block;
+	}
+
+	li {
+		a {
+			display: block;
+			color: $primaryActionColor;
+			text-decoration: none;
+			padding: 0.45em 1em;
+			
+			&:hover {
+				background: $selectionColor;
+			}
+		}
+		
+		&.selected a {
+			color: $color;
+			background: $selectionColor;
+		}
+	}
+	
+	&.horizontal {
+		ul, li, a {
+			display: inline-block;
+		}
+	}
+	
+	&.vertical {
+		li {
+			display: block;
+		}
+	}
+}

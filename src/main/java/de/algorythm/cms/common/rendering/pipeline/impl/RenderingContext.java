@@ -30,6 +30,7 @@ import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 
 import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.model.entity.ISchemaSource;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.resources.IArchiveExtractor;
@@ -40,6 +41,8 @@ import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.OutputResolver;
 import de.algorythm.cms.common.resources.impl.ResourceResolver;
 import de.algorythm.cms.common.resources.impl.SynchronizedZipArchiveExtractor;
+import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
+import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 
 public class RenderingContext implements IBundleRenderingContext {
 
@@ -53,9 +56,11 @@ public class RenderingContext implements IBundleRenderingContext {
 	private final IArchiveExtractor archiveExtractor;
 	private final JAXBContext jaxbContext;
 	private final Path tempDirectory;
+	private final IMetadataExtractor metadata;
 
-	public RenderingContext(final IBundle bundle, final JAXBContext jaxbContext, final IXmlSourceResolver xmlSourceResolver, final Path tmpDirectory, final Path outputDirectory, final URI resourcePrefix) {
+	public RenderingContext(final IBundle bundle, final IMetadataExtractor metadata, final JAXBContext jaxbContext, final IXmlSourceResolver xmlSourceResolver, final Path tmpDirectory, final Path outputDirectory, final URI resourcePrefix) {
 		this.bundle = bundle;
+		this.metadata = metadata;
 		this.resourcePrefix = resourcePrefix;
 		this.jaxbContext = jaxbContext;
 		this.xmlSourceResolver = xmlSourceResolver;
@@ -171,5 +176,10 @@ public class RenderingContext implements IBundleRenderingContext {
 	public XMLEventReader createXMLEventReader(InputStream stream)
 			throws XMLStreamException {
 		return xmlContext.createXMLEventReader(stream);
+	}
+
+	@Override
+	public IMetadata extractMetadata(URI uri) throws ResourceNotFoundException, MetadataExtractionException {
+		return metadata.extractMetadata(uri, this);
 	}
 }

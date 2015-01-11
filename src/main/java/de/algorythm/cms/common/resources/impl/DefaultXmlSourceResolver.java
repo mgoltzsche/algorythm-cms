@@ -19,7 +19,7 @@ public class DefaultXmlSourceResolver extends AbstractXmlSourceResolver {
 	}
 
 	@Override
-	public Source createXmlSourceInternal(URI uri, IBundleRenderingContext ctx) throws IOException, ResourceNotFoundException {
+	protected Source createXmlSourceInternal(URI uri, IBundleRenderingContext ctx) throws IOException, ResourceNotFoundException {
 		return new XmlSource(uri, ctx.resolveSource(uri));
 	}
 }

@@ -10,10 +10,10 @@
 		<xsl:variable name="parent" select="if (@parent) then @parent else '.'" />
 		<xsl:variable name="absoluteRootPath" select="c:absolute-path($parent)" />
 		
-		<nav class="pure-menu pure-menu-open pure-menu-vertical">
+		<nav class="menu vertical">
 			<xsl:call-template name="c:menu-html">
 				<xsl:with-param name="root" select="$c:pages//*[@path=$absoluteRootPath]" />
-				<xsl:with-param name="maxDepth" select="if (@depth) then number(@depth) else 0" />
+				<xsl:with-param name="maxDepth" select="if (@depth) then number(@depth) else 1" />
 			</xsl:call-template>
 		</nav>
 	</xsl:template>

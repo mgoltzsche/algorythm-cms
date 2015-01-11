@@ -1,6 +1,5 @@
-/*package de.algorythm.cms.common.rendering.pipeline.job;
+package de.algorythm.cms.common.rendering.pipeline.job;
 
-import java.io.InputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -11,32 +10,22 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.algorythm.cms.common.impl.TimeMeter;
+import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.resources.IDestinationPathResolver;
-import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.ResourceNotFoundException;
+import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 
 public class PageIndexer implements IRenderingJob {
 
-	static private final Logger log = LoggerFactory.getLogger(PageIndexer.class);
-	
-	@Inject
-	private XMLInputFactory xmlInputFactory;
 	@Inject
 	private JAXBContext jaxbContext;
 
@@ -58,10 +47,10 @@ public class PageIndexer implements IRenderingJob {
 					final DerivedPageConfig localizedStartPage = deriveLocalizedPage(unlocalizedStartPage, StringUtils.EMPTY, ctx, locale);
 					localizedStartPage.setName(name);
 					
-					for (IPageConfig child : unlocalizedStartPage.getPages())
+					for (IPageConfig child : unlocalizedStartPage.getPages()) {
 						deriveLocalizedChildren(localizedStartPage, child, ctx, locale);
+					}
 					
-					ctx.setStartPage(locale, localizedStartPage);
 					writePageXml(localizedStartPage, ctx, locale);
 				}
 			});
@@ -70,7 +59,7 @@ public class PageIndexer implements IRenderingJob {
 		meter.finish();
 	}
 	
-	private void writePageXml(final IPageConfig page, final IDestinationPathResolver resolver, final Locale locale) throws Exception {
+	private void writePageXml(final DerivedPageConfig page, final IDestinationPathResolver resolver, final Locale locale) throws Exception {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
 		final Path pagesXmlFile = resolver.resolveDestination(URI.create("tmp:///" + locale.toLanguageTag() + "/pages.xml"));
 		Files.createDirectories(pagesXmlFile.getParent());
@@ -81,66 +70,33 @@ public class PageIndexer implements IRenderingJob {
 		}
 	}
 
-	private void deriveLocalizedChildren(final IPageConfig localizedParent, final IPageConfig unlocalizedChild, final ISourcePathResolver resolver, final Locale locale) throws Exception {
+	private void deriveLocalizedChildren(final DerivedPageConfig localizedParent, final IPageConfig unlocalizedChild, final IRenderingContext ctx, final Locale locale) throws Exception {
 		final String name = unlocalizedChild.getName();
 		
 		if (name == null || name.isEmpty())
 			throw new IllegalStateException("Undefined page name");
 		
-		final String parentPath = localizedParent.getPath();
-		final IPageConfig localizedPage = deriveLocalizedPage(unlocalizedChild, parentPath + '/' + name, resolver, locale);
+		final String path = localizedParent.getPath() + '/' + name;
+		final DerivedPageConfig derivedPage = deriveLocalizedPage(unlocalizedChild, path, ctx, locale);
 		
-		localizedParent.getPages().add(localizedPage);
+		localizedParent.getPages().add(derivedPage);
 		
 		for (IPageConfig child : unlocalizedChild.getPages())
-			deriveLocalizedChildren(localizedPage, child, resolver, locale);
+			deriveLocalizedChildren(derivedPage, child, ctx, locale);
 	}
 
-	private DerivedPageConfig deriveLocalizedPage(final IPageConfig page, final String path, final ISourcePathResolver resolver, final Locale locale) throws Exception {
-		final DerivedPageConfig p = new DerivedPageConfig(page, path);
-		Path contentFile;
+	private DerivedPageConfig deriveLocalizedPage(final IPageConfig page, final String path, final IRenderingContext ctx, final Locale locale) throws Exception {
+		final IMetadata metadata = extractMetadata(ctx, page, locale);
 		
+		return new DerivedPageConfig(path, page, metadata);
+	}
+
+	private IMetadata extractMetadata(final IRenderingContext ctx, final IPageConfig page, final Locale locale) throws ResourceNotFoundException, MetadataExtractionException {
 		try {
-			contentFile = resolver.resolveSource(URI.create('/' + locale.toLanguageTag() + page.getContent().getPath()));
-		} catch(IllegalStateException e) {
-			contentFile = resolver.resolveSource(URI.create(page.getContent().getPath()));
+			return ctx.extractMetadata(URI.create('/' + locale.toLanguageTag() + page.getContent().getPath()));
+		} catch(ResourceNotFoundException e) {
+			return ctx.extractMetadata(URI.create(page.getContent().getPath()));
 		}
-		
-		try (InputStream stream = Files.newInputStream(contentFile)) {
-			final XMLEventReader reader = xmlInputFactory.createXMLEventReader(stream);
-			
-			try {
-				while (reader.hasNext()) {
-					final XMLEvent evt = reader.nextEvent();
-					
-					if (evt.isStartElement()) {
-						final StartElement element = evt.asStartElement();
-						final Attribute attTitle = element.getAttributeByName(new QName("title"));
-						final Attribute attNavTitle = element.getAttributeByName(new QName("nav-title"));
-						
-						if (attTitle != null)
-							p.setTitle(attTitle.getValue());
-						
-						if (attNavTitle != null)
-							p.setNavigationTitle(attNavTitle.getValue());
-						
-						break;
-					}
-				}
-			} finally {
-				reader.close();
-			}
-		}
-		
-		if (p.getTitle() == null || p.getTitle().isEmpty()) {
-			log.warn("Missing page title of " + p.getPath() + " due to undeclared content title in " + p.getContent());
-			p.setTitle(p.getName());
-		}
-		
-		if (p.getNavigationTitle() == null)
-			p.setNavigationTitle(p.getTitle());
-		
-		return p;
 	}
 
 	@Override
@@ -163,4 +119,4 @@ public class PageIndexer implements IRenderingJob {
 	public String toString() {
 		return getClass().getSimpleName();
 	}
-}*/
+}

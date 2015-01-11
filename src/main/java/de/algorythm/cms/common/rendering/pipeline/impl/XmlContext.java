@@ -46,11 +46,13 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import de.algorythm.cms.common.impl.TimeMeter;
+import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlContext;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.XmlSource;
+import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 
 public class XmlContext implements IXmlContext, URIResolver {
 

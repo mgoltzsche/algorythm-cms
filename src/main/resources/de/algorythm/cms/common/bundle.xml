@@ -7,7 +7,7 @@
 	<schema src="/types/de.algorythm.cms.common/CMS.xsd" />
 	<page content="/contents/default-welcome-page.xml" />
 	<output id="html">
-		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>-->
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageTransformer" phase="TRANSFORM">
 			<param id="theme" value="/templates/de.algorythm.cms.common/html/Theme.xsl" />

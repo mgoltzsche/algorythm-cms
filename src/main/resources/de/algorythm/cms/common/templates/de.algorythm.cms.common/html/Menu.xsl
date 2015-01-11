@@ -6,9 +6,9 @@
 	exclude-result-prefixes="c p">
 	<xsl:param name="relativeBaseUrl" />
 	<xsl:param name="page.path" />
+	<xsl:param name="page.locale" />
 
-	<xsl:variable name="c:pages" select="document('/pages.xml')" />
-	
+	<xsl:variable name="c:pages" select="document(concat('/', $page.locale, '/pages.xml'))" />
 	<!-- <xsl:key name="pageIndex" match="p:page" use="concat(@path, '/')"/>-->
 	
 	<xsl:template name="c:menu-html">
@@ -20,7 +20,7 @@
 			<xsl:for-each select="$root/*">
 				<xsl:if test="boolean(@nav-contained) = true()">
 					<xsl:variable name="active" select="@path = $page.path or starts-with($page.path, concat(@path, '/'))" />
-					<li class="{if ($active) then 'pure-menu-selected' else ''}" role="menuitem">
+					<li class="{if ($active) then 'selected' else ''}" role="menuitem">
 						<xsl:call-template name="c:link" />
 						<xsl:if test="* and ($maxDepth lt 1 or $depth lt $maxDepth)">
 							<xsl:call-template name="c:menu-html">
@@ -46,7 +46,7 @@
 	<xsl:template name="c:link">
 		<xsl:param name="page" select="." />
 		<a href="{$relativeBaseURL}{$page/@path}/index.html">
-			<xsl:value-of select="$page/@nav-title" />
+			<xsl:value-of select="$page/@short-title" />
 		</a>
 	</xsl:template>
 	

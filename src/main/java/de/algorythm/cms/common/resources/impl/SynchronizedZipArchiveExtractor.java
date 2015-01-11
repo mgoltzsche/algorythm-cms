@@ -46,7 +46,8 @@ public class SynchronizedZipArchiveExtractor implements IArchiveExtractor {
 			ZipEntry entry = zipStream.getNextEntry();
 			
 			while (entry != null) {
-				//if (!entry.getName().isEmpty()) {
+				System.out.println("## " + entry.getName());
+				if (!entry.getName().isEmpty()) {
 				final Path dest = destinationDirectory.resolve(entry.getName());
 				
 				if (entry.isDirectory()) {
@@ -55,11 +56,9 @@ public class SynchronizedZipArchiveExtractor implements IArchiveExtractor {
 					Files.createDirectories(dest.getParent());
 					Files.copy(zipStream, dest);
 				}
-				//}
+				}
 				entry = zipStream.getNextEntry();
 			}
-		} catch(Exception e) {
-			e.printStackTrace();
 		}
 	}
 }

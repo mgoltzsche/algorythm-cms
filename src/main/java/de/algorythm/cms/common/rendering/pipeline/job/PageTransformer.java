@@ -139,18 +139,16 @@ public class PageTransformer implements IRenderingJob {
 		
 		transformerHandler.setSystemId("file:///pages/" + path);
 		
-		//transformPage(pageCfg.getContent(), transformerHandler);
+		transformPage(pageCfg.getContent(), transformerHandler);
 		
-		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+		/*final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
 		final org.w3c.dom.Element element = doc.createElementNS("http://cms.algorythm.de/common/Page", "page");
 		element.setAttribute("content", pageCfg.getContent().toString());
 		final StringWriter writer = new StringWriter();
 		final Source source = ctx.createXmlSource(pageCfg.getContent());
 		
 		transformer.transform(new DOMSource(element), new StreamResult(writer));
-		//System.out.println(writer.getBuffer());
-		
-		//marshaller.marshal(pageFeed, transformerHandler);
+		System.out.println(writer.getBuffer());*/
 		
 		//errorListener.evaluateErrors();
 	}
@@ -162,7 +160,7 @@ public class PageTransformer implements IRenderingJob {
 		final String prefix = "p";
 		final AttributesImpl atts = new AttributesImpl();
 		
-		atts.addAttribute(null, "content", "content", "anyUri", uri.toString());
+		atts.addAttribute(StringUtils.EMPTY, "content", "content", "anyUri", uri.toString());
 		
 		transformerHandler.setDocumentLocator(SimpleLocator.INSTANCE);
 		transformerHandler.startDocument();

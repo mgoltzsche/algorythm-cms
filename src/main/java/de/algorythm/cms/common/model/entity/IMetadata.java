@@ -6,5 +6,6 @@ public interface IMetadata {
 
 	String getTitle();
 	String getShortTitle();
-	Date getLastModified();
+	Date getCreationTime();
+	Date getLastModifiedTime();
 }

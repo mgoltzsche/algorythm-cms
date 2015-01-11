@@ -3,7 +3,7 @@
 		title="My example site"
 		default-locale="en-GB"
 		context-path="/site1">
-	<locale locale="de-DE" />
+	<!-- <locale locale="de-DE" />-->
 	<param id="testparam" value="overwritten" />
 	<dependency name="common.cms.algorythm.de" />
 	<page content="/contents/welcome.xml">
@@ -11,6 +11,6 @@
 			<page name="info" content="/contents/info.xml" />
 		</page>
 		<page name="about" content="/contents/about.xml" />
-		<page name="odt" content="/contents/odtinclude.xml" />
+		<!-- <page name="odt" content="/contents/odtinclude.xml" />-->
 	</page>
 </bundle>

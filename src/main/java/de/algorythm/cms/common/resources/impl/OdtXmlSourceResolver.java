@@ -20,7 +20,7 @@ public class OdtXmlSourceResolver extends AbstractXmlSourceResolver {
 	}
 	
 	@Override
-	public Source createXmlSourceInternal(URI uri, IBundleRenderingContext ctx)
+	protected Source createXmlSourceInternal(URI uri, IBundleRenderingContext ctx)
 			throws IOException, ResourceNotFoundException {
 		final Path extractedOdtDirectory = ctx.unzip(uri);
 		final Path contentXmlFile = extractedOdtDirectory.resolve("content.xml");

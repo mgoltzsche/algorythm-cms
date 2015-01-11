@@ -3,6 +3,7 @@ package de.algorythm.cms.common.model.entity.impl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,16 +16,20 @@ public class Metadata implements IMetadata {
 
 	@XmlAttribute(required = true)
 	private String title;
-	@XmlAttribute
+	@XmlAttribute(name = "short-title")
 	private String shortTitle;
-	@XmlAttribute
-	private Date lastModified;
+	@XmlAttribute(name = "created")
+	private Date creationTime;
+	@XmlAttribute(name = "modified")
+	private Date lastModifiedTime;
 
 	public Metadata() {}
 
 	public Metadata(Path file) throws IOException {
 		title = file.getFileName().toString();
-		lastModified = new Date(Files.getLastModifiedTime(file).toMillis());
+		BasicFileAttributes attr = Files.readAttributes(file, BasicFileAttributes.class);
+		creationTime = new Date(attr.creationTime().toMillis());
+		lastModifiedTime = new Date(attr.creationTime().toMillis());
 	}
 
 	@Override
@@ -46,11 +51,20 @@ public class Metadata implements IMetadata {
 	}
 
 	@Override
-	public Date getLastModified() {
-		return lastModified;
+	public Date getCreationTime() {
+		return creationTime;
 	}
 
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
+	public void setCreationTime(Date creationTime) {
+		this.creationTime = creationTime;
+	}
+
+	@Override
+	public Date getLastModifiedTime() {
+		return lastModifiedTime;
+	}
+
+	public void setLastModifiedTime(Date lastModifiedTime) {
+		this.lastModifiedTime = lastModifiedTime;
 	}
 }

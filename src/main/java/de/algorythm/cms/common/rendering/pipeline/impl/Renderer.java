@@ -33,6 +33,7 @@ import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
+import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 import de.algorythm.cms.common.scheduling.IFuture;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.Future;
@@ -44,20 +45,22 @@ public class Renderer implements IRenderer {
 	private final Injector injector;
 	private final IXmlSourceResolver xmlSourceResolver;
 	private final JAXBContext jaxbContext;
+	private final IMetadataExtractor metadataExtractor;
 
 	@Inject
-	public Renderer(final IProcessScheduler scheduler, final Injector injector, final IXmlSourceResolver xmlSourceResolver, final JAXBContext jaxbContext) {
+	public Renderer(final IProcessScheduler scheduler, final Injector injector, final IXmlSourceResolver xmlSourceResolver, final JAXBContext jaxbContext, final IMetadataExtractor metadataExtractor) {
 		this.scheduler = scheduler;
 		this.injector = injector;
 		this.xmlSourceResolver = xmlSourceResolver;
 		this.jaxbContext = jaxbContext;
+		this.metadataExtractor = metadataExtractor;
 	}
 
 	@Override
 	public IFuture<Void> render(final IBundle bundle, final Path tmpDirectory, final Path outputDirectory) {
 		final TimeMeter meter = TimeMeter.meter(bundle.getName() + " process initialization");
 		final URI resourceOutputPath = URI.create("/r/" + new Date().getTime() + '/');
-		final IBundleRenderingContext ctx = new RenderingContext(bundle, jaxbContext, xmlSourceResolver, tmpDirectory, outputDirectory, resourceOutputPath);
+		final IBundleRenderingContext ctx = new RenderingContext(bundle, metadataExtractor, jaxbContext, xmlSourceResolver, tmpDirectory, outputDirectory, resourceOutputPath);
 		final Map<RenderingPhase, Set<IRenderingJob>> phaseMap = new HashMap<RenderingPhase, Set<IRenderingJob>>();
 		final LinkedList<Collection<IRenderingJob>> processJobs = new LinkedList<Collection<IRenderingJob>>();
 		final Future<Void> future = new Future<Void>();
