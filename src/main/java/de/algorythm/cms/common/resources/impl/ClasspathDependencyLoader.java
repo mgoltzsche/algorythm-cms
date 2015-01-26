@@ -1,6 +1,8 @@
 package de.algorythm.cms.common.resources.impl;
 
 import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
@@ -22,12 +24,15 @@ public class ClasspathDependencyLoader implements IDependencyLoader {
 	
 	@Override
 	public IBundle loadDependency(final String bundleName) {
-		final URL bundleFileUrl = getClass().getResource(name2path(bundleName));
+		final String path = name2path(bundleName);
+		final URL bundleFileUrl = getClass().getResource(path);
 		
 		if (bundleFileUrl == null)
-			throw new IllegalArgumentException("Cannot find bundle " + bundleName);
+			throw new IllegalArgumentException("Cannot find bundle '" + bundleName + '\'');
 		
 		try {
+			//final FileSystem fs = FileSystems.newFileSystem(Paths.get("zip:/home/max/development/java/algorythm-cms/target/algorythm-cms-jar-with-dependencies.jar"), null);
+			//return loader.getBundle(fs.getPath(path)); // same like next line
 			return loader.getBundle(Paths.get(bundleFileUrl.toURI()));
 		} catch(Exception e) {
 			throw new IllegalStateException("Cannot load bundle '" + bundleName + '\'', e);

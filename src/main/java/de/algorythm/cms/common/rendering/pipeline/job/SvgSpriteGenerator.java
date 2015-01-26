@@ -18,7 +18,7 @@ import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 
 public class SvgSpriteGenerator implements IRenderingJob {
 
-	static private final URI XSL_URI = URI.create("/templates/de.algorythm.cms.common/SvgSprites.xsl");
+	static private final URI XSL_URI = URI.create("/transformations/de.algorythm.cms.common/SvgSprites.xsl");
 	static private final URI FLAG_DIRECTORY = URI.create("/images/flags/");
 
 	@Inject

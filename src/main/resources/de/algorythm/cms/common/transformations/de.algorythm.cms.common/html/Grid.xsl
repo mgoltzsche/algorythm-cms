@@ -5,12 +5,13 @@
 	exclude-result-prefixes="c">
 
 	<xsl:template match="c:grid">
-		<div class="pure-g">
-			<xsl:variable name="columns" select="if (@columns) then number(@columns) else 1" />
-			<xsl:variable name="columnsSm" select="if (@columns-sm) then number(@columns-sm) else $columns" />
-			<xsl:variable name="columnsMd" select="if (@columns-md) then number(@columns-md) else $columnsSm" />
-			<xsl:variable name="columnsLg" select="if (@columns-lg) then number(@columns-lg) else $columnsMd" />
-			<xsl:variable name="columnsXl" select="if (@columns-xl) then number(@columns-xl) else $columnsLg" />
+		<xsl:variable name="spacingClass" select="if (not(@spacing) or @spacing = true()) then 'spacing' else ''" />
+		<xsl:variable name="columns" select="if (@columns) then number(@columns) else 1" />
+		<xsl:variable name="columnsSm" select="if (@columns-sm) then number(@columns-sm) else $columns" />
+		<xsl:variable name="columnsMd" select="if (@columns-md) then number(@columns-md) else $columnsSm" />
+		<xsl:variable name="columnsLg" select="if (@columns-lg) then number(@columns-lg) else $columnsMd" />
+		<xsl:variable name="columnsXl" select="if (@columns-xl) then number(@columns-xl) else $columnsLg" />
+		<div class="pure-g {$spacingClass}">
 			<xsl:apply-templates mode="grid">
 				<xsl:with-param name="columns" select="$columns" />
 				<xsl:with-param name="columnsSm" select="$columnsSm" />
@@ -78,7 +79,16 @@
 			</xsl:if>
 		</xsl:variable>
 		<div class="{normalize-space($styleClasses)}">
-			<xsl:apply-templates />
+			<xsl:choose>
+				<xsl:when test="not(../@spacing) or @spacing = true()">
+					<div>
+						<xsl:apply-templates />
+					</div>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:apply-templates />
+				</xsl:otherwise>
+			</xsl:choose>
 		</div>
 	</xsl:template>
 	

@@ -87,6 +87,27 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>de.algorythm.cms.common.CmsCommonMain</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<testResources>
 			<testResource>
@@ -171,7 +192,7 @@
 			<version>2.4.8</version>
 		</dependency>
 		<!-- wro4j -->
-		<dependency>
+		<!--<dependency>
 			<groupId>ro.isdc.wro4j</groupId>
 			<artifactId>wro4j-core</artifactId>
 			<version>1.7.7</version>
@@ -180,7 +201,7 @@
 			<groupId>ro.isdc.wro4j</groupId>
 			<artifactId>wro4j-extensions</artifactId>
 			<version>1.7.7</version>
-		</dependency>
+		</dependency>-->
 		<!-- sfntly -->
 		<dependency>
 			<groupId>fr.opensagres.xdocreport.sfntly</groupId>

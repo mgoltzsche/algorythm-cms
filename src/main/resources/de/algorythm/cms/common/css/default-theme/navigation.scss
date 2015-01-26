@@ -1,44 +1,117 @@
 .menu {
 	border: 1px solid $lightColor;
-
-	a {
-		text-decoration: none;
+	margin: 0 0 $spacing 0;
+	
+	h2 {
+		font-size: 1.2em;
+		line-height: 1.2em;
+		margin: 0;
+		padding: $spacing/2 $spacing;
 	}
-
+	
+	a {
+		display: block;
+		text-decoration: none;
+		padding: $spacing/2 $spacing;
+	}
+	
 	ul, li {
 		list-style-type: none;
 		margin: 0;
 		padding: 0;
-		display: block;
+	}
+	
+	ul ul {
+		margin: 0 0 0 $spacing;
 	}
 
 	li {
 		a {
 			display: block;
 			color: $primaryActionColor;
-			text-decoration: none;
-			padding: 0.45em 1em;
-			
-			&:hover {
-				background: $selectionColor;
-			}
+			padding: $spacing/2 $spacing;
 		}
 		
-		&.selected a {
-			color: $color;
+		&.folder a {
+			padding: $spacing/2 $spacing*3.4 $spacing/2 $spacing;
+		}
+		
+		&.selected > a, a:hover {
 			background: $selectionColor;
 		}
 	}
-	
-	&.horizontal {
-		ul, li, a {
-			display: inline-block;
+}
+
+@include respond-to-md {
+	.menu {
+		.btn-nav {
+			display: none;
 		}
-	}
-	
-	&.vertical {
-		li {
+		
+		&:before, &:after {
+			display: none;
+		}
+		
+		&.horizontal {
+			ul {
+				display: inline-block;
+
+				ul.collapsed {
+					display: none;
+				}				
+			}
+			li {
+				float: left;
+			}
+			ul ul {
+				margin: 0;
+				padding: $spacing 0;
+				position: absolute;
+				@include box-shadow(0 5px 10px rgba(0,0,0,.2));
+				background: $backgroundColor;
+				border: none;
+			}
+			ul ul ul {
+				padding: 0;
+				position: static;
+				@include box-shadow(none);
+				border: none;
+				margin: 0 0 0 $spacing;
+			}
+			ul ul, ul ul li {
+				display: block;
+				float: none;
+			}
+		}
+		
+		&.vertical ul {
 			display: block;
 		}
 	}
+}
+
+.btn-nav {
+	float: right;
+	
+	&:before {
+		display: inline-block;
+		content: '\2261';
+		font-size: 1.2em;
+		line-height: 1.2em;
+	}
+}
+
+.btn-expand {
+	float: right;
+	
+	&:before {
+		display: inline-block;
+		content: '\21E9';
+		font-size: 1.2em;
+		line-height: 1.2em;
+	}
+}
+
+.collapsed {
+	display: none;
 }

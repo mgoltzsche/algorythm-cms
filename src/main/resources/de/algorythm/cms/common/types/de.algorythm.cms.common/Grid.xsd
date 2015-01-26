@@ -26,6 +26,7 @@
 			<attribute name="columns-md" type="nonNegativeInteger" />
 			<attribute name="columns-lg" type="nonNegativeInteger" />
 			<attribute name="columns-xl" type="nonNegativeInteger" />
+			<attribute name="spacing" type="boolean" default="true" />
 		</complexType>
 	</element>
 </schema>

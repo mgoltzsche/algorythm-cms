@@ -15,18 +15,27 @@
 		<xsl:param name="root" select="$c:pages/*" />
 		<xsl:param name="depth" select="1" />
 		<xsl:param name="maxDepth" select="0" />
+		<xsl:param name="id" />
 		
 		<ul role="menu">
+			<xsl:if test="$id">
+				<xsl:attribute name="id" select="$id" />
+			</xsl:if>
 			<xsl:for-each select="$root/*">
 				<xsl:if test="boolean(@nav-contained) = true()">
-					<xsl:variable name="active" select="@path = $page.path or starts-with($page.path, concat(@path, '/'))" />
-					<li class="{if ($active) then 'selected' else ''}" role="menuitem">
+					<xsl:variable name="hasChildren" select="*[boolean(@nav-contained) = true()] and ($maxDepth lt 1 or $depth lt $maxDepth)" />
+					<xsl:variable name="expandId" select="generate-id()" />
+					<li class="{if (@path = $page.path or starts-with($page.path, concat(@path, '/'))) then 'selected' else ''} {if ($hasChildren) then 'folder' else ''}" role="menuitem">
+						<xsl:if test="$hasChildren">
+							<span cms-collapse="{$expandId}" class="btn btn-expand"></span>
+						</xsl:if>
 						<xsl:call-template name="c:link" />
-						<xsl:if test="* and ($maxDepth lt 1 or $depth lt $maxDepth)">
+						<xsl:if test="$hasChildren">
 							<xsl:call-template name="c:menu-html">
 								<xsl:with-param name="root" select="." />
 								<xsl:with-param name="depth" select="$depth + 1" />
 								<xsl:with-param name="maxDepth" select="$maxDepth" />
+								<xsl:with-param name="id" select="$expandId" />
 							</xsl:call-template>
 						</xsl:if>
 					</li>

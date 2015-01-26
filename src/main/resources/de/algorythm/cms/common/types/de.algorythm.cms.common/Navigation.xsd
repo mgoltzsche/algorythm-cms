@@ -9,6 +9,7 @@
 		<complexType>
 			<attribute name="parent" type="anyURI" default="." />
 			<attribute name="depth" type="nonNegativeInteger" default="1" />
+			<attribute name="title" type="string" />
 		</complexType>
 	</element>
 </schema>

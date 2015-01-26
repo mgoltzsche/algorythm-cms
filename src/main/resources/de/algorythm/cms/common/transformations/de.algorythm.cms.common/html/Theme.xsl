@@ -5,6 +5,7 @@
 	xmlns:p="http://cms.algorythm.de/common/Page"
 	xmlns:l="http://cms.algorythm.de/common/Locales"
 	exclude-result-prefixes="c p l">
+	<xsl:output method="html"/>
 	<xsl:param name="relativeBaseURL" />
 	<xsl:param name="resourceBaseURL" />
 	<xsl:param name="site.internationalized" />
@@ -22,7 +23,7 @@
 				</xsl:call-template>
 			</xsl:variable>
 			<xsl:apply-templates select="$includedContent">
-				<xsl:with-param name="showTitle" select="false()" />
+				<!--<xsl:with-param name="showTitle" select="true()" />-->
 			</xsl:apply-templates>
 		</xsl:variable>
 		<xsl:result-document href="content.html">
@@ -42,7 +43,7 @@
 				<script src="{$resourceBaseURL}/main.js"></script>
 			</head>
 			<body>
-				<div id="container">
+				<header id="header" class="collapsed">
 					<xsl:if test="$site.internationalized">
 						<ul class="locale-switch">
 							<xsl:for-each select="document(concat('/', $page.locale, '/supported-locales.xml'))/l:locales/l:locale">
@@ -59,33 +60,25 @@
 							</xsl:for-each>
 						</ul>
 					</xsl:if>
-					<img src="{$resourceBaseURL}/sprites.svg#logo" />
-					<img src="{$resourceBaseURL}/sprites.svg#example" />
-					<svg class="icon" xmlns:xlink="http://www.w3.org/1999/xlink">
-						<use xlink:href="{$resourceBaseURL}/sprites.svg#example" />
-					</svg>
-					<svg class="icon" xmlns:xlink="http://www.w3.org/1999/xlink">
-						<use xlink:href="{$resourceBaseURL}/sprites.svg#logo" />
-					</svg>
 					<nav id="nav" class="menu horizontal" cms-menu="selected" role="menubar">
+						<span cms-collapse="header" class="btn btn-nav"></span>
 						<a href="{$relativeBaseURL}/index.html" title="{$site.name}" class="logo">
 							<svg xmlns:xlink="http://www.w3.org/1999/xlink">
 								<use xlink:href="{$resourceBaseURL}/sprites.svg#logo" />
 							</svg>
 						</a>
 						<xsl:call-template name="c:menu-html">
-							<xsl:with-param name="maxDepth" select="1" />
+							<xsl:with-param name="maxDepth" select="0" />
+							<xsl:with-param name="id" select="'main-nav'" />
 						</xsl:call-template>
 					</nav>
-					<h1 ng-bind="pageTitle">
-						<xsl:value-of select="$page.title" />
-					</h1>
-					<div>
-						<main ng-view="">
-							<xsl:copy-of select="$content" />
-						</main>
-					</div>
-				</div>
+				</header>
+				<main ng-view="">
+					<xsl:copy-of select="$content" />
+				</main>
+				<footer>
+					Generated with algorythm-cms
+				</footer>
 			</body>
 		</html>
 	</xsl:template>

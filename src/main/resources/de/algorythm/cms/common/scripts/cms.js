@@ -137,5 +137,69 @@ directive('cmsMenu', ['$location', function($location) {
 			});
 		}
 	};
-}]);
+}]).
+directive('cmsCollapse', ['$log', '$document', function($log, $document) {
+	return {
+		restrict: 'A',
+		link: function(scope, el, attrs) {
+			var id = attrs.cmsCollapse,
+				collapsibleElement = document.getElementById(id),
+				flagVar = 'collapsed' + id;
+			
+			if (!collapsibleElement) {
+				$log.error("Cannot find collapsible element '" + id + "'");
+				return;
+			}
+			
+			scope[flagVar] = true;
+			var collapsible = angular.element(collapsibleElement);
+			var collapse = function() {
+				el.removeClass("active");
+				collapsible.addClass("collapsed");
+				$document.off('click', docClickListener);
+				scope[flagVar] = true;
+			},
+			contained = function(elem, container) {
+				while (elem) {
+					if (elem == container)
+						return true;
+					
+					elem = elem.parentNode;
+				}
+				
+				return false;
+			},
+			docClickListener = function(event) {
+				var target = event.target;
+				
+				if (target != el[0] && (!target.getAttribute('cms-collapse') || !contained(target, collapsibleElement)))
+					collapse();
+			};
+			
+			collapsible.addClass("collapsed");
+			el.on('click', function() {
+				if (scope[flagVar]) {
+					el.addClass("active");
+					collapsible.removeClass("collapsed");
+					$document.on('click', docClickListener);
+					scope[flagVar] = false;
+				} else {
+					collapse();
+				}
+			});
+		}
+	};
+}]).
+directive('cmsBotSafe', function() {
+	return {
+		restrict: 'A',
+		link: function(scope, el, attrs) {
+			var content = el.text().trim();
+			content = content.replace(/x([0-9A-Fa-f]{2})/g, function(a, b) {
+        		return String.fromCharCode(parseInt(b, 16));
+    		});
+    		el.text(content);
+		}
+	};
+});
 })(window, angular);

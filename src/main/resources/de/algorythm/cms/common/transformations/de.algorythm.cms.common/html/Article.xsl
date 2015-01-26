@@ -5,13 +5,7 @@
 	exclude-result-prefixes="c">
 	
 	<xsl:template match="c:article">
-		<xsl:param name="showTitle" select="true()"/>
 		<article>
-			<xsl:if test="@title and $showTitle">
-				<h2>
-					<xsl:value-of select="@title" />
-				</h2>
-			</xsl:if>
 			<xsl:apply-templates />
 		</article>
 	</xsl:template>

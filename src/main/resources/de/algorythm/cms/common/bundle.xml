@@ -9,15 +9,18 @@
 	<output id="html">
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.DirectoryExporter" phase="GENERATE">
+			<param id="directories" value="/files" />
+		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageTransformer" phase="TRANSFORM">
-			<param id="theme" value="/templates/de.algorythm.cms.common/html/Theme.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/html/Article.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/html/Markup.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/html/Menu.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/html/SubNavigation.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/html/Breadcrumbs.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/html/Grid.xsl" />
-			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
+			<param id="theme" value="/transformations/de.algorythm.cms.common/html/Theme.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Article.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Markup.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Menu.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/SubNavigation.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Breadcrumbs.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Grid.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/Include.xsl" />
 		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM">
 			<param id="compress" value="true" />

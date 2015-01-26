@@ -1,0 +1,8 @@
+/* Grid with margin */
+.pure-g.spacing {
+	margin: 0 -$spacing / 2;
+	
+	[class *= "pure-u"] > div {
+		margin: 0 $spacing/2 0 $spacing/2;
+	}
+}
