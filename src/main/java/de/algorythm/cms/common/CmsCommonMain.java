@@ -57,20 +57,7 @@ public class CmsCommonMain {
 	
 	public void generate(final Path bundleXml, final Path outputDirectory) throws Throwable {
 		final IBundle bundle = facade.loadBundle(bundleXml);
-		/*final String tmpDirName = "algorythm-cms-" + new Date().getTime();
-		final File tmpDirectory = new File(System.getProperty("java.io.tmpdir", null), tmpDirName);
 		
-		if (!tmpDirectory.mkdir())
-			throw new IOException("Cannot create temp directory " + tmpDirectory);
-		
-		if (outputDirectory.exists())
-			FileUtils.deleteDirectory(outputDirectory);
-		
-		if (!outputDirectory.mkdirs())
-			throw new IOException("Cannot create output directory " + outputDirectory);*/
-		
-		//facade.generatePagesXml(bundle, tmpDirectory);
-		//facade.generateSite(bundle, tmpDirectory, outputDirectory);
 		facade.render(bundle, outputDirectory).sync();
 	}
 	

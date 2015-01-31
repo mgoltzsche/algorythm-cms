@@ -1,8 +1,11 @@
 package de.algorythm.cms.common.resources.impl;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.inject.Inject;
@@ -16,14 +19,16 @@ import de.algorythm.cms.common.resources.IDependencyLoader;
 public class ClasspathDependencyLoader implements IDependencyLoader {
 
 	private final IBundleLoader loader;
+	private final ZipArchiveUtil zipUtil;
 	
 	@Inject
-	public ClasspathDependencyLoader(final IBundleLoader loader) {
+	public ClasspathDependencyLoader(IBundleLoader loader, ZipArchiveUtil zipUtil) {
 		this.loader = loader;
+		this.zipUtil = zipUtil;
 	}
 	
 	@Override
-	public IBundle loadDependency(final String bundleName) {
+	public IBundle loadDependency(final String bundleName, final Path tmpDirectory) {
 		final String path = name2path(bundleName);
 		final URL bundleFileUrl = getClass().getResource(path);
 		
@@ -31,9 +36,13 @@ public class ClasspathDependencyLoader implements IDependencyLoader {
 			throw new IllegalArgumentException("Cannot find bundle '" + bundleName + '\'');
 		
 		try {
+			final Path bundleFilePath = bundleFileUrl.getProtocol().equals("jar")
+					? extractedPath(bundleFileUrl.getPath().substring(5), tmpDirectory)
+					: Paths.get(bundleFileUrl.toURI());
+			
 			//final FileSystem fs = FileSystems.newFileSystem(Paths.get("zip:/home/max/development/java/algorythm-cms/target/algorythm-cms-jar-with-dependencies.jar"), null);
 			//return loader.getBundle(fs.getPath(path)); // same like next line
-			return loader.getBundle(Paths.get(bundleFileUrl.toURI()));
+			return loader.getBundle(bundleFilePath);
 		} catch(Exception e) {
 			throw new IllegalStateException("Cannot load bundle '" + bundleName + '\'', e);
 		}
@@ -50,5 +59,18 @@ public class ClasspathDependencyLoader implements IDependencyLoader {
 			depPath.append('/').append(depNameSegments[i]);
 		
 		return depPath.append("/bundle.xml").toString();
+	}
+	
+	private Path extractedPath(final String filePath, final Path tmpDirectory) throws IOException {
+		final Path destinationDirectory = tmpDirectory.resolve(String.valueOf(System.currentTimeMillis()));
+		final int fsSeparatorPos = filePath.indexOf('!');
+		final String zipPath = filePath.substring(0, fsSeparatorPos);
+		final String zipRelativePath = filePath.substring(fsSeparatorPos + 2);
+		final Path zipFile = Paths.get(URI.create("file:" + zipPath));
+		final Path resolvedFile = destinationDirectory.resolve(zipRelativePath);
+		
+		zipUtil.unzip(zipFile, destinationDirectory);
+		
+		return resolvedFile;
 	}
 }

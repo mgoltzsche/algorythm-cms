@@ -32,7 +32,7 @@ public class BundleExpander implements IBundleExpander {
 	}
 	
 	@Override
-	public IBundle expandBundle(final IBundle bundle) {
+	public IBundle expandBundle(final IBundle bundle, final Path expandDirectory) {
 		final Set<IBundle> flattened = new LinkedHashSet<IBundle>(); // To perform breadth-first search
 		final Set<Path> resolved = new LinkedHashSet<Path>();
 		final IBundle expandBundle = bundle.copy();
@@ -40,7 +40,7 @@ public class BundleExpander implements IBundleExpander {
 		resolved.add(expandBundle.getLocation());
 		
 		for (IDependency bundleRef : bundle.getDependencies())
-			resolveDependency(expandBundle, bundleRef, flattened, resolved);
+			resolveDependency(expandBundle, bundleRef, flattened, resolved, expandDirectory);
 		
 		while (!flattened.isEmpty()) {
 			final Iterator<IBundle> iter = flattened.iterator();
@@ -53,7 +53,7 @@ public class BundleExpander implements IBundleExpander {
 			mergeBundle(nextBundle, expandBundle);
 			
 			for (IDependency bundleRef : nextBundle.getDependencies())
-				resolveDependency(nextBundle, bundleRef, flattened, resolved);
+				resolveDependency(nextBundle, bundleRef, flattened, resolved, expandDirectory);
 		}
 		
 		expandBundle.setRootDirectories(Collections.unmodifiableList(new LinkedList<Path>(resolved)));
@@ -63,13 +63,13 @@ public class BundleExpander implements IBundleExpander {
 	
 	private void resolveDependency(final IBundle bundle,
 			final IDependency bundleRef, final Set<IBundle> flattened,
-			final Set<Path> resolved) {
+			final Set<Path> resolved, final Path expandDirectory) {
 		final String bName = bundleRef.getName();
 		
 		if (bName == null)
 			throw new IllegalStateException("Incomplete dependency in '" + bundle.getName() + '\'');
 		
-		final IBundle dependency = dependencyLoader.loadDependency(bName);
+		final IBundle dependency = dependencyLoader.loadDependency(bName, expandDirectory);
 		final Path dependencyDir = dependency.getLocation();
 		
 		if (resolved.add(dependencyDir) && !flattened.add(dependency))

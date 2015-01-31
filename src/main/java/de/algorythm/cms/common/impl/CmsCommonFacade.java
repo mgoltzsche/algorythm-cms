@@ -41,7 +41,7 @@ public class CmsCommonFacade implements ICmsCommonFacade {
 	public IBundle loadBundle(final Path bundleXml) {
 		try {
 			return bundleLoader.getBundle(bundleXml);
-		} catch (JAXBException e) {
+		} catch (IOException | JAXBException e) {
 			throw new RuntimeException("Cannot load bundle in '" + bundleXml + "'. " + e.getMessage(), e);
 		}
 	}
@@ -50,7 +50,7 @@ public class CmsCommonFacade implements ICmsCommonFacade {
 	public IFuture<Void> render(final IBundle bundle, final Path outputDirectory) {
 		final FileSystem tmpFs = Jimfs.newFileSystem(Configuration.unix());
 		final Path tempDirectory = tmpFs.getPath("/");
-		final IBundle expandedBundle = expander.expandBundle(bundle);
+		final IBundle expandedBundle = expander.expandBundle(bundle, tempDirectory);
 		
 		try {
 			if (Files.exists(outputDirectory))

@@ -1,5 +1,7 @@
 package de.algorythm.cms.common.resources.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
@@ -34,7 +36,7 @@ public class BundleLoader implements IBundleLoader {
 	}
 	
 	@Override
-	public IBundle getBundle(final Path bundleFile) throws JAXBException {
+	public IBundle getBundle(final Path bundleFile) throws JAXBException, IOException {
 		if (!Files.exists(bundleFile))
 			throw new IllegalArgumentException(bundleFile + " does not exist");
 		
@@ -79,9 +81,10 @@ public class BundleLoader implements IBundleLoader {
 		}
 	}
 
-	private Bundle readBundle(final Path siteCfgFile) throws JAXBException {
+	private Bundle readBundle(final Path siteCfgFile) throws JAXBException, IOException {
 		final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		final Source source = new StreamSource(siteCfgFile.toString());
+		final InputStream cfgStream = Files.newInputStream(siteCfgFile);
+		final Source source = new StreamSource(cfgStream);
 		
 		return unmarshaller.unmarshal(source, Bundle.class).getValue();
 	}

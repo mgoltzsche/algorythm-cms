@@ -16,6 +16,7 @@ public class SynchronizedZipArchiveExtractor implements IArchiveExtractor {
 
 	private final ISourcePathResolver sourceResolver;
 	private final Path tmpDirectory;
+	private final ZipArchiveUtil zipArchiveUtil = new ZipArchiveUtil();
 	
 	public SynchronizedZipArchiveExtractor(final ISourcePathResolver sourceResolver, final Path tmpDirectory) {
 		this.sourceResolver = sourceResolver;
@@ -31,34 +32,9 @@ public class SynchronizedZipArchiveExtractor implements IArchiveExtractor {
 			if (zipFile == null)
 				return null;
 			
-			unzip(zipFile, destinationDirectory);
+			zipArchiveUtil.unzip(zipFile, destinationDirectory);
 		}
 		
 		return destinationDirectory;
-	}
-	
-	private void unzip(final Path zipFile, final Path destinationDirectory)
-			throws IOException {
-		Files.createDirectories(destinationDirectory);
-		
-		try (InputStream stream = Files.newInputStream(zipFile);
-				ZipInputStream zipStream = new ZipInputStream(stream)) {
-			ZipEntry entry = zipStream.getNextEntry();
-			
-			while (entry != null) {
-				System.out.println("## " + entry.getName());
-				if (!entry.getName().isEmpty()) {
-				final Path dest = destinationDirectory.resolve(entry.getName());
-				
-				if (entry.isDirectory()) {
-					Files.createDirectories(dest);
-				} else {
-					Files.createDirectories(dest.getParent());
-					Files.copy(zipStream, dest);
-				}
-				}
-				entry = zipStream.getNextEntry();
-			}
-		}
 	}
 }
