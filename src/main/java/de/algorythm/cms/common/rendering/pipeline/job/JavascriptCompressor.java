@@ -103,7 +103,7 @@ public class JavascriptCompressor implements IRenderingJob {
 				script = writer.toString().replace("\n", "");
 			}
 			
-			scriptBuilder.append(script);
+			scriptBuilder.append(script).append("\n");
 		}
 		
 		final String scripts = scriptBuilder.toString();

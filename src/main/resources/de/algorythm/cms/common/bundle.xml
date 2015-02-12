@@ -27,10 +27,12 @@
 			<param id="sources" value="/css/default-theme/main.scss" />
 		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor" phase="TRANSFORM">
-			<param id="compress" value="true" />
+			<param id="compress" value="false" />
 			<param id="sources" value="/scripts/angular.min.js" />
 			<param id="sources" value="/scripts/angular-route.min.js" />
-			<param id="sources" value="/scripts/cms.js" />
+			<param id="sources" value="/scripts/angular-touch.min.js" />
+			<param id="sources" value="/scripts/algorythm-dialog.js" />
+			<param id="sources" value="/scripts/algorythm-cms.js" />
 		</job>
 		<job type="de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator" phase="TRANSFORM">
 			<param id="svg" value="/images/adobe-example.svg" />

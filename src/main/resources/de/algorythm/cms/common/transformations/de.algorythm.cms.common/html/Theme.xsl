@@ -32,7 +32,7 @@
 			</div>
 		</xsl:result-document>
 		
-		<html ng-app="cms">
+		<html ng-app="algorythm.cms">
 			<head>
 				<title ng-bind="pageTitle + ' - {$site.name}'">
 					<xsl:value-of select="$page.title" />

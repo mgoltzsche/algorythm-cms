@@ -151,52 +151,6 @@ p {
 	}
 }
 
-.img {
-	margin: 0 auto $spacing auto;
-	text-align: center;
-	
-	img {
-		display: inline-block;
-		max-width: 43%;
-		height: auto;
-	}
-	
-	span {
-		display: block;
-		margin: $spacing/2 0 0 0;
-		font-size: 0.81em;
-		line-height: 1.3em;
-	}
-}
-
-@include respond-to-md {
-	.img {
-		max-width: 30%;
-		padding: $spacing/2;
-		border: 1px solid $lightColor;
-		text-align: left;
-		margin: 0 0 $spacing/2 $spacing/2;
-		float: right;
-		clear: both;
-		
-		img {
-			display: block;
-			width: 100%;
-			max-width: 100%;
-		}
-	}
-}
-
-.img-fill {
-	display: block;
-	max-width: 100%;
-	height: auto;
-}
-
-.spacer {
-	margin: $spacing;
-}
-
 caption {
 	font-weight: bold;
 	margin: 0 0 $spacing/2;

@@ -48,16 +48,18 @@ var obj2str = function(o) {
 };
 
 var absSiteRootUrl = absoluteUrl(cms.baseUrl, w.location.href) + '/';
+var images = [];
 
-angular.module('cms', ['ngRoute']).
+angular.module('algorythm.cms', ['ngRoute', 'ngTouch', 'algorythm.dialog']).
 		config(['$routeProvider', function($routeProvider) {
-	var anchorRegex = /#(\/.+?)\/?$/;
-	var pathRegex = /^[\w]+:\/\/[^\/]*(\/.*?\/)([^\/]+)?(#.*)?$/
-	var url = window.location;
-	var match = pathRegex.exec(url);
+	var anchorRegex = /#(\/.+?)\/?$/,
+		pathRegex = /^[\w]+:\/\/[^\/]*(\/.*?\/)([^\/]+)?(#.*)?$/,
+		url = window.location,
+		match = pathRegex.exec(url);
 	 
 	$routeProvider.otherwise({
 		templateUrl: function() {
+			images = [];
 			var match = anchorRegex.exec(w.location);
 			
 			return cms.baseUrl + (match ? match[1] : '') + '/content.html';
@@ -65,13 +67,19 @@ angular.module('cms', ['ngRoute']).
 		controller: ['$scope', '$location', function($scope, $location) {
 			var path = $location.path();
 			
-			$scope.cmsAbsPageBaseUrl = path == '/'
-				? absSiteRootUrl : absoluteUrl(path.substring(1), absSiteRootUrl) + '/';
+			$scope.cms.absPageBaseUrl = path == '/'
+					? absSiteRootUrl
+					: absoluteUrl(path.substring(1), absSiteRootUrl) + '/';
 		}]
 	});
 }]).
 run(['$rootScope', function($rootScope) {
-	$rootScope.cmsAbsPageBaseUrl = absSiteRootUrl;
+	$rootScope.cms = {
+		absPageBaseUrl: absSiteRootUrl,
+		getImages: function() {
+			return images;
+		}
+	};
 }]).
 directive('a', ['$location', function($location) {
 	return {
@@ -80,7 +88,7 @@ directive('a', ['$location', function($location) {
 			var url = attrs.href;
 			
 			if (url) {
-				url = absoluteUrl(url, scope.cmsAbsPageBaseUrl);
+				url = absoluteUrl(url, scope.cms.absPageBaseUrl);
 				
 				if (url.indexOf(absSiteRootUrl) == 0 && url.indexOf('/index.html') == url.length - 11) {
 					// Rewrite internal URL to AJAX call
@@ -128,7 +136,8 @@ directive('cmsMenu', ['$location', function($location) {
 					var path = a.attr('href').substring(1);
 					var li = a.parent();
 					
-					if (path === currentPath || currentPath.indexOf(path + '/') == 0) {
+					if (path === currentPath ||
+							currentPath.indexOf(path + '/') == 0) {
 						li.addClass(clazz);
 					} else {
 						li.removeClass(clazz);
@@ -172,7 +181,8 @@ directive('cmsCollapse', ['$log', '$document', function($log, $document) {
 			docClickListener = function(event) {
 				var target = event.target;
 				
-				if (target != el[0] && (!target.getAttribute('cms-collapse') || !contained(target, collapsibleElement)))
+				if (target != el[0] && (!target.getAttribute('cms-collapse') ||
+						!contained(target, collapsibleElement)))
 					collapse();
 			};
 			
@@ -201,5 +211,61 @@ directive('cmsBotSafe', function() {
     		el.text(content);
 		}
 	};
-});
+}).
+directive('cmsImageDialog', ['createDialog', function(createDialog) {
+	var createIcon = function(iconId) {
+		return '<svg xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="/sprites.svg#' + iconId + '" /></svg>';
+	};
+	
+	return {
+		restrict: 'A',
+		link: function(scope, el, attrs) {
+			var url = attrs.src,
+				txt = attrs.cmsImageDialog,
+				images = scope.cms.getImages(),
+				imageIndex = images.length,
+				imageObj = {url: url, description: txt};
+			
+			images.push(imageObj);
+			
+			if (scope.currentIndex == undefined) {
+				scope.currentIndex = 0;
+			}
+			
+			el.css('cursor', 'pointer');
+			el.on('click', function() {
+				createDialog({
+					cssClass: 'image-view',
+					content: '<img ng-src="{{imageSrc}}" alt="" ng-swipe-left="previousImage()" ng-swipe-right="nextImage()" />',
+					footer: '<span ng-click="previousImage()" ng-show="hasPreviousImage" class="previous"> </span><span ng-click="nextImage()" ng-show="hasNextImage" class="next"> </span><div class="image-description">{{imageDescription}}</div>',
+					controller: function($scope, $timeout) {
+						var applyImage = function(img) {
+							$scope.imageSrc = img.url;
+							$scope.imageDescription = img.description;
+							$scope.hasPreviousImage = $scope.currentIndex > 0;
+							$scope.hasNextImage = $scope.currentIndex < images.length - 1;
+						};
+						
+						$scope.currentIndex = imageIndex;
+						
+						applyImage(imageObj);
+						
+						$scope.previousImage = function() {
+							if ($scope.hasPreviousImage) {
+								applyImage(images[--$scope.currentIndex]);
+								$scope.$resizeDialog();
+							}
+						};
+						$scope.nextImage = function() {
+							if ($scope.hasNextImage) {
+								applyImage(images[++$scope.currentIndex]);
+								$scope.$resizeDialog();
+							}
+						};
+					}
+				});
+			});
+		}
+	};
+}]);
 })(window, angular);

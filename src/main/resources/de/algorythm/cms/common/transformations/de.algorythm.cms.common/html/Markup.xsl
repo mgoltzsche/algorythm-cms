@@ -88,9 +88,9 @@
 				<img src="{$relativeBaseURL}{@src}" alt="{@title}" class="img-fill" />
 			</xsl:when>
 			<xsl:otherwise>
-				<div class="img">
+				<div class="img clearfix">
 					<div>
-						<img src="{$relativeBaseURL}{@src}" alt="" />
+						<img src="{$relativeBaseURL}{@src}" alt="" cms-image-dialog="{@title}" />
 						<span>
 							<xsl:value-of select="@title" />
 						</span>
