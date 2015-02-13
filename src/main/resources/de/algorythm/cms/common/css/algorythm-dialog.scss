@@ -2,6 +2,7 @@
 	position: fixed;
 	top: 0;
 	left: 0;
+	z-index: 500;
 }
 
 #dialog-overlay {
@@ -27,12 +28,6 @@
 	@include box-shadow(3px 5px 20px rgba(0,0,0,.7));
 	@include transition(width 0.5s, height 0.5s, top 0.5s, left 0.5s);
 	
-	&.resizing {
-		.dialog-header, .dialog-content, .dialog-footer {
-			display: none;
-		}
-	}
-	
 	.dialog-header:after, .dialog-footer:after {
 		content: ".";
 		display: block;
@@ -57,8 +52,8 @@
 		.dialog-content img {
 			max-width: 100%;
 			max-height: 100%;
-			display: block;
-			margin: 0 auto;
+			//display: block;
+			//margin: 0 auto;
 		}
 		.dialog-footer {
 			text-align: center;

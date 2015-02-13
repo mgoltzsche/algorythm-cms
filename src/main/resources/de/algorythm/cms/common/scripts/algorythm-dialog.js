@@ -1,7 +1,7 @@
 (function(angular) {
 	var self = {};
 
-	angular.module('algorythm.dialog', []).
+	angular.module('algorythm.dialog', ['ngAnimate']).
 	run(['$document', function($document) {
 		self.body = $document.find('body');
 		self.overlay = angular.element('<div id="dialog-overlay" class="hidden"> </div>');
@@ -30,6 +30,7 @@
 						// Template url
 						: '<div class="dialog-content" ng-include="\'' + options.content + '\'"></div>'),
 				dialog = angular.element('<div id="dialog" class="' + options.cssClass + '"> </div>'),
+				dialogContainer = angular.element('<div class="dialog-container"> </div>'),
 				onEscPressed = function(event) {
 					if (event.keyCode === 27) {
 						scope.$closeDialog();
@@ -42,70 +43,56 @@
 					top: -$window.innerHeight
 				};
 			
+			dialogContainer.css('left', '20px');
+			dialogContainer.css('top', '20px');
+			
 			scope.$resizeDialog = function() {
 				// Recalculate dialog size
 				$timeout(function() {
 					var maxDialogWidth = $window.innerWidth - 40,
 						maxDialogHeight = $window.innerHeight - 20,
-						dialogElement = dialog[0];
+						dialogElement = dialog[0],
+						dialogContainerElement = dialogContainer[0];
 					
-					dialog.css('max-width', maxDialogWidth + 'px');
-					dialog.css('left', '-1920px');
-					dialog.css('top', '-1080px');
-					dialog.css('width', 'auto');
-					dialog.css('height', 'auto');
+					dialogContainer.css('visibility', 'hidden');
+					dialogContainer.css('position', 'fixed');
+					dialogContainer.css('max-width', maxDialogWidth + 'px');
 					dialogContent.css('height', 'auto');
-					dialogContent.removeClass('overflow-horizontal');
-				
-					var dialogWidth = dialogElement.offsetWidth,
-						dialogHeight = dialogElement.offsetHeight,
-						headerFooterHeight = dialogHeight - dialogContent[0].offsetHeight,
-						maxContentHeight = maxDialogHeight - headerFooterHeight,
-						newDialogWidth = dialogWidth > maxDialogWidth ? maxDialogWidth : dialogWidth,
-						newDialogHeight = 0;
 					
-					if (dialogHeight > maxDialogHeight) {
-						dialogContent.css('height', maxContentHeight + 'px');
-						dialogContent.addClass('overflow-horizontal');
-						
-						newDialogHeight = maxDialogHeight;
-					} else {
-						dialogContent.css('height', (dialogHeight - headerFooterHeight) + 'px');
-						
-						newDialogHeight = dialogHeight;
-					}
+					var preferredDialogHeight = dialogContainerElement.offsetHeight,
+						newDialogWidth = 0,
+						newDialogHeight = preferredDialogHeight > maxDialogHeight ? maxDialogHeight : preferredDialogHeight,
+						headerFooterHeight = preferredDialogHeight - dialogContent[0].offsetHeight,
+						newContentHeight = newDialogHeight - headerFooterHeight;
 					
-					dialog.css('left', bounds.left + 'px');
-					dialog.css('top', bounds.top + 'px');
-					dialog.css('width', bounds.width + 'px');
-					dialog.css('height', bounds.height + 'px');
+					dialogContent.css('height', newContentHeight + 'px');
+					
+					newDialogWidth = dialogContainerElement.offsetWidth;
+					newDialogHeight = dialogContainerElement.offsetHeight;
+					
+					dialogContainer.css('position', 'static');
+					dialogContainer.css('visibility', 'visible');
+					
+					bounds.left = Math.floor($window.innerWidth/2 - newDialogWidth/2);
+					bounds.top = Math.floor($window.innerHeight/2 - newDialogHeight/2);
 					
 					if (newDialogWidth != bounds.width || newDialogHeight != bounds.height) {
-						//dialog.addClass('resizing');
-						
 						bounds.width = newDialogWidth;
 						bounds.height = newDialogHeight;
-						bounds.left = Math.floor($window.innerWidth/2 - newDialogWidth/2);
-						bounds.top = Math.floor($window.innerHeight/2 - newDialogHeight/2);
 						
-						$timeout(function() {
-							dialog.css('left', bounds.left + 'px');
-							dialog.css('top', bounds.top + 'px');
-							dialog.css('width', bounds.width + 'px');
-							dialog.css('height', bounds.height + 'px');
-							
-							/*$timeout(function() {
-								dialog.removeClass('resizing');
-							}, 500);*/
-						});
+						dialog.css('left', bounds.left + 'px');
+						dialog.css('top', bounds.top + 'px');
+						dialog.css('width', bounds.width + 'px');
+						dialog.css('height', bounds.height + 'px');
 					} else {
-						dialog.css('left', Math.floor($window.innerWidth/2 - newDialogWidth/2) + 'px');
-						dialog.css('top', Math.floor($window.innerHeight/2 - newDialogHeight/2) + 'px');
+						dialog.css('left', bounds.left + 'px');
+						dialog.css('top', bounds.top + 'px');
 					}
 				});
 			};
 			
-			dialog.append(dialogHeader).append(dialogContent).append(dialogFooter);
+			dialogContainer.append(dialogHeader).append(dialogContent).append(dialogFooter);
+			dialog.append(dialogContainer);
 			angular.extend(scope, scopeExt || {});
 			
 			scope.$closeDialog = function () {

@@ -31,6 +31,7 @@
 			<param id="sources" value="/scripts/angular.min.js" />
 			<param id="sources" value="/scripts/angular-route.min.js" />
 			<param id="sources" value="/scripts/angular-touch.min.js" />
+			<param id="sources" value="/scripts/angular-animate.min.js" />
 			<param id="sources" value="/scripts/algorythm-dialog.js" />
 			<param id="sources" value="/scripts/algorythm-cms.js" />
 		</job>

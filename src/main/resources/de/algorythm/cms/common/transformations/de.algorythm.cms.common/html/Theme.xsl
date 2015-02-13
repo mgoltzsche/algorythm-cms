@@ -42,7 +42,7 @@
 				<script type="text/javascript">var cms = {'baseUrl': '<xsl:value-of select="$relativeBaseURL"></xsl:value-of>'};</script>
 				<script src="{$resourceBaseURL}/main.js"></script>
 			</head>
-			<body>
+			<body class="ng-cloak">
 				<header id="header" class="collapsed">
 					<xsl:if test="$site.internationalized">
 						<ul class="locale-switch">
@@ -73,7 +73,7 @@
 						</xsl:call-template>
 					</nav>
 				</header>
-				<main ng-view="">
+				<main ng-view="" class="ng-cloak animate-flythrough">
 					<xsl:copy-of select="$content" />
 				</main>
 				<footer>
