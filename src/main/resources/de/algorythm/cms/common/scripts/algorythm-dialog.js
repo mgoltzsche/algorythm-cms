@@ -8,7 +8,8 @@
 		self.defaults = {
 			cssClass: '',
 			template: null,
-			templateUrl: null
+			templateUrl: null,
+			resizeProportional: false
 		};
 		
 		self.body.append(self.overlay);
@@ -47,31 +48,48 @@
 			dialogContainer.css('top', '20px');
 			
 			scope.$resizeDialog = function() {
+				var lastDialogContentHeight = dialogContent[0].offsetHeight;
+				
 				// Recalculate dialog size
 				$timeout(function() {
 					var maxDialogWidth = $window.innerWidth - 40,
 						maxDialogHeight = $window.innerHeight - 20,
 						dialogElement = dialog[0],
-						dialogContainerElement = dialogContainer[0];
+						dialogContainerElement = dialogContainer[0],
+						dialogContentElement = dialogContent[0];
 					
-					dialogContainer.css('visibility', 'hidden');
-					dialogContainer.css('position', 'fixed');
-					dialogContainer.css('max-width', maxDialogWidth + 'px');
-					dialogContent.css('height', 'auto');
+					dialogContainer
+						.css('position', 'fixed')
+						.css('max-width', maxDialogWidth + 'px');
+					
+					dialogContent.css('width', 'auto').css('height', 'auto');
 					
 					var preferredDialogHeight = dialogContainerElement.offsetHeight,
+						preferredContentHeight = dialogContentElement.offsetHeight,
+						preferredContentWidth = dialogContentElement.offsetWidth,
 						newDialogWidth = 0,
 						newDialogHeight = preferredDialogHeight > maxDialogHeight ? maxDialogHeight : preferredDialogHeight,
-						headerFooterHeight = preferredDialogHeight - dialogContent[0].offsetHeight,
+						headerFooterHeight = preferredDialogHeight - preferredContentHeight,
 						newContentHeight = newDialogHeight - headerFooterHeight;
 					
 					dialogContent.css('height', newContentHeight + 'px');
 					
+					if (options.resizeProportional) { // Fixes dialog scaling when working with images in Chrome
+						var contentScale = newContentHeight / preferredContentHeight,
+							newContentWidth = Math.ceil(preferredContentWidth * contentScale);
+						
+						dialogContent.css('width', newContentWidth + 'px');
+					}
+					
 					newDialogWidth = dialogContainerElement.offsetWidth;
+					
+					dialogContainer.css('width', newDialogWidth + 'px');
+					
 					newDialogHeight = dialogContainerElement.offsetHeight;
 					
+					dialogContent.css('width', 'auto');
+					dialogContainer.css('width', 'auto');
 					dialogContainer.css('position', 'static');
-					dialogContainer.css('visibility', 'visible');
 					
 					bounds.left = Math.floor($window.innerWidth/2 - newDialogWidth/2);
 					bounds.top = Math.floor($window.innerHeight/2 - newDialogHeight/2);
@@ -80,13 +98,15 @@
 						bounds.width = newDialogWidth;
 						bounds.height = newDialogHeight;
 						
-						dialog.css('left', bounds.left + 'px');
-						dialog.css('top', bounds.top + 'px');
-						dialog.css('width', bounds.width + 'px');
-						dialog.css('height', bounds.height + 'px');
+						dialog
+							.css('left', bounds.left + 'px')
+							.css('top', bounds.top + 'px')
+							.css('width', bounds.width + 'px')
+							.css('height', bounds.height + 'px');
 					} else {
-						dialog.css('left', bounds.left + 'px');
-						dialog.css('top', bounds.top + 'px');
+						dialog
+							.css('left', bounds.left + 'px')
+							.css('top', bounds.top + 'px');
 					}
 				});
 			};

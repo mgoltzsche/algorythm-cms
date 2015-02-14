@@ -236,6 +236,7 @@ directive('cmsImageDialog', ['createDialog', function(createDialog) {
 			el.on('click', function() {
 				createDialog({
 					cssClass: 'image-view',
+					resizeProportional: true,
 					content: '<img ng-src="{{imageSrc}}" alt="" ng-swipe-left="previousImage()" ng-swipe-right="nextImage()" />',
 					footer: '<span ng-click="previousImage()" ng-show="hasPreviousImage" class="previous"> </span><span ng-click="nextImage()" ng-show="hasNextImage" class="next"> </span><div class="image-description">{{imageDescription}}</div>',
 					controller: function($scope, $timeout) {
