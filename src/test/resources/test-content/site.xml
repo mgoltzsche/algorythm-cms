@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xml>
-<site xmlns="http://cms.algorythm.de/common/Site"
-	title="Test site"
-	description="Meine Testseite"
-	default-language="de"
-	default-template="http://cms.algorythm.de/common/theme/default-theme"
-	context-path="/site" />

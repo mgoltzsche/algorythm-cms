@@ -1,0 +1,13 @@
+.btn {
+	display: inline-block;
+	cursor: pointer;
+	@include border-radius($borderRadius);
+	margin: $spacing/2;
+	padding: 0 $spacing/2;
+	line-height: 1em;
+	font-size: 1em;
+}
+
+.btn.active, .btn:active {
+	@include box-shadow(0 0 0 1px rgba(0, 0, 0, 0.15) inset, 0 0 6px rgba(0, 0, 0, 0.2) inset);
+}

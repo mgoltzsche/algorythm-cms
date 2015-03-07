@@ -1,0 +1,52 @@
+<bundle xmlns="http://cms.algorythm.de/common/Bundle"
+		name="common.cms.algorythm.de"
+		title="My example site library"
+		default-locale="en-GB"
+		context-path="/site1">
+	<param id="testparam" value="paramvalue" />
+	<schema src="/types/de.algorythm.cms.common/CMS.xsd" />
+	<page src="/contents/default-welcome-page.xml" />
+	<output id="html">
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE"/>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator" phase="GENERATE" />
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.DirectoryExporter" phase="GENERATE">
+			<param id="directories" value="/files" />
+		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.PageTransformer" phase="TRANSFORM">
+			<param id="theme" value="/transformations/de.algorythm.cms.common/html/Theme.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Article.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Markup.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Menu.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/SubNavigation.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Breadcrumbs.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/html/Grid.xsl" />
+			<param id="templates" value="/transformations/de.algorythm.cms.common/Include.xsl" />
+		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler" phase="TRANSFORM">
+			<param id="compress" value="true" />
+			<param id="sources" value="/css/default-theme/main.scss" />
+		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor" phase="TRANSFORM">
+			<param id="compress" value="false" />
+			<param id="sources" value="/scripts/angular.min.js" />
+			<param id="sources" value="/scripts/angular-route.min.js" />
+			<param id="sources" value="/scripts/angular-touch.min.js" />
+			<param id="sources" value="/scripts/angular-animate.min.js" />
+			<param id="sources" value="/scripts/algorythm-dialog.js" />
+			<param id="sources" value="/scripts/algorythm-cms.js" />
+		</job>
+		<job type="de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator" phase="TRANSFORM">
+			<param id="svg" value="/images/adobe-example.svg" />
+			<param id="svg" value="/images/logo.svg" />
+		</job>-->
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.OdtTransformer" phase="TRANSFORM" />-->
+	</output>
+	<output id="pdf">
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PageIndexer" phase="GENERATE">
+			<param id="notFoundContent" value="/contents/not-found.xml" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/Copy.xsl" />
+			<param id="templates" value="/templates/de.algorythm.cms.common/Include.xsl" />
+		</job>-->
+		<!--<job type="de.algorythm.cms.common.rendering.pipeline.job.PagesXmlGenerator" phase="GENERATE" />-->
+	</output>
+</bundle>

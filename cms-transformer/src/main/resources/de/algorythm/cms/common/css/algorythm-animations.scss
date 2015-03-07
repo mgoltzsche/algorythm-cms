@@ -1,0 +1,88 @@
+body {
+	overflow-x: hidden;
+}
+
+@mixin scaleTranslate($x, $y, $ratio) {
+	-webkit-transform: translate($x, $y) scale($ratio);
+	   -moz-transform: translate($x, $y) scale($ratio);
+	    -ms-transform: translate($x, $y) scale($ratio);
+	     -o-transform: translate($x, $y) scale($ratio);
+	        transform: translate($x, $y) scale($ratio);
+}
+
+.animate-flythrough {
+	&.ng-enter {
+		position: relative;
+		z-index: 3;
+		@include transition(opacity 0.55s ease 0.45s, transform 0.55s ease 0.45s, -webkit-transform 0.55s ease 0.45s, -moz-transform 0.55s ease 0.45s, -o-transform 0.55s ease 0.45s);
+		@include scaleTranslate(0, -50%, 0.001);
+		@include opacity(0);
+	}
+	
+	&.ng-enter-active {
+		@include scaleTranslate(0, 0, 1);
+		@include opacity(100);
+	}
+	
+	&.ng-leave {
+		@include transition(opacity 0.55s ease, transform 0.55s ease, -webkit-transform 0.55s ease, -moz-transform 0.55s ease, -o-transform 0.55s ease);
+		position: absolute;
+		@include opacity(100);
+		@include scaleTranslate(0, 0, 1);
+	}
+	
+	&.ng-leave-active {
+		@include opacity(0);
+		-webkit-transform: scale(10) translate(0, 45%);
+		   -moz-transform: scale(10) translate(0, 45%);
+		    -ms-transform: scale(10) translate(0, 45%);
+		     -o-transform: scale(10) translate(0, 45%);
+		        transform: scale(10) translate(0, 45%);
+	}
+}
+
+.animate-slidehorizontal {
+	&.ng-enter, &.ng-leave {	
+		@include transition(transform 0.5s ease, -webkit-transform 0.5s ease, -moz-transform 0.5s ease, -o-transform 0.5s ease);
+	}
+	
+	&.ng-enter {
+		position: relative;
+		@include translate(103%, 0);
+	}
+	
+	&.ng-enter-active {
+		@include translate(0, 0);
+	}
+	
+	&.ng-leave {
+		position: absolute;
+		@include translate(0, 0);
+	}
+	
+	&.ng-leave-active {
+		@include translate(-103%, 0);
+	}
+}
+
+.animate-slidevertical {
+	&.ng-enter, &.ng-leave {	
+		@include transition(margin-top 0.5s ease);
+	}
+	
+	&.ng-enter {
+		margin-top: -100%;
+	}
+	
+	&.ng-enter-active {
+		margin-top: 0;
+	}
+	
+	&.ng-leave {
+		margin-top: 0;
+	}
+	
+	&.ng-leave-active {
+		margin-top: 100%;
+	}
+}

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>cms-server</artifactId>
+	<packaging>war</packaging>
+	<name>algorythm CMS server</name>
+
+	<parent>
+		<artifactId>cms-parent</artifactId>
+		<groupId>de.algorythm.cms</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<build>
+		<finalName>algorythm-cms</finalName>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<webXml>src/main/resources/WEB-INF/web.xml</webXml>
+					<!--<webResources>
+						<resource>
+							<directory>src/main/webapp</directory>
+						</resource>
+					</webResources>-->
+				</configuration>
+			</plugin>
+			<!-- To run with Apache Tomcat use mvn tomcat7:run -->
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<path>/algorythm-cms</path>
+					<warSourceDirectory>${project.build.outputDirectory}/../algorythm-cms</warSourceDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>de.algorythm.cms</groupId>
+			<artifactId>cms-transformer</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<!--<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>-->
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-servlet</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+</project>
