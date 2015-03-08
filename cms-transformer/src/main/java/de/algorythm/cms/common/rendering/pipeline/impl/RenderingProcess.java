@@ -2,6 +2,7 @@ package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -203,8 +204,8 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public Path resolveDestination(URI publicUri) {
-		return context.resolveDestination(publicUri);
+	public OutputStream createOutputStream(URI publicUri) {
+		return context.createOutputStream(publicUri);
 	}
 
 	@Override

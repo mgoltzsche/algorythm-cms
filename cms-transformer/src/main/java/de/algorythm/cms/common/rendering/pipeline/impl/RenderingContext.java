@@ -2,16 +2,13 @@ package de.algorythm.cms.common.rendering.pipeline.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -32,14 +29,13 @@ import org.xml.sax.XMLReader;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.model.entity.IPageConfig;
-import de.algorythm.cms.common.model.entity.ISchemaSource;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.resources.IArchiveExtractor;
-import de.algorythm.cms.common.resources.IDestinationPathResolver;
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
-import de.algorythm.cms.common.resources.impl.OutputResolver;
+import de.algorythm.cms.common.resources.impl.FileOutputStreamFactory;
 import de.algorythm.cms.common.resources.impl.ResourceResolver;
 import de.algorythm.cms.common.resources.impl.SynchronizedZipArchiveExtractor;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
@@ -50,7 +46,7 @@ public class RenderingContext implements IBundleRenderingContext {
 	private final IBundle bundle;
 	private final URI resourcePrefix;
 	private final ISourcePathResolver sourceResolver;
-	private final IDestinationPathResolver targetResolver;
+	private final IOutputStreamFactory outputStreamFactory;
 	private final IXmlSourceResolver xmlSourceResolver;
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 	private final XmlContext xmlContext;
@@ -68,14 +64,9 @@ public class RenderingContext implements IBundleRenderingContext {
 		this.xmlSourceResolver = xmlSourceResolver;
 		this.tempDirectory = tmpDirectory;
 		this.sourceResolver = new ResourceResolver(bundle, tmpDirectory);
-		this.targetResolver = new OutputResolver(outputDirectory, tmpDirectory);
+		this.outputStreamFactory = new FileOutputStreamFactory(outputDirectory, tmpDirectory);
 		this.archiveExtractor = new SynchronizedZipArchiveExtractor(this, tmpDirectory);
-		final Set<ISchemaSource> locations = new LinkedHashSet<ISchemaSource>(bundle.getSchemaLocations());
-		final List<URI> schemaLocations = new LinkedList<URI>();
-		
-		for (ISchemaSource location : locations)
-			schemaLocations.add(location.getUri());
-		
+
 		try {
 			this.xmlContext = new XmlContext(this);
 		} catch (Exception e) {
@@ -173,8 +164,8 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public Path resolveDestination(URI uri) {
-		return targetResolver.resolveDestination(uri);
+	public OutputStream createOutputStream(URI uri) {
+		return outputStreamFactory.createOutputStream(uri);
 	}
 
 	@Override

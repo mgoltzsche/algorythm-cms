@@ -54,7 +54,7 @@ public class Bundle implements IBundle {
 	private final Set<IOutputConfig> output = new LinkedHashSet<IOutputConfig>();
 	@XmlTransient
 	private Map<String, IOutputConfig> outputMap;
-	@XmlElementRef(type = PageConfig.class)
+	@XmlElementRef(type = Page.class)
 	private IPageConfig startPage;
 
 	@Override

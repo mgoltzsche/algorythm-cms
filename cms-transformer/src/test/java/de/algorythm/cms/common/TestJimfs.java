@@ -34,9 +34,9 @@ public class TestJimfs {
 		System.out.println();
 		
 		fs = FileSystems.getDefault();
-		Path a = fs.getPath(getClass().getResource("/test-content/article.xml").getPath());
+		Path a = fs.getPath(getClass().getResource("/test-repo/algorythm.de/bundle.xml").getPath());
 		System.out.println(Files.readAllLines(a, StandardCharsets.UTF_8));
-		Path dir = fs.getPath(getClass().getResource("/test-content/").getPath());
+		Path dir = fs.getPath(getClass().getResource("/test-repo/").getPath());
 		
 	}
 }

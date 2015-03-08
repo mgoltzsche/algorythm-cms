@@ -1,42 +1,30 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
-import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.saxon.lib.OutputURIResolver;
-import de.algorythm.cms.common.resources.IDestinationPathResolver;
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 
 public class CmsOutputURIResolver implements OutputURIResolver {
 
-	private final IDestinationPathResolver resolver;
+	private final IOutputStreamFactory outputStreamFactory;
 	
-	public CmsOutputURIResolver(final IDestinationPathResolver resolver) {
-		this.resolver = resolver;
+	public CmsOutputURIResolver(final IOutputStreamFactory outputStreamFactory) {
+		this.outputStreamFactory = outputStreamFactory;
 	}
 	
 	@Override
 	public Result resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);
 		final URI publicUri = baseUri.resolve(href);
-		final Path outputPath = resolver.resolveDestination(publicUri);
-		final OutputStream outputStream;
-		
-		try {
-			Files.createDirectories(outputPath.getParent());
-			
-			outputStream = Files.newOutputStream(outputPath);
-		} catch (IOException e) {
-			throw new TransformerException("Cannot write " + outputPath, e);
-		}
-		
-		final Result result = new StreamResult(outputStream);
+		final OutputStream out = outputStreamFactory.createOutputStream(publicUri);
+		final Result result = new StreamResult(out);
 		
 		result.setSystemId(publicUri.toString());
 		

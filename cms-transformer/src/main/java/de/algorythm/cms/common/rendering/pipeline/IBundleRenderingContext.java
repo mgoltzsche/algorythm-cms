@@ -11,12 +11,12 @@ import javax.xml.transform.Source;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.resources.IArchiveExtractor;
-import de.algorythm.cms.common.resources.IDestinationPathResolver;
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 
-public interface IBundleRenderingContext extends IXmlContext, IArchiveExtractor, ISourcePathResolver, IDestinationPathResolver {
+public interface IBundleRenderingContext extends IXmlContext, IArchiveExtractor, ISourcePathResolver, IOutputStreamFactory {
 
 	IBundle getBundle();
 	Path getTempDirectory();

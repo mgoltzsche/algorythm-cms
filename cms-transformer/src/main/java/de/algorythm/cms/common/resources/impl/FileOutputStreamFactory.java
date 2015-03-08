@@ -1,22 +1,37 @@
 package de.algorythm.cms.common.resources.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
-import de.algorythm.cms.common.resources.IDestinationPathResolver;
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 
-public class OutputResolver implements IDestinationPathResolver {
+public class FileOutputStreamFactory implements IOutputStreamFactory {
 
 	private final Path outputDirectory;
 	private final Path tmpDirectory;
 
-	public OutputResolver(final Path outputDirectory, final Path tmpDirectory) {
+	public FileOutputStreamFactory(final Path outputDirectory, final Path tmpDirectory) {
 		this.outputDirectory = outputDirectory.normalize();
 		this.tmpDirectory = tmpDirectory.normalize();
 	}
 
 	@Override
-	public Path resolveDestination(final URI publicUri) {
+	public OutputStream createOutputStream(final URI publicUri) {
+		final Path path = resolveUri(publicUri);
+		
+		try {
+			Files.createDirectories(path.getParent());
+			
+			return Files.newOutputStream(path);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private Path resolveUri(final URI publicUri) {
 		final String scheme = publicUri.getScheme();
 		final Path directory = scheme != null && scheme.toLowerCase().equals("tmp")
 				? tmpDirectory : outputDirectory;
@@ -32,7 +47,7 @@ public class OutputResolver implements IDestinationPathResolver {
 		
 		return resolvedDirectory;
 	}
-
+	
 	/*@Override
 	public Path resolveUri(final Path publicPath, final Path systemBasePath) {
 		final Path systemPath = (publicPath.isAbsolute()

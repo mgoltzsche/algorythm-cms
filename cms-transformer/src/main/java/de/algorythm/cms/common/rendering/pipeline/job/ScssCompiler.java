@@ -2,6 +2,7 @@ package de.algorythm.cms.common.rendering.pipeline.job;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -54,8 +55,7 @@ public class ScssCompiler implements IRenderingJob {
 	}
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
-		final URI cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS);
-		final Path cssSystemPath = ctx.resolveDestination(cssPath);
+		final URI cssUri = ctx.getResourcePrefix().resolve(MAIN_CSS);
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
 		final ScssStylesheet stylesheet = docHandler.getStyleSheet();
@@ -67,7 +67,7 @@ public class ScssCompiler implements IRenderingJob {
 		parser.parseStyleSheet(source);
 		stylesheet.addResolver(createResolver(ctx));
 		stylesheet.setCharset(StandardCharsets.UTF_8.name());
-        stylesheet.setFile(new File(cssPath.getPath()));
+        stylesheet.setFile(new File(cssUri.getPath()));
 		stylesheet.compile();
 		String css = stylesheet.printState();
 		
@@ -81,8 +81,11 @@ public class ScssCompiler implements IRenderingJob {
 			css = writer.toString().replace("\n", "");
 		}
 		
-		Files.createDirectories(cssSystemPath.getParent());
-		Files.write(cssSystemPath, css.getBytes(StandardCharsets.UTF_8));
+		try (OutputStream out = ctx.createOutputStream(cssUri)) {
+			out.write(css.getBytes(StandardCharsets.UTF_8));
+		} catch(Exception e) {
+			throw e;
+		}
 	}
 	
 	private ScssStylesheetResolver createResolver(final IRenderingContext ctx) {

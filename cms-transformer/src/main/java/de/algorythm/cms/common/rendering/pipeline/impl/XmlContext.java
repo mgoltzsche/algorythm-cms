@@ -46,13 +46,11 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import de.algorythm.cms.common.impl.TimeMeter;
-import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlContext;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.XmlSource;
-import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 
 public class XmlContext implements IXmlContext, URIResolver {
 
@@ -96,7 +94,7 @@ public class XmlContext implements IXmlContext, URIResolver {
 	};
 
 	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-	private final SAXTransformerFactory writerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+	private final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
 	private final IBundleRenderingContext ctx;
 	
 	public XmlContext(final IBundleRenderingContext ctx) throws Exception {
@@ -121,12 +119,10 @@ public class XmlContext implements IXmlContext, URIResolver {
 	
 	@Override
 	public ContentHandler createXMLWriter(final URI publicUri) throws IOException, TransformerConfigurationException {
-		final Path outputFile = ctx.resolveDestination(publicUri);
-		Files.createDirectories(outputFile.getParent());
-		final OutputStream outputStream = Files.newOutputStream(outputFile);
-		final TransformerHandler handler = writerFactory.newTransformerHandler();
+		final OutputStream out = ctx.createOutputStream(publicUri);
+		final TransformerHandler handler = transformerFactory.newTransformerHandler();
 		
-		handler.setResult(new StreamResult(outputStream));
+		handler.setResult(new StreamResult(out));
 		
 		return handler;
 	}
@@ -173,7 +169,7 @@ public class XmlContext implements IXmlContext, URIResolver {
 	
 	private Templates compileTemplates(final Source xslSource) throws TransformerConfigurationException {
 		final TimeMeter meter = TimeMeter.meter("template compilation");
-		final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
+		//final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
 		final TemplateErrorListener errorListener = new TemplateErrorListener();
 		final Templates templates;
 		
@@ -209,10 +205,8 @@ public class XmlContext implements IXmlContext, URIResolver {
 	@Override
 	public TransformerHandler createTransformerHandler(final Templates templates, final URI outputUri) throws IOException, TransformerConfigurationException {
 		final TransformerHandler transformerHandler = createTransformerHandler(templates);
-		final Path outputFile = ctx.resolveDestination(outputUri);
-		Files.createDirectories(outputFile.getParent());
-		final OutputStream outputStream = Files.newOutputStream(outputFile);
-		final Result result = new StreamResult(outputStream);
+		final OutputStream out = ctx.createOutputStream(outputUri);
+		final Result result = new StreamResult(out);
 		final String outputUriStr = outputUri.toString();
 		
 		result.setSystemId(outputUriStr);

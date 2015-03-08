@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 
 @XmlRootElement(name="page", namespace="http://cms.algorythm.de/common/Bundle")
-public class PageConfig implements IPageConfig {
+public class Page implements IPageConfig {
 
 	@XmlAttribute(required = true)
 	private String name;
@@ -25,12 +25,12 @@ public class PageConfig implements IPageConfig {
 	private String navigationTitle;
 	@XmlAttribute(name="nav-contained")
 	private boolean inNavigation = true;
-	@XmlElementRef(type=PageConfig.class)
+	@XmlElementRef(type=Page.class)
 	private List<IPageConfig> pages = new LinkedList<IPageConfig>();
 
-	public PageConfig() {}
+	public Page() {}
 
-	public PageConfig(final String name) {
+	public Page(final String name) {
 		this.name = name;
 	}
 
@@ -98,7 +98,7 @@ public class PageConfig implements IPageConfig {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PageConfig other = (PageConfig) obj;
+		Page other = (Page) obj;
 		if (name == null) {
 			if (other.name != null)
 				return false;

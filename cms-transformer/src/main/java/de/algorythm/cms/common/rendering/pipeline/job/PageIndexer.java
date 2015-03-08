@@ -1,10 +1,7 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
-import java.io.Writer;
+import java.io.OutputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -20,7 +17,7 @@ import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.IDestinationPathResolver;
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 
@@ -59,14 +56,12 @@ public class PageIndexer implements IRenderingJob {
 		meter.finish();
 	}
 	
-	private void writePageXml(final DerivedPageConfig page, final IDestinationPathResolver resolver, final Locale locale) throws Exception {
+	private void writePageXml(final DerivedPageConfig page, final IOutputStreamFactory outputStreamFactory, final Locale locale) throws Exception {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
-		final Path pagesXmlFile = resolver.resolveDestination(URI.create("tmp:///" + locale.toLanguageTag() + "/pages.xml"));
-		Files.createDirectories(pagesXmlFile.getParent());
 		
-		try (Writer writer = Files.newBufferedWriter(pagesXmlFile, StandardCharsets.UTF_8)) {
+		try (OutputStream out = outputStreamFactory.createOutputStream(URI.create("tmp:///" + locale.toLanguageTag() + "/pages.xml"))) {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			marshaller.marshal(page, writer);
+			marshaller.marshal(page, out);
 		}
 	}
 

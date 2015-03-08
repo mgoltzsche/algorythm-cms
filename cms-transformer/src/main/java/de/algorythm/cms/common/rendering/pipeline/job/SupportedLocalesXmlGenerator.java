@@ -1,10 +1,7 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
-import java.io.Writer;
+import java.io.OutputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,11 +28,9 @@ public class SupportedLocalesXmlGenerator implements IRenderingJob {
 		for (ISupportedLocale supportedLocale : bundle.getSupportedLocales()) {
 			final Locale locale = supportedLocale.getLocale();
 			final LocaleInfos locales = createLocaleInfos(bundle, locale);
-			final Path outputFile = ctx.resolveDestination(URI.create("tmp:///" + locale.toLanguageTag() + "/supported-locales.xml"));
-			Files.createDirectories(outputFile.getParent());
 			
-			try (Writer writer = Files.newBufferedWriter(outputFile, StandardCharsets.UTF_8)) {
-				marshaller.marshal(locales, writer);
+			try (OutputStream out = ctx.createOutputStream(URI.create("tmp:///" + locale.toLanguageTag() + "/supported-locales.xml"))) {
+				marshaller.marshal(locales, out);
 			}
 		}
 		

@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -84,7 +85,6 @@ public class JavascriptCompressor implements IRenderingJob {
 	public void run(final IRenderingContext ctx) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final URI jsUri = ctx.getResourcePrefix().resolve(MAIN_JS);
-		final Path jsSystemPath = ctx.resolveDestination(jsUri);
 		final StringBuilder scriptBuilder = new StringBuilder();
 		
 		for (Path source : sources) {
@@ -108,8 +108,12 @@ public class JavascriptCompressor implements IRenderingJob {
 		
 		final String scripts = scriptBuilder.toString();
 		
-		Files.createDirectories(jsSystemPath.getParent());
-		Files.write(jsSystemPath, scripts.getBytes(StandardCharsets.UTF_8));
+		try (OutputStream out = ctx.createOutputStream(jsUri)) {
+			out.write(scripts.getBytes(StandardCharsets.UTF_8));
+		} catch(Exception e) {
+			throw e;
+		}
+		
 		meter.finish();
 	}
 	
