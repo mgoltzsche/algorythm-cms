@@ -1,6 +1,7 @@
 package de.algorythm.cms.common.rendering.pipeline;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Path;
 
@@ -22,6 +23,7 @@ public interface IBundleRenderingContext extends IXmlContext, IArchiveExtractor,
 	Path getTempDirectory();
 	Source createXmlSource(URI uri) throws ResourceNotFoundException, IOException;
 	Marshaller createMarshaller() throws JAXBException;
+	OutputStream createTmpOutputStream(String publicPath);
 	URI getResourcePrefix();
 	IMetadata extractMetadata(URI uri) throws ResourceNotFoundException, MetadataExtractionException;
 	String getProperty(String name);

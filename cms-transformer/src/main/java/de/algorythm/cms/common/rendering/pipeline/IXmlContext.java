@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public interface IXmlContext {
@@ -27,6 +28,6 @@ public interface IXmlContext {
 	XMLReader createXMLReader() throws SAXException;
 	XMLEventReader createXMLEventReader(InputStream stream) throws XMLStreamException;
 	ContentHandler createXMLWriter(URI publicUri) throws IOException, TransformerConfigurationException;
-	TransformerHandler createTransformerHandler(Templates templates, URI outputUri) throws TransformerConfigurationException, IOException;
+	TransformerHandler createTransformerHandler(Templates templates, String outputPath, IOutputStreamFactory outFactory) throws TransformerConfigurationException, IOException;
 	XMLFilter createXMLFilter(Templates templates, XMLReader parent) throws TransformerConfigurationException;
 }

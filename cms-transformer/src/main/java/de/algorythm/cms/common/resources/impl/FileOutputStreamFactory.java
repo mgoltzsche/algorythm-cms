@@ -2,7 +2,6 @@ package de.algorythm.cms.common.resources.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -11,16 +10,14 @@ import de.algorythm.cms.common.resources.IOutputStreamFactory;
 public class FileOutputStreamFactory implements IOutputStreamFactory {
 
 	private final Path outputDirectory;
-	private final Path tmpDirectory;
 
-	public FileOutputStreamFactory(final Path outputDirectory, final Path tmpDirectory) {
+	public FileOutputStreamFactory(final Path outputDirectory) {
 		this.outputDirectory = outputDirectory.normalize();
-		this.tmpDirectory = tmpDirectory.normalize();
 	}
 
 	@Override
-	public OutputStream createOutputStream(final URI publicUri) {
-		final Path path = resolveUri(publicUri);
+	public OutputStream createOutputStream(final String publicPath) {
+		final Path path = resolvePath(publicPath);
 		
 		try {
 			Files.createDirectories(path.getParent());
@@ -31,19 +28,15 @@ public class FileOutputStreamFactory implements IOutputStreamFactory {
 		}
 	}
 
-	private Path resolveUri(final URI publicUri) {
-		final String scheme = publicUri.getScheme();
-		final Path directory = scheme != null && scheme.toLowerCase().equals("tmp")
-				? tmpDirectory : outputDirectory;
-		final String path = publicUri.normalize().getPath();
+	private Path resolvePath(final String path) {
 		final String relativePath = !path.isEmpty() && path.charAt(0) == '/'
 			? path.substring(1)
 			: path;
 		
-		final Path resolvedDirectory = directory.resolve(relativePath);
+		final Path resolvedDirectory = outputDirectory.resolve(relativePath);
 		
-		if (!resolvedDirectory.toString().startsWith(directory.toString()))
-			throw new IllegalAccessError("Output parent directory access denied: " + publicUri);
+		if (!resolvedDirectory.toString().startsWith(outputDirectory.toString()))
+			throw new IllegalAccessError("Output parent directory access denied: " + path);
 		
 		return resolvedDirectory;
 	}

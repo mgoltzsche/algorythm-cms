@@ -17,7 +17,6 @@ import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.IOutputStreamFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 
@@ -56,10 +55,10 @@ public class PageIndexer implements IRenderingJob {
 		meter.finish();
 	}
 	
-	private void writePageXml(final DerivedPageConfig page, final IOutputStreamFactory outputStreamFactory, final Locale locale) throws Exception {
+	private void writePageXml(final DerivedPageConfig page, final IRenderingContext ctx, final Locale locale) throws Exception {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
 		
-		try (OutputStream out = outputStreamFactory.createOutputStream(URI.create("tmp:///" + locale.toLanguageTag() + "/pages.xml"))) {
+		try (OutputStream out = ctx.createTmpOutputStream('/' + locale.toLanguageTag() + "/pages.xml")) {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.marshal(page, out);
 		}

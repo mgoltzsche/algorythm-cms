@@ -47,6 +47,7 @@ public class RenderingContext implements IBundleRenderingContext {
 	private final URI resourcePrefix;
 	private final ISourcePathResolver sourceResolver;
 	private final IOutputStreamFactory outputStreamFactory;
+	private final IOutputStreamFactory tmpOutputStreamFactory;
 	private final IXmlSourceResolver xmlSourceResolver;
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 	private final XmlContext xmlContext;
@@ -64,7 +65,8 @@ public class RenderingContext implements IBundleRenderingContext {
 		this.xmlSourceResolver = xmlSourceResolver;
 		this.tempDirectory = tmpDirectory;
 		this.sourceResolver = new ResourceResolver(bundle, tmpDirectory);
-		this.outputStreamFactory = new FileOutputStreamFactory(outputDirectory, tmpDirectory);
+		this.outputStreamFactory = new FileOutputStreamFactory(outputDirectory);
+		this.tmpOutputStreamFactory = new FileOutputStreamFactory(tmpDirectory);
 		this.archiveExtractor = new SynchronizedZipArchiveExtractor(this, tmpDirectory);
 
 		try {
@@ -131,9 +133,9 @@ public class RenderingContext implements IBundleRenderingContext {
 
 	@Override
 	public TransformerHandler createTransformerHandler(Templates templates,
-			URI outputUri)
+			String outputPath, IOutputStreamFactory outFactory)
 			throws IOException, TransformerConfigurationException {
-		return xmlContext.createTransformerHandler(templates, outputUri);
+		return xmlContext.createTransformerHandler(templates, outputPath, outFactory);
 	}
 
 	@Override
@@ -164,8 +166,13 @@ public class RenderingContext implements IBundleRenderingContext {
 	}
 
 	@Override
-	public OutputStream createOutputStream(URI uri) {
-		return outputStreamFactory.createOutputStream(uri);
+	public OutputStream createOutputStream(String publicPath) {
+		return outputStreamFactory.createOutputStream(publicPath);
+	}
+	
+	@Override
+	public OutputStream createTmpOutputStream(String publicPath) {
+		return tmpOutputStreamFactory.createOutputStream(publicPath);
 	}
 
 	@Override

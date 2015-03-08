@@ -1,7 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
 import java.io.OutputStream;
-import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,7 +28,7 @@ public class SupportedLocalesXmlGenerator implements IRenderingJob {
 			final Locale locale = supportedLocale.getLocale();
 			final LocaleInfos locales = createLocaleInfos(bundle, locale);
 			
-			try (OutputStream out = ctx.createOutputStream(URI.create("tmp:///" + locale.toLanguageTag() + "/supported-locales.xml"))) {
+			try (OutputStream out = ctx.createTmpOutputStream('/' + locale.toLanguageTag() + "/supported-locales.xml")) {
 				marshaller.marshal(locales, out);
 			}
 		}

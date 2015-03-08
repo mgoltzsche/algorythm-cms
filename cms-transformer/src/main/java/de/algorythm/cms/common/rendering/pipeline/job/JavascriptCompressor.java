@@ -84,7 +84,7 @@ public class JavascriptCompressor implements IRenderingJob {
 	@Override
 	public void run(final IRenderingContext ctx) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
-		final URI jsUri = ctx.getResourcePrefix().resolve(MAIN_JS);
+		final String jsPath = ctx.getResourcePrefix().resolve(MAIN_JS).getPath();
 		final StringBuilder scriptBuilder = new StringBuilder();
 		
 		for (Path source : sources) {
@@ -108,7 +108,7 @@ public class JavascriptCompressor implements IRenderingJob {
 		
 		final String scripts = scriptBuilder.toString();
 		
-		try (OutputStream out = ctx.createOutputStream(jsUri)) {
+		try (OutputStream out = ctx.createOutputStream(jsPath)) {
 			out.write(scripts.getBytes(StandardCharsets.UTF_8));
 		} catch(Exception e) {
 			throw e;

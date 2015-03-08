@@ -114,6 +114,11 @@ public class Renderer implements IRenderer {
 		return future;
 	}
 
+	/*@Override
+	public byte[] render(final String pagePath, final OutputFormat format) {
+		
+	}*/
+	
 	private IRenderingJob initializeJob(final IRenderingJobConfig jobCfg, final ISourcePathResolver sourcePathResolver) {
 		final Class<?> jobType = jobCfg.getJobType();
 		final IRenderingJob job;

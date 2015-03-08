@@ -98,11 +98,11 @@ public class PageTransformer implements IRenderingJob {
 	private void renderPage(final IRenderingContext ctx, final URI sourceUri, final String path, final String relativeRootPath, final Templates compiledTemplates, final Locale locale, final String resourceBasePath) throws IOException, TransformerException, SAXException, ParserConfigurationException, JAXBException, ResourceNotFoundException {
 		final IBundle bundle = ctx.getBundle();
 		final boolean internationalized = ctx.getBundle().getSupportedLocales().size() > 1;
-		final URI targetUri = internationalized
-				? URI.create('/' + locale.getLanguage() + path + "/index.html")
-				: URI.create(path + "/index.html");
+		final String targetPath = internationalized
+				? '/' + locale.getLanguage() + path + "/index.html"
+				: path + "/index.html";
 		final String resourceBaseUrl = URI.create(relativeRootPath + resourceBasePath).normalize().toString();
-		final TransformerHandler transformerHandler = ctx.createTransformerHandler(compiledTemplates, targetUri);
+		final TransformerHandler transformerHandler = ctx.createTransformerHandler(compiledTemplates, targetPath, ctx);
 		final Transformer transformer = transformerHandler.getTransformer();
 		final TemplateErrorListener errorListener = new TemplateErrorListener();
 		

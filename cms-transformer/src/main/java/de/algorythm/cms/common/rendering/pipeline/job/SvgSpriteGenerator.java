@@ -45,9 +45,9 @@ public class SvgSpriteGenerator implements IRenderingJob {
 		}
 		
 		if (!svg.isEmpty()) {
-			final URI outputUri = URI.create(ctx.getResourcePrefix() + "/sprites.svg");
+			final String outputPath = ctx.getResourcePrefix() + "/sprites.svg";
 			final Templates templates = ctx.compileTemplates(XSL_URI);
-			final TransformerHandler handler = ctx.createTransformerHandler(templates, outputUri);
+			final TransformerHandler handler = ctx.createTransformerHandler(templates, outputPath, ctx);
 			
 			jaxbContext.createMarshaller().marshal(new Sources(svg), handler);
 		}

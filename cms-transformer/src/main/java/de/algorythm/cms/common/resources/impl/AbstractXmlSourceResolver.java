@@ -56,7 +56,7 @@ public abstract class AbstractXmlSourceResolver implements IXmlSourceResolver {
 							
 							final Marshaller marshaller = ctx.createMarshaller();
 							
-							try (OutputStream outputStream = ctx.createOutputStream(URI.create("tmp:///meta" + uri.getPath()))) {
+							try (OutputStream outputStream = ctx.createTmpOutputStream("/meta" + uri.getPath())) {
 								marshaller.marshal(metadata, new StreamResult(outputStream));
 							}
 						} catch(MetadataExtractionException |JAXBException | IOException e) {

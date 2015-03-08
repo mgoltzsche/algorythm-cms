@@ -29,24 +29,20 @@ public class DirectoryExporter implements IRenderingJob {
 	public void run(final IRenderingContext ctx) throws Exception {
 		for (URI dirURI : directories) {
 			final String path = dirURI.getPath().substring(1);
-			final Path inDir = ctx.getBundle().getLocation().resolve(path)
-					.normalize();
-			final int inDirLength = inDir.toUri().getPath().length()
-					- path.length() - 1;
+			final Path inDir = ctx.getBundle().getLocation().resolve(path).normalize();
+			final int inDirLength = inDir.toUri().getPath().length() - path.length() - 1;
 
 			if (!Files.exists(inDir))
-				log.warn("Cannot export directory " + inDir
-						+ " because it does not exist");
+				log.warn("Cannot export directory " + inDir + " because it does not exist");
 
 			Files.walkFileTree(inDir, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file,
 						BasicFileAttributes attrs) throws IOException {
 					final String path = file.toUri().getPath().substring(inDirLength);
-					final URI outUri = URI.create(path);
 
 					try (InputStream in = Files.newInputStream(file);
-							OutputStream out = ctx.createOutputStream(outUri)) {
+							OutputStream out = ctx.createOutputStream(path)) {
 						copy(in, out);
 					} catch (IOException e) {
 						throw e;

@@ -18,7 +18,7 @@ public class OdtTransformer implements IRenderingJob {
 		final TimeMeter meter = TimeMeter.meter("ODT transformation");
 		//final Templates templates = ctx.compileTemplates(Collections.singleton(URI.create("/templates/odt2xhtml/export/xhtml/opendoc2xhtml.xsl")));
 		final Templates templates = ctx.compileTemplates(Collections.singleton(URI.create("/templates/de.algorythm.cms.common/SvgSprites.xsl")));
-		final TransformerHandler handler = ctx.createTransformerHandler(templates, URI.create("/odt/index.html"));
+		final TransformerHandler handler = ctx.createTransformerHandler(templates, "/odt/index.html", ctx);
 		final Transformer transformer = handler.getTransformer();
 		
 		transformer.setParameter("metaFileURL", "meta.xml");

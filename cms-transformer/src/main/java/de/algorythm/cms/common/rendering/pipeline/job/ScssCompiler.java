@@ -55,7 +55,7 @@ public class ScssCompiler implements IRenderingJob {
 	}
 	
 	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
-		final URI cssUri = ctx.getResourcePrefix().resolve(MAIN_CSS);
+		final String cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS).getPath();
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
 		final ScssStylesheet stylesheet = docHandler.getStyleSheet();
@@ -67,7 +67,7 @@ public class ScssCompiler implements IRenderingJob {
 		parser.parseStyleSheet(source);
 		stylesheet.addResolver(createResolver(ctx));
 		stylesheet.setCharset(StandardCharsets.UTF_8.name());
-        stylesheet.setFile(new File(cssUri.getPath()));
+        stylesheet.setFile(new File(cssPath));
 		stylesheet.compile();
 		String css = stylesheet.printState();
 		
@@ -81,7 +81,7 @@ public class ScssCompiler implements IRenderingJob {
 			css = writer.toString().replace("\n", "");
 		}
 		
-		try (OutputStream out = ctx.createOutputStream(cssUri)) {
+		try (OutputStream out = ctx.createOutputStream(cssPath)) {
 			out.write(css.getBytes(StandardCharsets.UTF_8));
 		} catch(Exception e) {
 			throw e;

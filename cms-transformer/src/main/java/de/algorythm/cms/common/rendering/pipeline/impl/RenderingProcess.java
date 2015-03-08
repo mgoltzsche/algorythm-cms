@@ -34,6 +34,7 @@ import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 import de.algorythm.cms.common.scheduling.IProcess;
@@ -145,9 +146,9 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public TransformerHandler createTransformerHandler(Templates templates, URI outputUri)
+	public TransformerHandler createTransformerHandler(Templates templates, String outputPath, IOutputStreamFactory outFactory)
 			throws IOException, TransformerConfigurationException {
-		return context.createTransformerHandler(templates, outputUri);
+		return context.createTransformerHandler(templates, outputPath, outFactory);
 	}
 
 	@Override
@@ -204,8 +205,13 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public OutputStream createOutputStream(URI publicUri) {
-		return context.createOutputStream(publicUri);
+	public OutputStream createOutputStream(String publicPath) {
+		return context.createOutputStream(publicPath);
+	}
+	
+	@Override
+	public OutputStream createTmpOutputStream(String publicPath) {
+		return context.createTmpOutputStream(publicPath);
 	}
 
 	@Override

@@ -48,6 +48,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlContext;
+import de.algorythm.cms.common.resources.IOutputStreamFactory;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.XmlSource;
@@ -119,7 +120,7 @@ public class XmlContext implements IXmlContext, URIResolver {
 	
 	@Override
 	public ContentHandler createXMLWriter(final URI publicUri) throws IOException, TransformerConfigurationException {
-		final OutputStream out = ctx.createOutputStream(publicUri);
+		final OutputStream out = ctx.createOutputStream(publicUri.getPath());
 		final TransformerHandler handler = transformerFactory.newTransformerHandler();
 		
 		handler.setResult(new StreamResult(out));
@@ -203,25 +204,24 @@ public class XmlContext implements IXmlContext, URIResolver {
 		
 	}
 	@Override
-	public TransformerHandler createTransformerHandler(final Templates templates, final URI outputUri) throws IOException, TransformerConfigurationException {
-		final TransformerHandler transformerHandler = createTransformerHandler(templates);
-		final OutputStream out = ctx.createOutputStream(outputUri);
+	public TransformerHandler createTransformerHandler(final Templates templates, final String outputPath, final IOutputStreamFactory outFactory) throws IOException, TransformerConfigurationException {
+		final TransformerHandler transformerHandler = createTransformerHandler(templates, outFactory);
+		final OutputStream out = outFactory.createOutputStream(outputPath);
 		final Result result = new StreamResult(out);
-		final String outputUriStr = outputUri.toString();
 		
-		result.setSystemId(outputUriStr);
+		result.setSystemId(outputPath);
 		//trnsfrmCtrl.setBaseOutputURI(outputUriStr);
 		transformerHandler.setResult(result);
 		
 		return transformerHandler;
 	}
 
-	private TransformerHandler createTransformerHandler(final Templates templates) throws IOException, TransformerConfigurationException {
+	private TransformerHandler createTransformerHandler(final Templates templates, final IOutputStreamFactory outFactory) throws IOException, TransformerConfigurationException {
 		final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
 		final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler(templates);
 		final Transformer transformer = transformerHandler.getTransformer();
 		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
-		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(ctx);
+		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(outFactory, ctx);
 		
 		trnsfrmCtrl.setOutputURIResolver(outputUriResolverAdapter);
 		
