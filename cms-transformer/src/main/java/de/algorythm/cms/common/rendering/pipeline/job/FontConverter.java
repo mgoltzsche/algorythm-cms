@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import javax.inject.Singleton;
+
 import org.apache.commons.io.FileUtils;
 
 import com.google.typography.font.sfntly.Font;
@@ -11,14 +13,13 @@ import com.google.typography.font.sfntly.FontFactory;
 import com.google.typography.font.tools.conversion.woff.WoffWriter;
 
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 
-public class FontConverter implements IRenderingJob {
+@Singleton
+public class FontConverter {
 
 	private File source;
-	
-	@Override
-	public void run(final IRenderingContext context) throws Exception {
+
+	public void convertFont(final IRenderingContext context) throws Exception {
 		final FontFactory fontFactory = FontFactory.getInstance();
 		//final Font.Builder fontBuilder = fontFactory.newFontBuilder();
 		//final Table.Builder<? extends Table> tableBuilder = fontBuilder.newTableBuilder(0);

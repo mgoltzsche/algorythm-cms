@@ -1,8 +1,5 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -10,33 +7,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.sax.TransformerHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLFilter;
-import org.xml.sax.XMLReader;
-
-import com.google.inject.Injector;
 
 import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.model.entity.IMetadata;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
-import de.algorythm.cms.common.resources.IOutputStreamFactory;
+import de.algorythm.cms.common.resources.IOutputTarget;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
-import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 import de.algorythm.cms.common.scheduling.IProcess;
 import de.algorythm.cms.common.scheduling.IProcessObserver;
 import de.algorythm.cms.common.scheduling.IProgressObserver;
@@ -56,14 +34,13 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 		}
 	}
 	
-	private final Injector injector;
-	private final IBundleRenderingContext context;
+	private final IRenderingContext context;
 	private final Iterator<PipelinePhase> phaseIter;
 	private PipelinePhase currentPhase;
 	private final IProgressObserver<Void> observer;
 	private final long startTime = System.currentTimeMillis();
 
-	public RenderingProcess(final IBundleRenderingContext context, final List<Collection<IRenderingJob>> jobPhases, final Injector injector, final IProgressObserver<Void> observer) {
+	public RenderingProcess(final IRenderingContext context, final List<Collection<IRenderingJob>> jobPhases, final IProgressObserver<Void> observer) {
 		if (jobPhases.isEmpty())
 			throw new IllegalArgumentException("No jobs to execute");
 		
@@ -71,16 +48,11 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 		this.observer = observer;
 		final LinkedList<PipelinePhase> phases = new LinkedList<PipelinePhase>();
 		
-		for (Collection<IRenderingJob> jobs : jobPhases) {
+		for (Collection<IRenderingJob> jobs : jobPhases)
 			phases.add(new PipelinePhase(new LinkedList<IRenderingJob>(jobs)));
-			
-			for (IRenderingJob job : jobs)
-				injector.injectMembers(job);
-		}
 		
 		phaseIter = phases.iterator();
 		currentPhase = phaseIter.next();
-		this.injector = injector;
 	}
 
 	@Override
@@ -114,16 +86,6 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 			}
 		}
 	}
-	
-	@Override
-	public void execute(final IRenderingJob job) {
-		injector.injectMembers(job);
-		
-		synchronized(phaseIter) {
-			currentPhase.jobs.add(job);
-			currentPhase.pendingSize++;
-		}
-	}
 
 	@Override
 	public IBundle getBundle() {
@@ -136,67 +98,8 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public String getProperty(String name) {
-		return context.getProperty(name);
-	}
-
-	@Override
-	public void setProperty(String name, String value) {
-		context.setProperty(name, value);
-	}
-
-	@Override
-	public TransformerHandler createTransformerHandler(Templates templates, String outputPath, IOutputStreamFactory outFactory)
-			throws IOException, TransformerConfigurationException {
-		return context.createTransformerHandler(templates, outputPath, outFactory);
-	}
-
-	@Override
-	public Templates compileTemplates(Collection<URI> xslSourceUris) throws TransformerConfigurationException {
-		return context.compileTemplates(xslSourceUris);
-	}
-	
-	@Override
-	public Templates compileTemplates(URI xslSourceUri) throws TransformerConfigurationException, ResourceNotFoundException {
-		return context.compileTemplates(xslSourceUri);
-	}
-
-	@Override
 	public String toString() {
 		return "RenderingProcess [" + context.getBundle().getName() + ']';
-	}
-
-	@Override
-	public void parse(URI publicUri, ContentHandler handler)
-			throws IOException, SAXException, ParserConfigurationException, ResourceNotFoundException {
-		context.parse(publicUri, handler);
-	}
-
-	@Override
-	public XMLReader createXMLReader() throws SAXException {
-		return context.createXMLReader();
-	}
-
-	@Override
-	public ContentHandler createXMLWriter(URI publicUri)
-			throws IOException, TransformerConfigurationException {
-		return context.createXMLWriter(publicUri);
-	}
-
-	@Override
-	public XMLFilter createXMLFilter(Templates templates, XMLReader parent)
-			throws TransformerConfigurationException {
-		return context.createXMLFilter(templates, parent);
-	}
-
-	@Override
-	public Path unzip(URI uri) throws ResourceNotFoundException, IOException {
-		return context.unzip(uri);
-	}
-
-	@Override
-	public Source createXmlSource(URI uri) throws ResourceNotFoundException, IOException {
-		return context.createXmlSource(uri);
 	}
 
 	@Override
@@ -205,34 +108,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public OutputStream createOutputStream(String publicPath) {
-		return context.createOutputStream(publicPath);
-	}
-	
-	@Override
-	public OutputStream createTmpOutputStream(String publicPath) {
-		return context.createTmpOutputStream(publicPath);
-	}
-
-	@Override
-	public XMLEventReader createXMLEventReader(InputStream stream)
-			throws XMLStreamException {
-		return context.createXMLEventReader(stream);
-	}
-
-	@Override
-	public Marshaller createMarshaller() throws JAXBException {
-		return context.createMarshaller();
-	}
-
-	@Override
-	public Path getTempDirectory() {
-		return context.getTempDirectory();
-	}
-
-	@Override
-	public IMetadata extractMetadata(URI uri) throws ResourceNotFoundException,
-			MetadataExtractionException {
-		return context.extractMetadata(uri);
+	public IOutputTarget createOutputTarget(String publicPath) {
+		return context.createOutputTarget(publicPath);
 	}
 }

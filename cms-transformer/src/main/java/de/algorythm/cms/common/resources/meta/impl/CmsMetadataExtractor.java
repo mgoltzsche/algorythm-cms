@@ -5,6 +5,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.events.Attribute;
@@ -16,7 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.model.entity.impl.Metadata;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
@@ -24,16 +26,23 @@ import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
 public class CmsMetadataExtractor implements IMetadataExtractor {
 
 	static private Logger log = LoggerFactory.getLogger(CmsMetadataExtractor.class);
+	
+	private final IXmlFactory xmlFactory;
 
+	@Inject
+	public CmsMetadataExtractor(final IXmlFactory xmlFactory) {
+		this.xmlFactory = xmlFactory;
+	}
+	
 	@Override
-	public IMetadata extractMetadata(final URI uri, final IBundleRenderingContext ctx) throws ResourceNotFoundException, MetadataExtractionException {
+	public IMetadata extractMetadata(final URI uri, final IRenderingContext ctx) throws ResourceNotFoundException, MetadataExtractionException {
 		final Path xmlFile = ctx.resolveSource(uri);
 		
 		try {
 			final Metadata m = new Metadata(xmlFile);
 			
 			try (InputStream stream = Files.newInputStream(xmlFile)) {
-				final XMLEventReader reader = ctx.createXMLEventReader(stream);
+				final XMLEventReader reader = xmlFactory.createXMLEventReader(stream);
 				
 				try {
 					while (reader.hasNext()) {

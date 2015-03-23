@@ -6,6 +6,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javax.inject.Inject;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
@@ -16,7 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.model.entity.impl.Metadata;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
+import de.algorythm.cms.common.resources.IArchiveExtractor;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
@@ -25,11 +28,20 @@ public class OdtMetadataExtractor implements IMetadataExtractor {
 
 	static private Logger log = LoggerFactory.getLogger(CmsMetadataExtractor.class);
 
+	private final IXmlFactory xmlFactory;
+	private final IArchiveExtractor archiveExtractor;
+
+	@Inject
+	public OdtMetadataExtractor(IXmlFactory xmlFactory, IArchiveExtractor archiveExtractor) {
+		this.xmlFactory = xmlFactory;
+		this.archiveExtractor = archiveExtractor;
+	}
+	
 	@Override
-	public IMetadata extractMetadata(final URI uri, final IBundleRenderingContext ctx)
+	public IMetadata extractMetadata(final URI uri, final IRenderingContext ctx)
 			throws ResourceNotFoundException, MetadataExtractionException {
 		try {
-			final Path extractedOdtDirectory = ctx.unzip(uri);
+			final Path extractedOdtDirectory = archiveExtractor.unzip(uri, ctx);
 			final Path metaXmlFile = extractedOdtDirectory.resolve("meta.xml");
 			final Metadata md = new Metadata(ctx.resolveSource(uri));
 			
@@ -45,9 +57,9 @@ public class OdtMetadataExtractor implements IMetadataExtractor {
 		}
 	}
 	
-	private void extractMetadata(final Path metaXmlFile, final IBundleRenderingContext ctx, final Metadata r) throws IOException, XMLStreamException {
+	private void extractMetadata(final Path metaXmlFile, final IRenderingContext ctx, final Metadata r) throws IOException, XMLStreamException {
 		try (InputStream stream = Files.newInputStream(metaXmlFile)) {
-			final XMLEventReader reader = ctx.createXMLEventReader(stream);
+			final XMLEventReader reader = xmlFactory.createXMLEventReader(stream);
 			
 			try {
 				while (reader.hasNext()) {

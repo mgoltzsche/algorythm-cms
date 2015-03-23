@@ -13,7 +13,10 @@ import javax.xml.transform.stream.StreamResult;
 import com.google.common.base.Function;
 
 import de.algorythm.cms.common.model.entity.IMetadata;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IMetadataExtractorProvider;
+import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
+import de.algorythm.cms.common.resources.IOutputTarget;
 import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
@@ -22,15 +25,17 @@ import de.algorythm.cms.common.scheduling.impl.SynchronizedContext;
 
 public abstract class AbstractXmlSourceResolver implements IXmlSourceResolver {
 
+	private final IXmlFactory xmlFactory;
 	private final IMetadataExtractor metadataExtractor;
 	private final SynchronizedContext<URI, Source> synchronizer = new SynchronizedContext<URI, Source>();
 	
-	public AbstractXmlSourceResolver(final IMetadataExtractor metadataExtractor) {
-		this.metadataExtractor = metadataExtractor;
+	public AbstractXmlSourceResolver(final IXmlFactory xmlFactory, final IMetadataExtractorProvider metadataExtractorProvider) {
+		this.xmlFactory = xmlFactory;
+		this.metadataExtractor = metadataExtractorProvider.getMetadataExtractor();
 	}
 	
 	@Override
-	public final Source createXmlSource(URI uri, final IBundleRenderingContext ctx)
+	public final Source createXmlSource(URI uri, final IRenderingContext ctx)
 			throws ResourceNotFoundException, IOException {
 		final String scheme = uri.getScheme();
 		uri = uri.normalize();
@@ -54,10 +59,11 @@ public abstract class AbstractXmlSourceResolver implements IXmlSourceResolver {
 								throw new RuntimeException(e);
 							}
 							
-							final Marshaller marshaller = ctx.createMarshaller();
+							final Marshaller marshaller = xmlFactory.createMarshaller();
+							final IOutputTarget target = ctx.createOutputTarget("/meta" + uri.getPath());
 							
-							try (OutputStream outputStream = ctx.createTmpOutputStream("/meta" + uri.getPath())) {
-								marshaller.marshal(metadata, new StreamResult(outputStream));
+							try (OutputStream out = target.createOutputStream()) {
+								marshaller.marshal(metadata, new StreamResult(out));
 							}
 						} catch(MetadataExtractionException |JAXBException | IOException e) {
 							throw new RuntimeException(e);
@@ -82,5 +88,5 @@ public abstract class AbstractXmlSourceResolver implements IXmlSourceResolver {
 		}
 	}
 	
-	protected abstract Source createXmlSourceInternal(final URI uri, final IBundleRenderingContext ctx) throws ResourceNotFoundException, IOException;
+	protected abstract Source createXmlSourceInternal(final URI uri, final IRenderingContext ctx) throws ResourceNotFoundException, IOException;
 }

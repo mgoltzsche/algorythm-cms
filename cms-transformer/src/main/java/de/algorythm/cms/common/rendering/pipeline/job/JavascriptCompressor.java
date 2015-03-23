@@ -9,10 +9,11 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.inject.Singleton;
 
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
@@ -23,9 +24,11 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.resources.IOutputTarget;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
 
-public class JavascriptCompressor implements IRenderingJob {
+@Singleton
+public class JavascriptCompressor {
 
 	static private final Logger log = LoggerFactory.getLogger(JavascriptCompressor.class);
 	static private final URI MAIN_JS = URI.create("main.js");
@@ -73,17 +76,15 @@ public class JavascriptCompressor implements IRenderingJob {
 			return msg.toString();
 		}
 	}
-	
-	private final Set<Path> sources = new LinkedHashSet<Path>();
+
 	private boolean compress = false;
 	private boolean munge = true;
 	private boolean verbose = false;
 	private boolean preserveAllSemiColons = false;
 	private boolean disableOptimizations = false;
 
-	@Override
-	public void run(final IRenderingContext ctx) throws Exception {
-		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
+	public void compressJs(final IRenderingContext ctx, final Set<Path> sources, final IOutputTargetFactory targetFactory) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(toString());
 		final String jsPath = ctx.getResourcePrefix().resolve(MAIN_JS).getPath();
 		final StringBuilder scriptBuilder = new StringBuilder();
 		
@@ -107,9 +108,10 @@ public class JavascriptCompressor implements IRenderingJob {
 		}
 		
 		final String scripts = scriptBuilder.toString();
+		final IOutputTarget target = targetFactory.createOutputTarget(jsPath);
 		
-		try (OutputStream out = ctx.createOutputStream(jsPath)) {
-			out.write(scripts.getBytes(StandardCharsets.UTF_8));
+		try (OutputStream outStream = target.createOutputStream()) {
+			outStream.write(scripts.getBytes(StandardCharsets.UTF_8));
 		} catch(Exception e) {
 			throw e;
 		}

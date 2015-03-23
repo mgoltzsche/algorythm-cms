@@ -1,8 +1,5 @@
 package de.algorythm.cms.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLInputFactory;
@@ -18,20 +15,20 @@ import de.algorythm.cms.common.model.entity.impl.LocaleInfos;
 import de.algorythm.cms.common.model.entity.impl.Metadata;
 import de.algorythm.cms.common.model.entity.impl.PageFeed;
 import de.algorythm.cms.common.model.entity.impl.Sources;
-import de.algorythm.cms.common.rendering.pipeline.impl.MetadataExtractor;
+import de.algorythm.cms.common.rendering.pipeline.IMetadataExtractorProvider;
+import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
+import de.algorythm.cms.common.rendering.pipeline.IXmlSourceResolverProvider;
+import de.algorythm.cms.common.rendering.pipeline.impl.MetadataExtractorFactory;
+import de.algorythm.cms.common.rendering.pipeline.impl.XmlFactory;
+import de.algorythm.cms.common.rendering.pipeline.impl.XmlSourceResolverProvider;
+import de.algorythm.cms.common.resources.IArchiveExtractor;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IBundleLoader;
 import de.algorythm.cms.common.resources.IDependencyLoader;
-import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.impl.BundleExpander;
 import de.algorythm.cms.common.resources.impl.BundleLoader;
 import de.algorythm.cms.common.resources.impl.ClasspathDependencyLoader;
-import de.algorythm.cms.common.resources.impl.DefaultXmlSourceResolver;
-import de.algorythm.cms.common.resources.impl.OdtXmlSourceResolver;
-import de.algorythm.cms.common.resources.impl.XmlSourceResolverDelegator;
-import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
-import de.algorythm.cms.common.resources.meta.impl.CmsMetadataExtractor;
-import de.algorythm.cms.common.resources.meta.impl.OdtMetadataExtractor;
+import de.algorythm.cms.common.resources.impl.SynchronizedZipArchiveExtractor;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler;
 
@@ -49,8 +46,10 @@ public class CmsCommonModule extends AbstractModule {
 			bindIDependencyLoader(bind(IDependencyLoader.class));
 			bindXMLInputFactory(bind(XMLInputFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
-			bindIXmlSourceResolver(bind(IXmlSourceResolver.class));
-			bindIMetadataExtractor(bind(IMetadataExtractor.class));
+			bindIXmlSourceResolverProvider(bind(IXmlSourceResolverProvider.class));
+			bindIMetadataExtractorProvider(bind(IMetadataExtractorProvider.class));
+			bindIXmlFactory(bind(IXmlFactory.class));
+			bindIArchiveExtractor(bind(IArchiveExtractor.class));
 		} catch(Exception e) {
 			throw new RuntimeException("Cannot initialize module", e);
 		}
@@ -96,26 +95,19 @@ public class CmsCommonModule extends AbstractModule {
 		}
 	}
 	
-	protected void bindIXmlSourceResolver(AnnotatedBindingBuilder<IXmlSourceResolver> bind) {
-		final Map<String, IXmlSourceResolver> extensionMap = new HashMap<String, IXmlSourceResolver>();
-		final IXmlSourceResolver xmlResolver = new DefaultXmlSourceResolver();
-		
-		extensionMap.put("xml", xmlResolver);
-		extensionMap.put("xsl", xmlResolver);
-		extensionMap.put("xsd", xmlResolver);
-		extensionMap.put("svg", xmlResolver);
-		extensionMap.put("odt", new OdtXmlSourceResolver());
-		bind.toInstance(new XmlSourceResolverDelegator(extensionMap));
+	protected void bindIXmlSourceResolverProvider(AnnotatedBindingBuilder<IXmlSourceResolverProvider> bind) {
+		bind.to(XmlSourceResolverProvider.class);
 	}
 	
-	protected void bindIMetadataExtractor(AnnotatedBindingBuilder<IMetadataExtractor> bind) {
-		final Map<String, IMetadataExtractor> extensionMap = new HashMap<String, IMetadataExtractor>();
-		final IMetadataExtractor xmlExtractor = new CmsMetadataExtractor();
-		final IMetadataExtractor odtExtractor = new OdtMetadataExtractor();
-		
-		extensionMap.put("xml", xmlExtractor);
-		extensionMap.put("odt", odtExtractor);
-		
-		bind.toInstance(new MetadataExtractor(extensionMap));
+	protected void bindIMetadataExtractorProvider(AnnotatedBindingBuilder<IMetadataExtractorProvider> bind) {
+		bind.to(MetadataExtractorFactory.class);
+	}
+	
+	protected void bindIXmlFactory(AnnotatedBindingBuilder<IXmlFactory> bind) {
+		bind.to(XmlFactory.class);
+	}
+	
+	protected void bindIArchiveExtractor(AnnotatedBindingBuilder<IArchiveExtractor> bind) {
+		bind.to(SynchronizedZipArchiveExtractor.class);
 	}
 }

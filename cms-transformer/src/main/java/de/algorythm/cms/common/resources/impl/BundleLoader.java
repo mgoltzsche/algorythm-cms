@@ -13,7 +13,6 @@ import javax.inject.Singleton;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
@@ -26,13 +25,11 @@ import de.algorythm.cms.common.resources.IBundleLoader;
 @Singleton
 public class BundleLoader implements IBundleLoader {
 
-	private final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 	private final JAXBContext jaxbContext;
 	
 	@Inject
 	public BundleLoader(final JAXBContext jaxbContext) throws JAXBException {
 		this.jaxbContext = jaxbContext;
-		parserFactory.setNamespaceAware(true);
 	}
 	
 	@Override

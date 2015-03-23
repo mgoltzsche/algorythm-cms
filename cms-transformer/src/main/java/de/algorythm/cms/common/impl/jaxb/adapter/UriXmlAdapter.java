@@ -8,14 +8,11 @@ public class UriXmlAdapter extends XmlAdapter<String, URI> {
 
 	@Override
 	public String marshal(final URI uri) throws Exception {
-		if (uri == null)
-			throw new IllegalStateException("Missing URI");
-		
-		return uri.toString();
+		return uri == null ? null : uri.normalize().toString();
 	}
 
 	@Override
 	public URI unmarshal(final String uriStr) throws Exception {
-		return new URI(uriStr);
+		return uriStr == null ? null : new URI(uriStr).normalize();
 	}
 }

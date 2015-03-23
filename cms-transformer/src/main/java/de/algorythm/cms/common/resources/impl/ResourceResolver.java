@@ -3,29 +3,17 @@ package de.algorythm.cms.common.resources.impl;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 
-import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class ResourceResolver implements ISourcePathResolver {
 
-	private final Collection<Path> rootPathes;
+	private final List<Path> rootPathes;
 	
-	public ResourceResolver(final IBundle bundle, final Path tmpDirectory) {
-		final Set<Path> rootPathSet = new LinkedHashSet<Path>();
-		
-		rootPathSet.add(tmpDirectory);
-		rootPathSet.add(bundle.getLocation());
-		
-		for (Path rootPath : bundle.getRootDirectories())
-			rootPathSet.add(rootPath);
-		
-		rootPathes = new LinkedList<Path>(rootPathSet);
+	public ResourceResolver(final List<Path> locations) {
+		this.rootPathes = locations;
 	}
 
 	@Override

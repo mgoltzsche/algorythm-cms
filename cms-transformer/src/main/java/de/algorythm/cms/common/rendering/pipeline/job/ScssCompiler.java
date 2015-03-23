@@ -10,8 +10,9 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
+
+import javax.inject.Singleton;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.w3c.css.sac.InputSource;
@@ -26,35 +27,35 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
 
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.resources.IOutputTarget;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
-public class ScssCompiler implements IRenderingJob {
+@Singleton
+public class ScssCompiler {
 
 	static private final URI MAIN_CSS = URI.create("main.css");
 
-	private List<URI> config = new LinkedList<URI>();
-	private List<URI> sources = new LinkedList<URI>();
 	private boolean compress = false;
 
-	@Override
-	public void run(final IRenderingContext ctx) throws Exception {
+	public void compileScss(final IRenderingContext ctx, final List<URI> sources, final IOutputTargetFactory targetFactory) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
-		final List<URI> uris = new LinkedList<URI>(config);
-		final StringBuilder scss = new StringBuilder();
+		final String scss = createIncludingSCSS(sources);
 		
-		uris.addAll(sources);
-		createIncludingSCSS(uris, scss);
-		compileSource(scss.toString(), ctx);
+		compileSource(scss, ctx, targetFactory);
 		meter.finish();
 	}
 	
-	private void createIncludingSCSS(final List<URI> uris, final StringBuilder scss) {
+	private String createIncludingSCSS(final List<URI> uris) {
+		final StringBuilder scss = new StringBuilder();
+		
 		for (URI uri : uris)
 			scss.append("@import \"").append(StringEscapeUtils.escapeJava(uri.getPath())).append("\";\n");
+		
+		return scss.toString();
 	}
 	
-	private void compileSource(final String scss, final IRenderingContext ctx) throws Exception {
+	private void compileSource(final String scss, final IRenderingContext ctx, final IOutputTargetFactory targetFactory) throws Exception {
 		final String cssPath = ctx.getResourcePrefix().resolve(MAIN_CSS).getPath();
 		final SCSSDocumentHandler docHandler = new SCSSDocumentHandlerImpl();
 		final SCSSErrorHandler errorHandler = new SCSSErrorHandler();
@@ -81,7 +82,9 @@ public class ScssCompiler implements IRenderingJob {
 			css = writer.toString().replace("\n", "");
 		}
 		
-		try (OutputStream out = ctx.createOutputStream(cssPath)) {
+		final IOutputTarget target = targetFactory.createOutputTarget(cssPath);
+		
+		try (OutputStream out = target.createOutputStream()) {
 			out.write(css.getBytes(StandardCharsets.UTF_8));
 		} catch(Exception e) {
 			throw e;

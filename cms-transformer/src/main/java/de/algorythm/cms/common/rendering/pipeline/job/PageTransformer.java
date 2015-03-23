@@ -13,10 +13,11 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_PARAM_P
 import java.io.IOException;
 import java.net.URI;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Templates;
@@ -26,6 +27,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.TransformerHandler;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -34,27 +37,30 @@ import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
+import de.algorythm.cms.common.model.entity.impl.XmlTemplates;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
 import de.algorythm.cms.common.rendering.pipeline.impl.TemplateErrorListener;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.SimpleLocator;
+import de.algorythm.cms.common.scheduling.IExecutor;
 
-public class PageTransformer implements IRenderingJob {
+@Singleton
+public class PageTransformer {
 
+	static private final Logger log = LoggerFactory.getLogger(PageTransformer.class);
 	static private final String DOT = ".";
 
-	private List<URI> templates = new LinkedList<URI>();
-	private URI theme;
+	private final IXmlFactory xmlFactory;
 	
-	@Override
-	public void run(final IRenderingContext ctx) throws TransformerConfigurationException {
-		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this + " initialization");
-		final LinkedList<URI> templateLocations = new LinkedList<URI>();
-		
-		templateLocations.addAll(templates);
-		templateLocations.add(theme);
-		
+	@Inject
+	public PageTransformer(final IXmlFactory xmlFactory) {
+		this.xmlFactory = xmlFactory;
+	}
+
+	public void transformPages(final IRenderingContext ctx, final XmlTemplates templateUris, final IExecutor executor, final IOutputTargetFactory targetFactory) throws TransformerConfigurationException {
+		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this + " initialization");		
 		final IBundle bundle = ctx.getBundle();
 		final Set<ISupportedLocale> supportedLocales = bundle.getSupportedLocales();
 		final boolean localizeOutput = supportedLocales.size() > 1;
@@ -66,23 +72,38 @@ public class PageTransformer implements IRenderingJob {
 		final String localizedResourceBasePath = localizeOutput
 				? "/.." + resourceBasePath
 				: resourceBasePath;
-		final Templates templates = ctx.compileTemplates(templateLocations);
+		final Templates templates = compileTemplates(templateUris, ctx);
 		final IPageConfig startPage = bundle.getStartPage();
 		
 		for (ISupportedLocale supportedLocale : supportedLocales) {
 			final Locale locale = supportedLocale.getLocale();
 			
-			renderPages(startPage, StringUtils.EMPTY, DOT, templates, ctx, locale, localizedResourceBasePath);
+			renderPages(startPage, StringUtils.EMPTY, DOT, templates, ctx, locale, localizedResourceBasePath, targetFactory, executor);
 		}
 		
 		meter.finish();
 	}
 	
-	private void renderPages(final IPageConfig pageConfig, final String path, final String relativeRootPath, final Templates compiledTemplates, final IRenderingContext ctx, final Locale locale, final String resourceBasePath) {
-		ctx.execute(new IRenderingJob() {
+	private Templates compileTemplates(final XmlTemplates templates, final IRenderingContext ctx) throws TransformerConfigurationException {
+		final LinkedList<URI> templateLocations = new LinkedList<URI>();
+		
+		templateLocations.addAll(templates.getTemplateUris());
+		templateLocations.add(templates.getThemeTemplateUri());
+		
+		return xmlFactory.compileTemplates(templateLocations, ctx);
+	}
+	
+	private void renderPages(final IPageConfig pageConfig, final String path, final String relativeRootPath, final Templates compiledTemplates, final IRenderingContext ctx, final Locale locale, final String resourceBasePath, final IOutputTargetFactory targetFactory, final IExecutor executor) {
+		executor.execute(new Runnable() {
 			@Override
-			public void run(final IRenderingContext ctx) throws Exception {
-				renderPage(ctx, pageConfig.getSource(), path, relativeRootPath, compiledTemplates, locale, resourceBasePath);
+			public void run() {
+				try {
+					transformPage(ctx, pageConfig.getSource(), path, relativeRootPath, compiledTemplates, locale, resourceBasePath, targetFactory);
+				} catch (IOException | TransformerException | SAXException
+						| ParserConfigurationException | JAXBException
+						| ResourceNotFoundException e) {
+					log.error("Page transformation failed: " + path, e);
+				}
 			}
 			@Override
 			public String toString() {
@@ -92,17 +113,17 @@ public class PageTransformer implements IRenderingJob {
 		
 		// Render sub pages
 		for (IPageConfig child : pageConfig.getPages())
-			renderPages(child, path + '/' + child.getName(), relativeRootPath + "/..", compiledTemplates, ctx, locale, resourceBasePath);
+			renderPages(child, path + '/' + child.getName(), relativeRootPath + "/..", compiledTemplates, ctx, locale, resourceBasePath, targetFactory, executor);
 	}
 	
-	private void renderPage(final IRenderingContext ctx, final URI sourceUri, final String path, final String relativeRootPath, final Templates compiledTemplates, final Locale locale, final String resourceBasePath) throws IOException, TransformerException, SAXException, ParserConfigurationException, JAXBException, ResourceNotFoundException {
+	public void transformPage(final IRenderingContext ctx, final URI sourceUri, final String path, final String relativeRootPath, final Templates compiledTemplates, final Locale locale, final String resourceBasePath, final IOutputTargetFactory targetFactory) throws IOException, TransformerException, SAXException, ParserConfigurationException, JAXBException, ResourceNotFoundException {
 		final IBundle bundle = ctx.getBundle();
 		final boolean internationalized = ctx.getBundle().getSupportedLocales().size() > 1;
 		final String targetPath = internationalized
 				? '/' + locale.getLanguage() + path + "/index.html"
 				: path + "/index.html";
 		final String resourceBaseUrl = URI.create(relativeRootPath + resourceBasePath).normalize().toString();
-		final TransformerHandler transformerHandler = ctx.createTransformerHandler(compiledTemplates, targetPath, ctx);
+		final TransformerHandler transformerHandler = xmlFactory.createTransformerHandler(compiledTemplates, ctx, targetPath, targetFactory);
 		final Transformer transformer = transformerHandler.getTransformer();
 		final TemplateErrorListener errorListener = new TemplateErrorListener();
 		

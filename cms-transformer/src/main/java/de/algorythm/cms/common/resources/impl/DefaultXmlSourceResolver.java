@@ -3,23 +3,25 @@ package de.algorythm.cms.common.resources.impl;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.xml.transform.Source;
 
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IMetadataExtractorProvider;
+import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
-import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
-import de.algorythm.cms.common.resources.meta.impl.CmsMetadataExtractor;
 
+@Singleton
 public class DefaultXmlSourceResolver extends AbstractXmlSourceResolver {
 
-	static private final IMetadataExtractor metadataExtractor = new CmsMetadataExtractor();
-	
-	public DefaultXmlSourceResolver() {
-		super(metadataExtractor);
+	@Inject
+	public DefaultXmlSourceResolver(final IXmlFactory xmlFactory, final IMetadataExtractorProvider metadataExtractor) {
+		super(xmlFactory, metadataExtractor);
 	}
 
 	@Override
-	protected Source createXmlSourceInternal(URI uri, IBundleRenderingContext ctx) throws IOException, ResourceNotFoundException {
+	protected Source createXmlSourceInternal(URI uri, IRenderingContext ctx) throws IOException, ResourceNotFoundException {
 		return new XmlSource(uri, ctx.resolveSource(uri));
 	}
 }

@@ -22,51 +22,84 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 
-import com.google.inject.Injector;
-
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.IRenderingJobConfig;
 import de.algorythm.cms.common.model.entity.IRenderingJobConfig.RenderingPhase;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.model.entity.impl.XmlTemplates;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
+import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor;
+import de.algorythm.cms.common.rendering.pipeline.job.PageIndexer;
+import de.algorythm.cms.common.rendering.pipeline.job.PageTransformer;
+import de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler;
+import de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator;
+import de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
+import de.algorythm.cms.common.scheduling.IExecutor;
 import de.algorythm.cms.common.scheduling.IFuture;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.Future;
 
 public class Renderer implements IRenderer {
 
-	private final IProcessScheduler scheduler;
-	private final Injector injector;
-	private final IXmlSourceResolver xmlSourceResolver;
-	private final JAXBContext jaxbContext;
-	private final IMetadataExtractor metadataExtractor;
 	private final IBundle bundle;
 	private final Path tmpDirectory;
+	private final IRenderingContext ctx;
+	
+	private final SupportedLocalesXmlGenerator localesXmlGenerator;
+	private final PageIndexer indexer;
+	private final PageTransformer transformer;
+	private final JavascriptCompressor jsCompressor;
+	private final ScssCompiler scssCompiler;
+	private final SvgSpriteGenerator svgSpriteGenerator;
 
-	public Renderer(final IProcessScheduler scheduler, final Injector injector,
-			final IXmlSourceResolver xmlSourceResolver,
-			final JAXBContext jaxbContext,
+	public Renderer(final IXmlSourceResolver xmlSourceResolver,
 			final IMetadataExtractor metadataExtractor,
+			final JAXBContext jaxbContext,
 			final IBundle expandedBundle,
-			final Path tmpDirectory) {
-		this.scheduler = scheduler;
-		this.injector = injector;
-		this.xmlSourceResolver = xmlSourceResolver;
-		this.jaxbContext = jaxbContext;
-		this.metadataExtractor = metadataExtractor;
-		
+			final Path tmpDirectory,
+			final SupportedLocalesXmlGenerator localesXmlGenerator,
+			final PageIndexer indexer,
+			final PageTransformer transformer,
+			final JavascriptCompressor jsCompressor,
+			final ScssCompiler scssCompiler,
+			final SvgSpriteGenerator svgSpriteGenerator) {
 		this.bundle = expandedBundle;
 		this.tmpDirectory = tmpDirectory;
+		final URI resourcePrefix = URI.create("/r/" + new Date().getTime() + '/');
+		this.ctx = new RenderingContext(expandedBundle, tmpDirectory, resourcePrefix);
+		
+		this.localesXmlGenerator = localesXmlGenerator;
+		this.indexer = indexer;
+		this.transformer = transformer;
+		this.jsCompressor = jsCompressor;
+		this.scssCompiler = scssCompiler;
+		this.svgSpriteGenerator = svgSpriteGenerator;
 	}
 
+	public void renderAll(IExecutor executor, IOutputTargetFactory targetFactory) throws Exception {
+		final XmlTemplates tpls = new XmlTemplates(templateUris, themeUri);
+		
+		localesXmlGenerator.generateSupportedLocalesXml(ctx.getBundle(), true, targetFactory);
+		indexer.indexPages(ctx, executor);
+		transformer.transformPages(ctx, tpls, executor, targetFactory);
+		jsCompressor.compressJs(ctx, sources, targetFactory);
+		scssCompiler.compileScss(ctx, sources, targetFactory);
+		svgSpriteGenerator.generateSvgSprite(ctx, sources, flagDirectoryUri, true, targetFactory);
+	}
+	
+	public void renderPage(IExecutor executor) {
+		transformer.transformPage(ctx, sourceUri, path, relativeRootPath, compiledTemplates, locale, resourceBasePath, targetFactory)
+	}
+	
 	@Override
 	public IFuture<Void> render(final Path outputDirectory) {
 		try {
@@ -80,7 +113,7 @@ public class Renderer implements IRenderer {
 		
 		final TimeMeter meter = TimeMeter.meter(bundle.getName() + " process initialization");
 		final URI resourceOutputPath = URI.create("/r/" + new Date().getTime() + '/');
-		final IBundleRenderingContext ctx = new RenderingContext(bundle, metadataExtractor, jaxbContext, xmlSourceResolver, tmpDirectory, outputDirectory, resourceOutputPath);
+		final IRenderingContext ctx = new RenderingContext(bundle, tmpDirectory, resourceOutputPath);
 		final Map<RenderingPhase, Set<IRenderingJob>> phaseMap = new HashMap<RenderingPhase, Set<IRenderingJob>>();
 		final LinkedList<Collection<IRenderingJob>> processJobs = new LinkedList<Collection<IRenderingJob>>();
 		final Future<Void> future = new Future<Void>();
@@ -108,7 +141,7 @@ public class Renderer implements IRenderer {
 				processJobs.add(jobs);
 		}
 		
-		scheduler.execute(new RenderingProcess(ctx, processJobs, injector, future));
+		scheduler.execute(new RenderingProcess(ctx, processJobs, future));
 		meter.finish();
 	
 		return future;

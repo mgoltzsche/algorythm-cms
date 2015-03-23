@@ -1,6 +1,13 @@
 package de.algorythm.cms.common.rendering.pipeline;
 
-public interface IRenderingContext extends IBundleRenderingContext {
+import java.net.URI;
 
-	void execute(IRenderingJob job);
+import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
+import de.algorythm.cms.common.resources.ISourcePathResolver;
+
+public interface IRenderingContext extends ISourcePathResolver, IOutputTargetFactory {
+
+	IBundle getBundle();
+	URI getResourcePrefix();
 }

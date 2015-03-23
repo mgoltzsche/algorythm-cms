@@ -1,38 +1,26 @@
 package de.algorythm.cms.common.resources.impl;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-import de.algorythm.cms.common.resources.IOutputStreamFactory;
+import de.algorythm.cms.common.resources.IOutputTarget;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
 
-public class FileOutputStreamFactory implements IOutputStreamFactory {
+public class FileOutputTargetFactory implements IOutputTargetFactory {
 
 	private final Path outputDirectory;
 
-	public FileOutputStreamFactory(final Path outputDirectory) {
+	public FileOutputTargetFactory(final Path outputDirectory) {
 		this.outputDirectory = outputDirectory.normalize();
 	}
 
 	@Override
-	public OutputStream createOutputStream(final String publicPath) {
-		final Path path = resolvePath(publicPath);
-		
-		try {
-			Files.createDirectories(path.getParent());
-			
-			return Files.newOutputStream(path);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public IOutputTarget createOutputTarget(final String publicPath) {
+		return new FileOutputTarget(publicPath, resolvePath(publicPath));
 	}
 
 	private Path resolvePath(final String path) {
 		final String relativePath = !path.isEmpty() && path.charAt(0) == '/'
-			? path.substring(1)
-			: path;
-		
+			? path.substring(1) : path;
 		final Path resolvedDirectory = outputDirectory.resolve(relativePath);
 		
 		if (!resolvedDirectory.toString().startsWith(outputDirectory.toString()))

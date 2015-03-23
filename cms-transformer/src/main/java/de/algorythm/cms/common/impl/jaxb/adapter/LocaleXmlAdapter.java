@@ -6,6 +6,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class LocaleXmlAdapter extends XmlAdapter<String, Locale> {
 
+	static public final LocaleXmlAdapter INSTANCE = new LocaleXmlAdapter(); 
+
 	@Override
 	public String marshal(final Locale locale) throws Exception {
 		return locale.toLanguageTag();

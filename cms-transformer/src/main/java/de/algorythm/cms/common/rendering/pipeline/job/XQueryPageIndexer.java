@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
+import javax.inject.Singleton;
 import javax.xml.transform.stream.StreamSource;
 
 import net.sf.saxon.Configuration;
@@ -14,10 +15,10 @@ import net.sf.saxon.s9api.XQueryExecutable;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
 
-public class XQueryPageIndexer implements IRenderingJob {
+@Singleton
+public class XQueryPageIndexer {
 
-	@Override
-	public void run(IRenderingContext context) throws Exception {
+	public void executeXQuery(final IRenderingContext context) throws Exception {
 		/*Configuration cfg = new Configuration();
 		cfg.setXIncludeAware(false);
 		Processor processor = new Processor(cfg);

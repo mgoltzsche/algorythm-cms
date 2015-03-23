@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 
 import de.algorythm.cms.common.model.entity.IMetadata;
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
@@ -20,7 +20,7 @@ public class MetadataExtractor implements IMetadataExtractor {
 	}
 	
 	@Override
-	public IMetadata extractMetadata(URI uri, IBundleRenderingContext ctx)
+	public IMetadata extractMetadata(URI uri, IRenderingContext ctx)
 			throws ResourceNotFoundException, MetadataExtractionException {
 		final String extension = FilenameUtils.getExtension(uri.getPath());
 		

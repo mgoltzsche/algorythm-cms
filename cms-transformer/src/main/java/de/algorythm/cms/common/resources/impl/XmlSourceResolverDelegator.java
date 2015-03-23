@@ -8,7 +8,7 @@ import javax.xml.transform.Source;
 
 import org.apache.commons.io.FilenameUtils;
 
-import de.algorythm.cms.common.rendering.pipeline.IBundleRenderingContext;
+import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
@@ -21,7 +21,7 @@ public class XmlSourceResolverDelegator implements IXmlSourceResolver {
 	}
 	
 	@Override
-	public Source createXmlSource(URI uri, IBundleRenderingContext ctx)
+	public Source createXmlSource(URI uri, IRenderingContext ctx)
 			throws ResourceNotFoundException, IOException {
 		final String extension = FilenameUtils.getExtension(uri.getPath()).toLowerCase();
 		

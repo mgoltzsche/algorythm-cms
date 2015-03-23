@@ -8,41 +8,42 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.LinkedList;
 import java.util.List;
+
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingJob;
+import de.algorythm.cms.common.resources.IOutputTarget;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
 import de.algorythm.cms.common.resources.impl.SimpleFileVisitor;
 
-public class DirectoryExporter implements IRenderingJob {
+@Singleton
+public class DirectoryExporter {
 
 	static private final Logger log = LoggerFactory.getLogger(DirectoryExporter.class);
 	static private final int BUFFER_SIZE = 8192;
 
-	private final List<URI> directories = new LinkedList<URI>();
-
-	@Override
-	public void run(final IRenderingContext ctx) throws Exception {
+	public void exportDirectories(final IRenderingContext ctx, final List<URI> directories, final IOutputTargetFactory targetFactory) throws Exception {
+		final Path rootDir = ctx.resolveSource(URI.create("/"));
+		
 		for (URI dirURI : directories) {
-			final String path = dirURI.getPath().substring(1);
-			final Path inDir = ctx.getBundle().getLocation().resolve(path).normalize();
-			final int inDirLength = inDir.toUri().getPath().length() - path.length() - 1;
+			Path dirPath = ctx.resolveSource(dirURI);
 
-			if (!Files.exists(inDir))
-				log.warn("Cannot export directory " + inDir + " because it does not exist");
+			if (!Files.exists(dirPath))
+				log.warn("Cannot export directory " + dirPath + " because it does not exist");
 
-			Files.walkFileTree(inDir, new SimpleFileVisitor<Path>() {
+			Files.walkFileTree(dirPath, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file,
 						BasicFileAttributes attrs) throws IOException {
-					final String path = file.toUri().getPath().substring(inDirLength);
+					final String path = rootDir.relativize(file).toString();
+					final IOutputTarget target = targetFactory.createOutputTarget(path);
 
 					try (InputStream in = Files.newInputStream(file);
-							OutputStream out = ctx.createOutputStream(path)) {
+							OutputStream out = target.createOutputStream()) {
 						copy(in, out);
 					} catch (IOException e) {
 						throw e;

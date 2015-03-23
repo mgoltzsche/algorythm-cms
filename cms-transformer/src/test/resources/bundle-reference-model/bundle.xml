@@ -1,0 +1,72 @@
+<bundle xmlns="http://cms.algorythm.de/common/Bundle"
+		title="algorythm.de"
+		default-locale="de-DE">
+	<dependencies>
+		<dependency>/org/example/cms/module1/bundle.xml</dependency>
+		<dependency>/org/example/cms/module2/bundle.xml</dependency>
+		<dependency>/org/example/cms/module3/bundle.xml</dependency>
+	</dependencies>
+	<supported-locales>
+		<locale>de-DE</locale>
+		<locale>en-UK</locale>
+	</supported-locales>
+	<output-mapping>
+		<output format="HTML">
+			<theme base="/org/example/cms/module1">
+				<templates>
+					<template>transformations/html/MyPage.xsl</template>
+					<template>transformations/html/MyMarkup.xsl</template>
+					<template>transformations/html/MyMenu.xsl</template>
+					<!-- <template>transformations/html/Theme.xsl</template>
+					<template>transformations/html/Article.xsl</template>
+					<template>transformations/html/Markup.xsl</template>
+					<template>transformations/html/Menu.xsl</template>
+					<template>transformations/html/SubNavigation.xsl</template>
+					<template>transformations/html/Breadcrumbs.xsl</template>
+					<template>transformations/html/Grid.xsl</template>
+					<template>transformations/Include.xsl</template>-->
+				</templates>
+				<styles>
+					<style>css/style1.scss</style>
+					<style>css/style2.scss</style>
+					<style>css/style3.scss</style>
+				</styles>
+				<scripts>
+					<script>js/script1.js</script>
+					<script>js/script2.js</script>
+					<script>js/script3.js</script>
+				</scripts>
+			</theme>
+			<module>
+				<templates>
+					<template></template>
+				</templates>
+				<styles>
+					<style></style>
+				</styles>
+				<scripts>
+					<script></script>
+				</scripts>
+			</module>
+		</output>
+		<output format="PDF">
+			<theme>
+			</theme>
+			<module>
+			</module>
+		</output>
+	</output-mapping>
+	<page src="/contents/welcome.xml">
+		<page name="projects" src="/contents/projects.xml">
+			<page name="algorythm-cms" src="/contents/projects/algorythm-cms.xml" />
+			<page name="goolap" src="/contents/projects/goolap.xml" />
+			<page name="mdsd-dsls" src="/contents/projects/mdsd-dsls.xml" />
+			<page name="java-desktop-database" src="/contents/projects/jddb.xml" />
+			<page name="webgl-dof" src="/contents/projects/webgl-dof.xml" />
+			<page name="defender3d" src="/contents/projects/defender3d.xml" />
+			<page name="ogre3d-hmd" src="/contents/projects/ogre3d-hmd.xml" />
+			<page name="travel-ant" src="/contents/projects/travel-ant.xml" />
+		</page>
+		<page name="about" src="/contents/about.xml" />
+	</page>
+</bundle>
