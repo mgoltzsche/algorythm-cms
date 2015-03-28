@@ -14,6 +14,6 @@ public interface IBundle {
 	Locale getDefaultLocale();
 	Set<Locale> getSupportedLocales();
 	Set<URI> getDependencies();
-	Map<OutputFormat, IOutputConfig> getOutputMapping();
+	Map<Format, IOutputConfig> getOutputMapping();
 	Page getStartPage();
 }

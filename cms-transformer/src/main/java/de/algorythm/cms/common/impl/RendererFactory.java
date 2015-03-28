@@ -22,6 +22,7 @@ import de.algorythm.cms.common.rendering.pipeline.job.PageTransformer;
 import de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler;
 import de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator;
 import de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator;
+import de.algorythm.cms.common.rendering.pipeline.job.TemplateCompiler;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IXmlSourceResolver;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
@@ -34,6 +35,7 @@ public class RendererFactory implements IRendererFactory {
 	private final JAXBContext jaxbContext;
 	private final IBundleExpander expander;
 	// transformation jobs
+	private final TemplateCompiler templateCompiler;
 	private final SupportedLocalesXmlGenerator localesXmlGenerator;
 	private final PageIndexer indexer;
 	private final PageTransformer transformer;
@@ -46,6 +48,7 @@ public class RendererFactory implements IRendererFactory {
 			final IXmlSourceResolverProvider xmlSourceResolverProvider,
 			final IMetadataExtractorProvider metadataExtractorProvider,
 			final JAXBContext jaxbContext, final IBundleExpander expander,
+			final TemplateCompiler templateCompiler,
 			final SupportedLocalesXmlGenerator localesXmlGenerator,
 			final PageIndexer indexer,
 			final PageTransformer transformer,
@@ -56,6 +59,7 @@ public class RendererFactory implements IRendererFactory {
 		this.metadataExtractor = metadataExtractorProvider.getMetadataExtractor();
 		this.jaxbContext = jaxbContext;
 		this.expander = expander;
+		this.templateCompiler = templateCompiler;
 		this.localesXmlGenerator = localesXmlGenerator;
 		this.indexer = indexer;
 		this.transformer = transformer;
@@ -73,7 +77,7 @@ public class RendererFactory implements IRendererFactory {
 		return new Renderer(xmlSourceResolver,
 				metadataExtractor, jaxbContext,
 				expandedBundle, tmpDirectory,
-				localesXmlGenerator, indexer, transformer,
+				localesXmlGenerator, indexer, templateCompiler, transformer,
 				jsCompressor, scssCompiler, svgSpriteGenerator);
 	}
 }

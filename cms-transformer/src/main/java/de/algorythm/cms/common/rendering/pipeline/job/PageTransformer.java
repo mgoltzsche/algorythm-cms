@@ -12,7 +12,6 @@ import static de.algorythm.cms.common.ParameterNameConstants.Render.SITE_PARAM_P
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Set;
 
@@ -37,7 +36,6 @@ import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
-import de.algorythm.cms.common.model.entity.impl.XmlTemplates;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
 import de.algorythm.cms.common.rendering.pipeline.impl.TemplateErrorListener;
@@ -59,7 +57,7 @@ public class PageTransformer {
 		this.xmlFactory = xmlFactory;
 	}
 
-	public void transformPages(final IRenderingContext ctx, final XmlTemplates templateUris, final IExecutor executor, final IOutputTargetFactory targetFactory) throws TransformerConfigurationException {
+	public void transformPages(final IRenderingContext ctx, final Templates templates, final IExecutor executor, final IOutputTargetFactory targetFactory) throws TransformerConfigurationException {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this + " initialization");		
 		final IBundle bundle = ctx.getBundle();
 		final Set<ISupportedLocale> supportedLocales = bundle.getSupportedLocales();
@@ -69,11 +67,10 @@ public class PageTransformer {
 		if (!resourceBasePath.isEmpty() && resourceBasePath.charAt(resourceBasePath.length() - 1) == '/')
 			resourceBasePath = resourceBasePath.substring(0, resourceBasePath.length() - 1);
 		
+		final IPageConfig startPage = bundle.getStartPage();
 		final String localizedResourceBasePath = localizeOutput
 				? "/.." + resourceBasePath
 				: resourceBasePath;
-		final Templates templates = compileTemplates(templateUris, ctx);
-		final IPageConfig startPage = bundle.getStartPage();
 		
 		for (ISupportedLocale supportedLocale : supportedLocales) {
 			final Locale locale = supportedLocale.getLocale();
@@ -83,16 +80,7 @@ public class PageTransformer {
 		
 		meter.finish();
 	}
-	
-	private Templates compileTemplates(final XmlTemplates templates, final IRenderingContext ctx) throws TransformerConfigurationException {
-		final LinkedList<URI> templateLocations = new LinkedList<URI>();
-		
-		templateLocations.addAll(templates.getTemplateUris());
-		templateLocations.add(templates.getThemeTemplateUri());
-		
-		return xmlFactory.compileTemplates(templateLocations, ctx);
-	}
-	
+
 	private void renderPages(final IPageConfig pageConfig, final String path, final String relativeRootPath, final Templates compiledTemplates, final IRenderingContext ctx, final Locale locale, final String resourceBasePath, final IOutputTargetFactory targetFactory, final IExecutor executor) {
 		executor.execute(new Runnable() {
 			@Override

@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerConfigurationException;
 
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IBundle;
@@ -38,6 +40,7 @@ import de.algorythm.cms.common.rendering.pipeline.job.PageTransformer;
 import de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler;
 import de.algorythm.cms.common.rendering.pipeline.job.SupportedLocalesXmlGenerator;
 import de.algorythm.cms.common.rendering.pipeline.job.SvgSpriteGenerator;
+import de.algorythm.cms.common.rendering.pipeline.job.TemplateCompiler;
 import de.algorythm.cms.common.resources.IOutputTargetFactory;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.IXmlSourceResolver;
@@ -56,6 +59,7 @@ public class Renderer implements IRenderer {
 	
 	private final SupportedLocalesXmlGenerator localesXmlGenerator;
 	private final PageIndexer indexer;
+	private final TemplateCompiler templateCompiler;
 	private final PageTransformer transformer;
 	private final JavascriptCompressor jsCompressor;
 	private final ScssCompiler scssCompiler;
@@ -68,6 +72,7 @@ public class Renderer implements IRenderer {
 			final Path tmpDirectory,
 			final SupportedLocalesXmlGenerator localesXmlGenerator,
 			final PageIndexer indexer,
+			final TemplateCompiler templateCompiler,
 			final PageTransformer transformer,
 			final JavascriptCompressor jsCompressor,
 			final ScssCompiler scssCompiler,
@@ -79,6 +84,7 @@ public class Renderer implements IRenderer {
 		
 		this.localesXmlGenerator = localesXmlGenerator;
 		this.indexer = indexer;
+		this.templateCompiler = templateCompiler;
 		this.transformer = transformer;
 		this.jsCompressor = jsCompressor;
 		this.scssCompiler = scssCompiler;
@@ -86,12 +92,12 @@ public class Renderer implements IRenderer {
 	}
 
 	public void renderAll(IExecutor executor, IOutputTargetFactory targetFactory) throws Exception {
-		final XmlTemplates tpls = new XmlTemplates(templateUris, themeUri);
+		final Templates templates = templateCompiler.compileTemplates(output);
 		
 		localesXmlGenerator.generateSupportedLocalesXml(ctx.getBundle(), true, targetFactory);
 		indexer.indexPages(ctx, executor);
-		transformer.transformPages(ctx, tpls, executor, targetFactory);
-		jsCompressor.compressJs(ctx, sources, targetFactory);
+		transformer.transformPages(ctx, templates, executor, targetFactory);
+		jsCompressor.compressJs(ctx, sources, targetFactory);s
 		scssCompiler.compileScss(ctx, sources, targetFactory);
 		svgSpriteGenerator.generateSvgSprite(ctx, sources, flagDirectoryUri, true, targetFactory);
 	}

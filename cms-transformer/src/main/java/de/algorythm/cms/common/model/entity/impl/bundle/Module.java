@@ -42,6 +42,14 @@ public class Module implements IModule {
 	})
 	private final Set<URI> scripts = new LinkedHashSet<>();
 
+	public Module() {}
+
+	public Module(IModule src) {
+		templates.addAll(src.getTemplates());
+		styles.addAll(src.getStyles());
+		scripts.addAll(src.getScripts());
+	}
+
 	@Override
 	public Set<URI> getTemplates() {
 		return templates;

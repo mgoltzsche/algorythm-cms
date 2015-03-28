@@ -9,15 +9,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import de.algorythm.cms.common.model.entity.bundle.IOutputConfig;
 import de.algorythm.cms.common.model.entity.bundle.IModule;
 import de.algorythm.cms.common.model.entity.bundle.ITheme;
-import de.algorythm.cms.common.model.entity.bundle.OutputFormat;
+import de.algorythm.cms.common.model.entity.bundle.Format;
 
 @XmlRootElement(name="output", namespace="http://cms.algorythm.de/common/Bundle")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OutputConfig implements IOutputConfig {
 
 	@XmlAttribute(required = true)
-	private OutputFormat format;
-	@XmlElementRef(type = Theme.class)
+	private Format format;
+	@XmlElementRef(type = Theme.class, required = true)
 	private ITheme theme;
 	@XmlElementRef(type = Module.class)
 	private IModule module;
@@ -25,21 +25,23 @@ public class OutputConfig implements IOutputConfig {
 	public OutputConfig() {}
 
 	public OutputConfig(IOutputConfig src) {
-		this(src.getFormat(), src.getTheme(), src.getModule());
+		this(src.getFormat(),
+			new Theme(src.getTheme()),
+			new Module());
 	}
 
-	public OutputConfig(OutputFormat format, ITheme theme, IModule module) {
+	public OutputConfig(Format format, ITheme theme, IModule module) {
 		this.format = format;
 		this.theme = theme;
 		this.module = module;
 	}
 	
 	@Override
-	public OutputFormat getFormat() {
+	public Format getFormat() {
 		return format;
 	}
 
-	public void setFormat(OutputFormat format) {
+	public void setFormat(Format format) {
 		this.format = format;
 	}
 

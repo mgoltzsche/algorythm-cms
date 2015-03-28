@@ -22,19 +22,19 @@ import de.algorythm.cms.common.impl.jaxb.adapter.OutputMapXmlAdapter;
 import de.algorythm.cms.common.impl.jaxb.adapter.UriXmlAdapter;
 import de.algorythm.cms.common.model.entity.bundle.IBundle;
 import de.algorythm.cms.common.model.entity.bundle.IOutputConfig;
-import de.algorythm.cms.common.model.entity.bundle.OutputFormat;
+import de.algorythm.cms.common.model.entity.bundle.Format;
 import de.algorythm.cms.common.model.entity.impl.Page;
 
 @XmlRootElement(name="bundle", namespace="http://cms.algorythm.de/common/Bundle")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Bundle implements IBundle {
 
-	@XmlAttribute(required = true)
-	private String title;
 	@XmlJavaTypeAdapter(value = UriXmlAdapter.class)
-	@XmlAttribute(required = true)
+	@XmlAttribute
 	@XmlSchemaType(name = "anyURI")
 	private URI uri;
+	@XmlAttribute(required = true)
+	private String title;
 	@XmlJavaTypeAdapter(value = LocaleXmlAdapter.class, type = String.class)
 	@XmlAttribute(name = "default-locale")
 	private Locale defaultLocale = Locale.UK;
@@ -53,9 +53,20 @@ public class Bundle implements IBundle {
 	private final Set<URI> dependencies = new LinkedHashSet<>();
 	@XmlElement(name = "output-mapping", namespace = "http://cms.algorythm.de/common/Bundle", required = false)
 	@XmlJavaTypeAdapter(OutputMapXmlAdapter.class)
-	private final Map<OutputFormat, IOutputConfig> outputMapping = new HashMap<>();
+	private final Map<Format, IOutputConfig> outputMapping = new HashMap<>();
 	private Page startPage;
 
+	public Bundle() {}
+	
+	public Bundle(IBundle src) {
+		uri = src.getUri();
+		title = src.getTitle();
+		startPage = src.getStartPage();
+		defaultLocale = src.getDefaultLocale();
+		supportedLocales.addAll(src.getSupportedLocales());
+		supportedLocales.add(defaultLocale);
+	}
+	
 	@Override
 	public String getTitle() {
 		return title;
@@ -103,7 +114,12 @@ public class Bundle implements IBundle {
 	}
 
 	@Override
-	public Map<OutputFormat, IOutputConfig> getOutputMapping() {
+	public Map<Format, IOutputConfig> getOutputMapping() {
 		return outputMapping;
+	}
+	
+	@Override
+	public String toString() {
+		return uri == null ? "Bundle" : uri.toString();
 	}
 }

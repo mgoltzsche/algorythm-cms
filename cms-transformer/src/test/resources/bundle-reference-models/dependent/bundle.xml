@@ -1,0 +1,37 @@
+<bundle xmlns="http://cms.algorythm.de/common/Bundle"
+		title="Example extending bundle"
+		default-locale="de-DE">
+	<dependencies>
+		<dependency>/bundle-reference-models/base/bundle.xml</dependency>
+	</dependencies>
+	<supported-locales>
+		<locale>de-DE</locale>
+	</supported-locales>
+	<output-mapping>
+		<output format="HTML">
+			<theme base="../base/bundle.xml">
+				<templates>
+					<template>theme/transformations/html/Template3.xsl</template>
+				</templates>
+				<styles>
+					<style>theme/css/style3.scss</style>
+				</styles>
+				<scripts>
+					<script>theme/js/script3.js</script>
+				</scripts>
+			</theme>
+			<module>
+				<templates>
+					<template>transformations/html/Template3.xsl</template>
+				</templates>
+				<styles>
+					<style>css/style3.scss</style>
+				</styles>
+				<scripts>
+					<script>js/script3.js</script>
+				</scripts>
+			</module>
+		</output>
+	</output-mapping>
+	<page src="contents/welcome.xml" />
+</bundle>

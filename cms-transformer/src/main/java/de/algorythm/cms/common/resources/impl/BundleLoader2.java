@@ -6,7 +6,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -14,6 +13,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import de.algorythm.cms.common.impl.jaxb.adapter.UriXmlAdapter;
 import de.algorythm.cms.common.model.entity.bundle.IBundle;
 import de.algorythm.cms.common.model.entity.impl.bundle.Bundle;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
@@ -24,35 +24,40 @@ public class BundleLoader2 {
 
 	private final JAXBContext jaxbContext;
 
-	@Inject
-	public BundleLoader2(final JAXBContext jaxbContext) throws JAXBException {
-		this.jaxbContext = jaxbContext;
+	public BundleLoader2() throws JAXBException {
+		jaxbContext = JAXBContext.newInstance(Bundle.class);
 	}
 
 	public IBundle getBundle(URI publicUri, final ISourcePathResolver resolver) throws ResourceNotFoundException, IOException, JAXBException {
 		publicUri = publicUri.normalize();
-		final Path bundleFile = resolver.resolveSource(publicUri);
+		final Path privatePath = resolver.resolveSource(publicUri);
 		
-		if (Files.isDirectory(bundleFile))
-			throw new IllegalArgumentException(bundleFile + " is a directory");
+		if (Files.isDirectory(privatePath))
+			throw new IllegalArgumentException(privatePath + " is a directory");
 		
-		final Bundle bundle = readBundle(bundleFile);
-		
-		bundle.setUri(publicUri);
+		final Bundle bundle = readBundle(publicUri, privatePath);
 		
 		if (bundle.getTitle() == null || bundle.getTitle().isEmpty())
-			throw new IllegalArgumentException("Missing title in bundle " + publicUri);
+			throw new IllegalArgumentException("Missing title attribute of bundle " + publicUri);
 		
-		// TODO: supported locales
+		if (bundle.getDefaultLocale() == null)
+			throw new IllegalArgumentException("Missing default-locale attribute of bundle " + publicUri);
+		
+		bundle.setUri(publicUri);
+		bundle.getSupportedLocales().add(bundle.getDefaultLocale());
 		
 		return bundle;
 	}
 
-	private Bundle readBundle(final Path siteCfgFile) throws JAXBException, IOException {
+	private Bundle readBundle(final URI publicUri, final Path privatePath) throws JAXBException, IOException {
 		final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-		final InputStream cfgStream = Files.newInputStream(siteCfgFile);
-		final Source source = new StreamSource(cfgStream);
 		
-		return unmarshaller.unmarshal(source, Bundle.class).getValue();
+		unmarshaller.setAdapter(UriXmlAdapter.class, new UriXmlAdapter(publicUri));
+		
+		try (InputStream stream = Files.newInputStream(privatePath)) {
+			final Source source = new StreamSource(stream);
+			
+			return unmarshaller.unmarshal(source, Bundle.class).getValue();
+		}
 	}
 }

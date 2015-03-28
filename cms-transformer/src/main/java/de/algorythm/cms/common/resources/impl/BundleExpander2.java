@@ -1,36 +1,129 @@
 package de.algorythm.cms.common.resources.impl;
 
+import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.transform.Templates;
-import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.bind.JAXBException;
 
-import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
-import de.algorythm.cms.common.rendering.pipeline.impl.RenderingContext;
+import de.algorythm.cms.common.model.entity.bundle.Format;
+import de.algorythm.cms.common.model.entity.bundle.IBundle;
+import de.algorythm.cms.common.model.entity.bundle.IModule;
+import de.algorythm.cms.common.model.entity.bundle.IOutputConfig;
+import de.algorythm.cms.common.model.entity.bundle.ITheme;
+import de.algorythm.cms.common.model.entity.impl.bundle.Bundle;
+import de.algorythm.cms.common.model.entity.impl.bundle.OutputConfig;
 import de.algorythm.cms.common.resources.ISourcePathResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class BundleExpander2 {
 
-	private final IXmlFactory xmlFactory;
+	private final BundleLoader2 loader;
 
-	public BundleExpander2(IXmlFactory xmlFactory) {
-		this.xmlFactory = xmlFactory;
+	public BundleExpander2(BundleLoader2 loader) {
+		this.loader = loader;
 	}
 
-	public void expandBundle(URI bundleUri) throws ResourceNotFoundException {
-		final IRenderingContext renderingContext = new RenderingContext(bundle, tmpDirectory, resourcePrefix);
-		final Templates templates = xmlFactory.compileTemplates(xslSourceUris, ctx);
-		final Marshaller marshaller = xmlFactory.createMarshaller();
-		final TransformerHandler transformerHandler = xmlFactory.createTransformerHandler(templates, ctx, outputPath, outFactory)
+	public IBundle expandedBundle(final IBundle bundle, final ISourcePathResolver resolver) throws ResourceNotFoundException, IOException, JAXBException {
+		final URI uri = bundle.getUri();
+		final Bundle result = new Bundle(bundle);
+		final Map<Format, IOutputConfig> resultResources = result.getOutputMapping();
+		final Map<URI, IBundle> includes = new LinkedHashMap<>();
+		final Set<URI> dependencyUris = new HashSet<>();
+		
+		collectTransitiveDependencies(includes, dependencyUris, bundle, resolver);
+		includes.put(uri, bundle);
+		
+		for (IOutputConfig resources : bundle.getOutputMapping().values())
+			resultResources.put(resources.getFormat(), new OutputConfig(resources));
+		
+		for (IBundle dependency : includes.values())
+			extend(result, dependency);
+		
+		for (IOutputConfig output : result.getOutputMapping().values()) {
+			final Format format = output.getFormat();
+			final ITheme resultTheme = output.getTheme();
+			IOutputConfig resources = bundle.getOutputMapping().get(format);
+			
+			if (resources == null)
+				resources = output;
+			
+			final ITheme srcTheme = resources.getTheme();
+			final Set<URI> alreadyExtended = new HashSet<>();
+			
+			extendTheme(resultTheme, srcTheme, format, includes, alreadyExtended);
+		}
+		
+		return result;
+	}
+
+	private void collectTransitiveDependencies(final Map<URI, IBundle> includes, final Set<URI> dependencyUris, final IBundle bundle, final ISourcePathResolver resolver) throws ResourceNotFoundException, IOException, JAXBException {
+		for (URI dependencyUri : bundle.getDependencies()) {
+			final URI normalizedUri = dependencyUri.normalize();
+			
+			if (dependencyUris.add(normalizedUri)) {
+				final IBundle dependency = loader.getBundle(normalizedUri, resolver);
+				
+				collectTransitiveDependencies(includes, dependencyUris, dependency, resolver);
+				includes.put(normalizedUri, dependency);
+			}
+		}
+	}
+
+	private void extend(IBundle bundle, IBundle dependency) {
+		bundle.getSupportedLocales().addAll(dependency.getSupportedLocales());
+
+		for (IOutputConfig src : dependency.getOutputMapping().values()) {
+			final Map<Format, IOutputConfig> map = bundle.getOutputMapping();
+			final Format format = src.getFormat();
+			final IModule srcModule = src.getModule();
+			IOutputConfig target = map.get(format);
+			
+			if (src.getTheme() == null)
+				throw new IllegalStateException("Missing theme declaration in " + bundle.getUri() + " for output format " + format);
+			
+			if (target == null)
+				map.put(format, target = new OutputConfig(src));
+			
+			if (srcModule != null)
+				extendModule(target.getModule(), srcModule);
+		}
+	}
+
+	private void extendModule(IModule module, IModule base) {
+		module.getTemplates().addAll(base.getTemplates());
+		module.getStyles().addAll(base.getStyles());
+		module.getScripts().addAll(base.getScripts());
 	}
 	
-	public IBundle loadBundle(final URI publicUri) {
+	private void extendTheme(ITheme theme, ITheme base, Format format, Map<URI, IBundle> includes, Set<URI> alreadyExtended) {
+		final URI themeBaseUri = base.getBaseTheme();
 		
+		if (themeBaseUri != null) {
+			if (!alreadyExtended.add(themeBaseUri))
+				throw new IllegalStateException("Cyclic " + format + " base theme reference to " + themeBaseUri);
+			
+			final IBundle baseBundle = includes.get(themeBaseUri);
+			
+			if (baseBundle == null)
+				throw new IllegalStateException("Theme base bundle " + themeBaseUri + " is not declared as dependency");
+			
+			final IOutputConfig baseFormat = baseBundle.getOutputMapping().get(format);
+			
+			if (baseFormat == null)
+				throw new IllegalStateException("Theme base " + themeBaseUri + " does not support output format " + format);
+			
+			final ITheme baseTheme = baseFormat.getTheme();
+			
+			if (baseTheme == null)
+				throw new IllegalStateException(format + " theme base " + themeBaseUri + " does not declare a theme");
+			
+			extendTheme(theme, baseTheme, format, includes, alreadyExtended); // Recursion
+		}
+		
+		extendModule(theme, base);
 	}
 }

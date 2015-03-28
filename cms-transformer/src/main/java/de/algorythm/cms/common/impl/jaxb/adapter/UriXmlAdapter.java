@@ -6,6 +6,12 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class UriXmlAdapter extends XmlAdapter<String, URI> {
 
+	private final URI bundleUri;
+
+	public UriXmlAdapter(final URI bundleUri) {
+		this.bundleUri = bundleUri;
+	}
+
 	@Override
 	public String marshal(final URI uri) throws Exception {
 		return uri == null ? null : uri.normalize().toString();
@@ -13,6 +19,9 @@ public class UriXmlAdapter extends XmlAdapter<String, URI> {
 
 	@Override
 	public URI unmarshal(final String uriStr) throws Exception {
-		return uriStr == null ? null : new URI(uriStr).normalize();
+		if (uriStr == null || uriStr.isEmpty())
+			throw new IllegalStateException("Undefined URI in " + bundleUri);
+		
+		return bundleUri.resolve(uriStr).normalize();
 	}
 }

@@ -1,6 +1,6 @@
 package de.algorythm.cms.common.model.entity.bundle;
 
-public enum OutputFormat {
+public enum Format {
 
 	HTML,
 	PDF

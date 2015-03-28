@@ -224,6 +224,6 @@ public class Bundle implements IBundle {
 
 	@Override
 	public String toString() {
-		return "Site [" + getName() + "]";
+		return "Bundle [" + getName() + "]";
 	}
 }

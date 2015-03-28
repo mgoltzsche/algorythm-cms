@@ -1,0 +1,45 @@
+<bundle xmlns="http://cms.algorythm.de/common/Bundle"
+		title="Example base bundle"
+		default-locale="en-UK">
+	<supported-locales>
+		<locale>ru-RU</locale>
+		<locale>en-UK</locale>
+	</supported-locales>
+	<output-mapping>
+		<output format="HTML">
+			<theme>
+				<templates>
+					<template>theme/transformations/html/Template1.xsl</template>
+					<template>theme/transformations/html/Template2.xsl</template>
+				</templates>
+				<styles>
+					<style>theme/css/style1.scss</style>
+					<style>theme/css/style2.scss</style>
+				</styles>
+				<scripts>
+					<script>theme/js/script1.js</script>
+					<script>theme/js/script2.js</script>
+				</scripts>
+			</theme>
+			<module>
+				<templates>
+					<template>transformations/html/Template1.xsl</template>
+					<template>transformations/html/Template2.xsl</template>
+				</templates>
+				<styles>
+					<style>css/style1.scss</style>
+					<style>css/style2.scss</style>
+				</styles>
+				<scripts>
+					<script>js/script1.js</script>
+					<script>js/script2.js</script>
+				</scripts>
+			</module>
+		</output>
+		<output format="PDF">
+			<theme>
+			</theme>
+		</output>
+	</output-mapping>
+	<page src="contents/welcome.xml" />
+</bundle>
