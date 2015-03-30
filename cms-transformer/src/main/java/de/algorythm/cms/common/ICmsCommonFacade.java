@@ -2,7 +2,7 @@ package de.algorythm.cms.common;
 
 import java.nio.file.Path;
 
-import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.bundle.IBundle;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 
 public interface ICmsCommonFacade {

@@ -31,7 +31,7 @@ public class TestBundleLoader {
 
 	@Test
 	public void loadBundle_should_load_bundle() throws Exception {
-		BundleLoader2 testee = new BundleLoader2();
+		BundleLoader testee = new BundleLoader();
 		URL bundleFileUrl = getClass().getResource("/");
 		Path bundlePath = Paths.get(bundleFileUrl.toURI());
 		ISourcePathResolver resolver = new ResourceResolver(Collections.singletonList(bundlePath));

@@ -25,8 +25,8 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
 
 import de.algorythm.cms.common.impl.TimeMeter;
-import de.algorythm.cms.common.model.entity.IBundle;
-import de.algorythm.cms.common.model.entity.IOutputConfig;
+import de.algorythm.cms.common.model.entity.bundle.IBundle;
+import de.algorythm.cms.common.model.entity.bundle.IOutputConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.IRenderingJobConfig;
 import de.algorythm.cms.common.model.entity.IRenderingJobConfig.RenderingPhase;
@@ -65,10 +65,7 @@ public class Renderer implements IRenderer {
 	private final ScssCompiler scssCompiler;
 	private final SvgSpriteGenerator svgSpriteGenerator;
 
-	public Renderer(final IXmlSourceResolver xmlSourceResolver,
-			final IMetadataExtractor metadataExtractor,
-			final JAXBContext jaxbContext,
-			final IBundle expandedBundle,
+	public Renderer(final IBundle expandedBundle,
 			final Path tmpDirectory,
 			final SupportedLocalesXmlGenerator localesXmlGenerator,
 			final PageIndexer indexer,
@@ -92,20 +89,32 @@ public class Renderer implements IRenderer {
 	}
 
 	public void renderAll(IExecutor executor, IOutputTargetFactory targetFactory) throws Exception {
-		final Templates templates = templateCompiler.compileTemplates(output);
+		IOutputConfig output = bundle.getOutput(format);
+		final Templates templates = templateCompiler.compileTemplates(output, ctx);
+		final Set<URI> styles = mergeUris(output.getModule().getStyles(), output.getTheme().getStyles());
+		final Set<URI> scripts = mergeUris(output.getModule().getScripts(), output.getTheme().getScripts());
 		
 		localesXmlGenerator.generateSupportedLocalesXml(ctx.getBundle(), true, targetFactory);
 		indexer.indexPages(ctx, executor);
 		transformer.transformPages(ctx, templates, executor, targetFactory);
-		jsCompressor.compressJs(ctx, sources, targetFactory);s
-		scssCompiler.compileScss(ctx, sources, targetFactory);
-		svgSpriteGenerator.generateSvgSprite(ctx, sources, flagDirectoryUri, true, targetFactory);
+		jsCompressor.compressJs(ctx, scripts, targetFactory);
+		scssCompiler.compileScss(ctx, styles, targetFactory);
+		//svgSpriteGenerator.generateSvgSprite(ctx, sources, flagDirectoryUri, true, targetFactory);
 	}
-	
+
 	public void renderPage(IExecutor executor) {
 		transformer.transformPage(ctx, sourceUri, path, relativeRootPath, compiledTemplates, locale, resourceBasePath, targetFactory)
 	}
 	
+	private Set<URI> mergeUris(Set<URI> uris1, Set<URI> uris2) {
+		final Set<URI> merged = new HashSet<URI>();
+		
+		merged.addAll(uris1);
+		merged.addAll(uris2);
+		
+		return merged;
+	}
+
 	@Override
 	public IFuture<Void> render(final Path outputDirectory) {
 		try {

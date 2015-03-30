@@ -9,9 +9,9 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Singleton;
 
@@ -83,13 +83,15 @@ public class JavascriptCompressor {
 	private boolean preserveAllSemiColons = false;
 	private boolean disableOptimizations = false;
 
-	public void compressJs(final IRenderingContext ctx, final Set<Path> sources, final IOutputTargetFactory targetFactory) throws Exception {
+	public void compressJs(final IRenderingContext ctx, final Collection<URI> sources, final IOutputTargetFactory targetFactory) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(toString());
 		final String jsPath = ctx.getResourcePrefix().resolve(MAIN_JS).getPath();
 		final StringBuilder scriptBuilder = new StringBuilder();
 		
-		for (Path source : sources) {
-			String script = new String(Files.readAllBytes(source), StandardCharsets.UTF_8);
+		for (URI source : sources) {
+			Path file = ctx.resolveSource(source);
+			byte[] bytes = Files.readAllBytes(file);
+			String script = new String(bytes, StandardCharsets.UTF_8);
 			
 			if (compress) {
 				final Reader reader = new StringReader(script);

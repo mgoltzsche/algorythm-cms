@@ -24,8 +24,8 @@ public class TestBundleExpander {
 
 	@Test
 	public void expandBundle_should_expand_bundle() throws Exception {
-		BundleLoader2 loader = new BundleLoader2();
-		BundleExpander2 testee = new BundleExpander2(loader);
+		BundleLoader loader = new BundleLoader();
+		BundleExpander testee = new BundleExpander(loader);
 		URL bundleFileUrl = getClass().getResource("/");
 		Path bundlePath = Paths.get(bundleFileUrl.toURI());
 		ISourcePathResolver resolver = new ResourceResolver(Collections.singletonList(bundlePath));

@@ -1,10 +1,12 @@
 package de.algorythm.cms.common.resources;
 
-import java.nio.file.Path;
+import java.io.IOException;
 
-import de.algorythm.cms.common.model.entity.IBundle;
+import javax.xml.bind.JAXBException;
+
+import de.algorythm.cms.common.model.entity.bundle.IBundle;
 
 public interface IBundleExpander {
 
-	IBundle expandBundle(IBundle bundle, Path expandDirectory);
+	IBundle expandedBundle(IBundle bundle, ISourcePathResolver resolver) throws ResourceNotFoundException, IOException, JAXBException;
 }

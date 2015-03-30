@@ -4,7 +4,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
 
-import de.algorythm.cms.common.model.entity.IBundle;
+import de.algorythm.cms.common.model.entity.bundle.IBundle;
 import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.resources.IOutputTarget;

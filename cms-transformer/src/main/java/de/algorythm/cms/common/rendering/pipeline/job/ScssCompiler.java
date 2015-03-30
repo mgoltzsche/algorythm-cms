@@ -10,7 +10,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collection;
 
 import javax.inject.Singleton;
 
@@ -38,7 +38,7 @@ public class ScssCompiler {
 
 	private boolean compress = false;
 
-	public void compileScss(final IRenderingContext ctx, final List<URI> sources, final IOutputTargetFactory targetFactory) throws Exception {
+	public void compileScss(final IRenderingContext ctx, final Collection<URI> sources, final IOutputTargetFactory targetFactory) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
 		final String scss = createIncludingSCSS(sources);
 		
@@ -46,7 +46,7 @@ public class ScssCompiler {
 		meter.finish();
 	}
 	
-	private String createIncludingSCSS(final List<URI> uris) {
+	private String createIncludingSCSS(final Collection<URI> uris) {
 		final StringBuilder scss = new StringBuilder();
 		
 		for (URI uri : uris)
