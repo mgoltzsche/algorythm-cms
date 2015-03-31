@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Travel Ant">
+	<include href="/templates/project-template.xml">
+		<replace placeholder="title">Travel Ant - der Ameisenalgorithmus</replace>
+		<replace placeholder="content">
+			<img src="/files/travel-ant/travel-ant.png" title="Travel Ant Screenshot" align="right" />
+			<p>
+				Das <a href="http://de.wikipedia.org/wiki/Problem_des_Handlungsreisenden" title="Problem des Handlungsreisenden in der deutschen Wikipedia">Problem des Handlungsreisenden</a> <i>(engl. Traveling Salesman Problem (TSP))</i> ist ein kombinatorisches Optimierungsproblem.
+				Es handelt sich dabei um die Findung der kürzesten Route durch eine Menge von Orten und Rückkehr zum Ausgangspunkt.
+				Dieses Problem ist <a href="http://de.wikipedia.org/wiki/NP-Vollst%C3%A4ndigkeit" title="NP-Vollständigkeit in der deutschen Wikipedia">NP-vollständig</a>, da die Kombination aller möglichen Routen um alle Orte nicht deterministisch in Polynomialzeit möglich ist.
+				In anderen Worten können Probleme dieser Klasse mit zunehmender Problemmenge auch nicht auf modernen Rechnern zeitnah deterministisch gelöst werden.
+				Stattdessen werden <a href="http://de.wikipedia.org/wiki/Heuristik" title="Heuristik in der deutschen Wikipedia">Heuristiken</a>, Annäherungen an die ideale Lösung, zur Berechnung herangezogen.
+				<a href="http://de.wikipedia.org/wiki/Ameisenalgorithmus" title="Ameisenalgorithmus in der deutschen Wikipedia">Ameisenalgorithmen</a> <i>(engl. ant colony optimization (ACO))</i> sind Metaheuristiken, die zur Lösung dieser Klasse von Problemen verwendet werden können und bedienen sich einer natürlichen Analogie.
+			</p>
+			<p>
+				Die Wegfindung der Ameisen ist eines der vielen Wunder der Natur.
+				Ameisen errichten ihre Ameisenstraßen meist auf einem nahezu optimalen Weg zwischen ihrem Bau und einer Futterquelle,
+				obwohl eine einzelne Ameise keine Übersicht über das Gelände erlangen kann.
+				Zur Findung der richtigen Wege hinterlassen Ameisen eine flüchtige Spur aus <a href="http://de.wikipedia.org/wiki/Pheromon" title="Pheromon in der deutschen Wikipedia">Pheromon</a>, die viele Artgenossen dazu bewegt, ihr zu folgen.
+				Je mehr Ameisen sich auf einem Weg bewegen, umso mehr Pheromon befindet sich dort und je mehr Pheromon sich auf dem Weg befindet, umso wahrscheinlicher ist es, dass ihm mehr Ameisen folgen.
+				Die optimale Route einer Ameisenstraße entsteht dadurch, dass eine Ameise, die den schnellsten Weg zu einer Futterquelle gefunden hat, auch am schnellsten zurückkehren und ihre Pheromonspur dabei auffrischen kann.
+			</p>
+			<p>
+				Analog zu den Ameisen nähert sich ein Ameisenalgorithmus in mehreren Iterationen der optimalen Lösung. Häufig wird schon nach wenigen Iterationen ein akzeptables Ergebnis erreicht.
+				Der Problemraum wird als Graph abgebildet.
+				Pro Kante wird analog zu dem Pheromon ein mit 0 initialisierter Wert gespeichert.
+				In jeder Iteration werden n Routen bzw. Kreise berechnet, wobei n als Anzahl der Ameisen zu verstehen ist.
+				Ein Route enthält jeden Knoten genau einmal. Der Startknoten für jede Route wird zufällig gewählt.
+				Bei der Kreiskonstruktion wird der nächste Knoten zufällig aus der Menge möglicher Nachbarn gewählt.
+				Dabei wird mit einer hohen Wahrscheinlichkeit der Knoten gewählt, zu dem vom aktuellen Knoten ausgehend eine Kante mit einem hohen Wert existiert.
+				Am Ende jeder Iteration wird der Pheromonwert jeder Kante jedes besuchten Kreises entsprechend der Kreisgröße inkrementiert, so dass Kanten kleinerer Kreise eine höhere Wertigkeit erlangen als solche größerer.
+				Besonders interessant ist die Tatsache, dass sich der Graphzustand dynamisch verändern kann, der Algorithmus die Lösung fortwährend anpasst und dabei für jede neue Lösung tendenziell weniger Zeit als für die erste Lösung benötigt.
+			</p>
+			<p>
+				Im Rahmen des Kurses "Multimedia Engineering 1" des dritten Semesters des Studiengangs Medieninformatik Bachelor an der <a href="http://www.beuth-hochschule.de" title="Hochschulseite">Beuth Hochschule für Technik Berlin</a> entwarf ich gemeinsam mit meinem Kommilitonen Igor Marijanovic eine Infotainment-Anwendung zum Ameisenalgorithmus in ActionScript 3.
+				Darin wird der Ameisenalgorithmus und seine Optimierungen erläutert und in einem Spiel der Ameisenalgorithmus im wahrsten Sinne des Wortes demonstriert:
+				Ameisen müssen einen Weg um alle Futterquellen finden. Der Spieler kann initial auf die Ameise wetten, die insgesamt die geringste Strecke zurücklegt.
+				Futterquellen können zur Laufzeit versetzt und die Animationsgeschwindigkeit angepasst werden.
+			</p>
+			<h2>Pseudocode</h2>
+			<p>
+				Der für diese Anwendung verwendete Ant System (AS)-Algorithmus wurde der Arbeit "<a href="http://www.swarm-bots.org/~mdorigo/HomePageDorigo/thesis/master/DarquennesMASTER.pdf">Implementation and Applications of Ant Colony Algorithms</a>" von Denis Darquennes (2005) entnommen.
+				Der Pseudocode wird im Folgenden gezeigt.
+			</p>
+			<h3>Datenstrukturen</h3>
+			<code>
+structure Ant // einzelne Ameise
+		integer tour_length // aktuelle Tourlänge
+		integer tour[n+1]   // aktueller Weg der Runde
+		boolean visited[n]  // besuchte Probleme
+end-structure
+			</code>
+			<h3>Variablen</h3>
+			<code>
+ProblemNode problem[n]  // Problemknoten; Liste der zu behandelnden Problempunkte; Städte
+integer dist[n][n]      // Weglänge zwischen den Problempunkten
+integer nn_list[n][n]   // Matrix mit einer Liste von nahen Nachbarn für jeden Problempunkt
+real pheromone[n][n]    // Pheromonmatrix
+choice_info[n][n]       // aus Weglänge, Pheromonwertigkeit und beliebigen Exponenten
+                        //   ALPHA und BETA verrechneter Entscheidungswert für jeden Weg
+Ant ant[m]              // Liste der Ameisen
+			</code>
+			<h3>Methoden</h3>
+			<h4>Hauptmethode zum Start des Algorithmus</h4>
+			<code>
+procedure ACOMetaheuristicMain()
+	InitializeData()
+	while (termination condition not met) do
+		constructAntsSolutions()
+		updatePheromoneMatrix()
+	end-while
+end-procedure
+			</code>
+			<h4>Initialisierung der Daten</h4>
+			<code>
+procedure InitializeData()
+	computeDistancesBetweenProblems()
+	computeNearestNeighborLists()
+	computeChoiceInformation()
+	initializeAnts()
+	initializeParameters()
+	initializeStatistics()
+end-procedure
+			</code>
+			<h4>Konstruktion einer Tour für jede Ameise pro Runde</h4>
+			<code>
+procedure ConstructAntsSolutions()
+	for k = 1 to m do
+		for i = 1 to n do
+			ant[k].visited[i] = false
+		end
+	end-for
+	step = 1
+	for k = 1 to m do
+		r = random(0, n)
+		ant[k].tour[step] = r
+		ant[k].visited[r] = true
+	end-for
+	while (step &lt; n)
+		step = step + 1
+		for k = 1 to m do
+			NeighborListAsDecisionRule(k, step)
+		end-for
+	end-while
+	for k = 1 to m do
+		ant[k].tour[n + 1] = ant[k].tour[1]
+		ant[k].tour_length = ComputeTourLength(k)
+	end-for
+end-procedure
+			</code>
+			<h4>Auswählen des Wahrscheinlichsten nächsten Nachbarn</h4>
+			<code>
+procedure chooseNearestNeighbor(k, i)
+// sucht einen Weg aus der nn_list des letzten besuchten Problemknoten
+	input k // Ameisenindex
+	input i // Konstruktionsschritt der Tour
+	c = ant[k].tour[i - 1]
+	sum_probabilities = 0.0
+	for j = 1 to nn do
+		if ant[k].visited[nn_list[c][j]] then
+			selection_probability[j] = 0.0
+		else
+			selection_probability[j] = choice_info[c][nn_list[c][j]]
+			sum_probabilities = sum_probabilities + selection_probability[j]
+		end-if
+	end-for
+	if (sum_probabilities = 0.0) then
+		// suche global, da keinen noch nicht besuchten in nn_list[c] gefunden
+		chooseBestNext(k, i)
+	else
+		r = random(0, sum_probabilities)
+		j = 1
+		p = selection_probability[j]
+		while (p &lt; r) do
+			j = j + 1
+			p = p + selection_probability[j]
+		end-while
+		ant[k].tour[i] = nn_list[c][j]
+		ant[k].visited[nn_list[c][j]] = true
+	end-if
+end-procedure
+
+procedure chooseBestNext(k, i)
+	input k // Ameisen Index
+	input i // Konstruktionsschritt der Tour
+	v = 0.0
+	c = ant[k].tour[i - 1]
+	for j = 1 to n do
+		if not ant[k].visited[j] and choice_info[c][j] &gt; v then
+			// Problemknoten, dessen Weg den höchsten Entscheidungswert
+			// besitzt und noch nicht besucht wurde
+			nc = j
+			v = choice_info[c][j]
+		end-if
+	end-for
+	ant[k].tour[i] = nc
+	ant[k].visited[nc] = true
+end-procedure
+			</code>
+			<h4>Aktualisierung der Pheromonmatrix am Ende jeder Runde</h4>
+			<code>
+procedure UpdatePheromoneMatrix()
+	// gesamte Pheromonmatrix verdunstet um einen konstanten
+	// Faktor f {0,...,1}, z.B. f=0.1
+	for i = 1 to n do
+		for j = 1 to n
+			if i != j
+				pheromone[i][j] = pheromone[i][j] * f
+			end-if
+		end-for
+	end-for
+	// jede Ameise deponiert mehr oder weniger Pheromone,
+	// je nach Kürze des Weges
+	for k = 1 to m do
+		depositPheromones(k)
+	end-for
+	// neue Berechnung der Entscheidungswerte für jeden Weg
+	computeChoiceInformation()
+end-procedure
+			</code>
+			<h2>Links</h2>
+			<ul>
+				<li><file src="/files/travel-ant/travel-ant-demo/Main.html" title="Travel Ant Demo" /></li>
+				<li><file src="/files/travel-ant/TravelAntUI.zip" title="Travel Ant Source" /></li>
+				<li><file src="/files/travel-ant/travel-ant-konzept.pdf" title="Travel Ant Konzept" /></li>
+			</ul>
+		</replace>
+	</include>
+</article>

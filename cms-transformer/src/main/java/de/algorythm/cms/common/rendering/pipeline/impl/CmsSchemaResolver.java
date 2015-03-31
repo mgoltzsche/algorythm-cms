@@ -5,48 +5,46 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
-import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class CmsSchemaResolver implements LSResourceResolver {
 
-	private final ISourcePathResolver sourcePathResolver;
-	
-	public CmsSchemaResolver(final ISourcePathResolver sourcePathResolver) {
-		this.sourcePathResolver = sourcePathResolver;
+	private final IInputResolver inputResolver;
+
+	public CmsSchemaResolver(final IInputResolver inputResolver) {
+		this.inputResolver = inputResolver;
 	}
-	
+
 	@Override
 	public LSInput resolveResource(String type, String namespaceURI,
 			String publicId, String systemId, String baseURI) {
 		final URI base = URI.create(baseURI);
 		final URI publicUri = base.resolve(systemId);
-		final Path systemPath;
+		final InputStream stream;
 		
 		try {
-			systemPath = sourcePathResolver.resolveSource(publicUri);
-		} catch (ResourceNotFoundException e) {
+			stream = inputResolver.createInputStream(publicUri);
+		} catch (ResourceNotFoundException | IOException e) {
 			throw new RuntimeException(e);
 		}
 		
-		return new XsdInput(publicUri, systemPath);
+		return new XsdInput(publicUri, stream);
 	}
-	
+
 	static private class XsdInput implements LSInput {
-		
-		private final Path path;
+
+		private final InputStream stream;
 		private final String systemId;
 		private String encoding;
 		private boolean certifiedText;
-		
-		public XsdInput(final URI uri, final Path path) {
-			this.path = path;
+
+		public XsdInput(final URI uri, final InputStream stream) {
+			this.stream = stream;
 			systemId = uri.toString();
 			encoding = StandardCharsets.UTF_8.name();
 		}
@@ -63,11 +61,7 @@ public class CmsSchemaResolver implements LSResourceResolver {
 
 		@Override
 		public InputStream getByteStream() {
-			try {
-				return Files.newInputStream(path);
-			} catch (IOException e) {
-				throw new RuntimeException("Cannot read " + path, e);
-			}
+			return stream;
 		}
 
 		@Override

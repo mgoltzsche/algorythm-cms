@@ -62,4 +62,9 @@ public class OutputConfig implements IOutputConfig {
 	public void setModule(IModule module) {
 		this.module = module;
 	}
+
+	@Override
+	public String toString() {
+		return format + " output resources";
+	}
 }

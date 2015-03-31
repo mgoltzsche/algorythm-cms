@@ -1,14 +1,14 @@
-package de.algorythm.cms.common.model.entity;
+package de.algorythm.cms.common.model.entity.bundle;
 
 import java.net.URI;
 import java.util.List;
 
-public interface IPageConfig {
+public interface IPage {
 
 	String getName();
 	URI getSource();
 	String getTitle();
 	String getNavigationTitle();
-	List<IPageConfig> getPages();
+	List<IPage> getPages();
 	boolean isInNavigation();
 }

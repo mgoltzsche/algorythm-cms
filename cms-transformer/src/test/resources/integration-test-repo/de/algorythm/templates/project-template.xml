@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Projekt-Template">
+	<grid columns-lg="24">
+		<cell span="16" span-xl="18">
+			<h1><customizable placeholder="title">Projekte</customizable></h1>
+			<customizable placeholder="content"></customizable>
+		</cell>
+		<cell span="8" span-xl="6">
+			<nav parent="/projects" title="Projekte" />
+			<customizable placeholder="teaser-right"></customizable>
+		</cell>
+	</grid>
+</article>

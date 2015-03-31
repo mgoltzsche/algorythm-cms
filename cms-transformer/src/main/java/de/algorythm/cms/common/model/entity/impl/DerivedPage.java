@@ -11,10 +11,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
 import de.algorythm.cms.common.model.entity.IMetadata;
-import de.algorythm.cms.common.model.entity.IPageConfig;
+import de.algorythm.cms.common.model.entity.bundle.IPage;
 
 @XmlRootElement(name="page", namespace="http://cms.algorythm.de/common/Pages")
-public class DerivedPageConfig {
+public class DerivedPage {
 
 	@XmlAttribute(required = true)
 	private String path;
@@ -34,11 +34,11 @@ public class DerivedPageConfig {
 	@XmlAttribute(name = "modified")
 	private Date lastModifiedTime;
 	@XmlElementRef
-	private final List<DerivedPageConfig> pages = new LinkedList<DerivedPageConfig>();
+	private final List<DerivedPage> pages = new LinkedList<DerivedPage>();
 
-	public DerivedPageConfig() {}
+	public DerivedPage() {}
 	
-	public DerivedPageConfig(final String path, final IPageConfig pageCfg, final IMetadata metadata) {
+	public DerivedPage(final String path, final IPage pageCfg, final IMetadata metadata) {
 		this.path = path;
 		name = pageCfg.getName();
 		content = pageCfg.getSource();
@@ -113,7 +113,7 @@ public class DerivedPageConfig {
 		this.lastModifiedTime = lastModifiedTime;
 	}
 
-	public List<DerivedPageConfig> getPages() {
+	public List<DerivedPage> getPages() {
 		return pages;
 	}
 }

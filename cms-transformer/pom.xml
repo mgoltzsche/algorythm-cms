@@ -17,6 +17,17 @@
 	<build>
 		<finalName>algorythm-cms-transformer</finalName>
 
+		<testResources>
+			<testResource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -86,12 +97,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
-			</testResource>
-		</testResources>
 	</build>
 
 	<dependencies>

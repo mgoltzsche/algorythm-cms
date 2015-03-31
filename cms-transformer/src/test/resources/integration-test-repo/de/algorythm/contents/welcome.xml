@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Code that rocks">
+	<h1>Code that rocks!</h1>
+	<p>
+		Willkommen in Max Goltzsches Software-Schmiede.
+	</p>
+	<img src="/files/welcome.png" title="Willkommen" fill="true" />
+	<position bottom="10%" right="10%">
+		<h2>Subsysteme</h2>
+		<ul>
+			<li><a href="https://redmine.algorythm.de">Redmine</a></li>
+			<li><a href="https://repository.algorythm.de">Nexus Repository</a></li>
+		</ul>
+	</position>
+	<spacer />
+	<spacer />
+</article>

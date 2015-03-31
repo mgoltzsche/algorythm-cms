@@ -9,10 +9,10 @@ import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 
-import de.algorythm.cms.common.model.entity.IPageConfig;
+import de.algorythm.cms.common.model.entity.bundle.IPage;
 
 @XmlRootElement(name="page", namespace="http://cms.algorythm.de/common/Bundle")
-public class Page implements IPageConfig {
+public class Page implements IPage {
 
 	@XmlAttribute(required = true)
 	private String name;
@@ -26,7 +26,7 @@ public class Page implements IPageConfig {
 	@XmlAttribute(name="nav-contained")
 	private boolean inNavigation = true;
 	@XmlElementRef(type=Page.class)
-	private List<IPageConfig> pages = new LinkedList<IPageConfig>();
+	private List<IPage> pages = new LinkedList<IPage>();
 
 	public Page() {}
 
@@ -73,11 +73,11 @@ public class Page implements IPageConfig {
 	}
 
 	@Override
-	public List<IPageConfig> getPages() {
+	public List<IPage> getPages() {
 		return pages;
 	}
 	
-	public void setPages(final List<IPageConfig> pages) {
+	public void setPages(final List<IPage> pages) {
 		this.pages = pages;
 	}
 	

@@ -28,7 +28,7 @@ public class OdtXmlSourceResolver extends AbstractXmlSourceResolver {
 	@Override
 	protected Source createXmlSourceInternal(final URI uri, final IRenderingContext ctx)
 			throws IOException, ResourceNotFoundException {
-		final Path extractedOdtDirectory = archiveExtractor.unzip(uri, ctx);
+		final Path extractedOdtDirectory = archiveExtractor.unzip(uri, ctx, ctx.getTmpResources());
 		final Path contentXmlFile = extractedOdtDirectory.resolve("content.xml");
 		
 		return new XmlSource(uri.getPath() + "/content.xml", contentXmlFile);

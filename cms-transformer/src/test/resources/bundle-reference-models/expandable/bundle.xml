@@ -33,5 +33,8 @@
 			</module>
 		</output>
 	</output-mapping>
-	<page src="contents/welcome.xml" />
+	<page src="contents/welcome.xml">
+		<page name="projects" src="contents/projects.xml" />
+		<page name="about" src="contents/about.xml" />
+	</page>
 </bundle>

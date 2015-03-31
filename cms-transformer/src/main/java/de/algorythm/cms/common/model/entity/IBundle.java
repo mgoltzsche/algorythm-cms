@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import de.algorythm.cms.common.model.entity.bundle.IPage;
+
 public interface IBundle extends Comparable<IBundle> {
 
 	String getName();
@@ -24,7 +26,7 @@ public interface IBundle extends Comparable<IBundle> {
 	IOutputConfig getOutput(String id);
 	boolean containsOutput(IOutputConfig cfg);
 	boolean addOutput(IOutputConfig cfg);
-	IPageConfig getStartPage();
-	void setStartPage(IPageConfig page);
+	IPage getStartPage();
+	void setStartPage(IPage page);
 	IBundle copy();
 }

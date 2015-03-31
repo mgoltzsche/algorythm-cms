@@ -5,8 +5,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import de.algorythm.cms.common.model.entity.impl.Page;
-
 public interface IBundle {
 
 	String getTitle();
@@ -15,5 +13,5 @@ public interface IBundle {
 	Set<Locale> getSupportedLocales();
 	Set<URI> getDependencies();
 	Map<Format, IOutputConfig> getOutputMapping();
-	Page getStartPage();
+	IPage getStartPage();
 }

@@ -13,12 +13,12 @@ import de.algorythm.cms.common.resources.IOutputTargetFactory;
 
 public class CmsOutputURIResolver implements OutputURIResolver {
 
-	private final IOutputTargetFactory targetFactory;
-	private final IOutputTargetFactory tmpTargetFactory;
+	private final IOutputTargetFactory out;
+	private final IOutputTargetFactory tmp;
 	
-	public CmsOutputURIResolver(final IOutputTargetFactory targetFactory, final IOutputTargetFactory tmpTargetFactory) {
-		this.tmpTargetFactory = tmpTargetFactory;
-		this.targetFactory = targetFactory;
+	public CmsOutputURIResolver(final IOutputTargetFactory out, final IOutputTargetFactory tmp) {
+		this.tmp = tmp;
+		this.out = out;
 	}
 	
 	@Override
@@ -27,10 +27,10 @@ public class CmsOutputURIResolver implements OutputURIResolver {
 		final URI publicUri = baseUri.resolve(href);
 		final String publicPath = publicUri.normalize().getPath();
 		final String scheme = publicUri.getScheme();
-		final IOutputTargetFactory targetFactory = scheme != null &&
+		final IOutputTargetFactory outFactory = scheme != null &&
 				scheme.toLowerCase().equals("tmp")
-				? tmpTargetFactory : this.targetFactory;
-		final IOutputTarget target = targetFactory.createOutputTarget(publicPath);
+				? tmp : this.out;
+		final IOutputTarget target = outFactory.createOutputTarget(publicPath);
 		
 		try {
 			final Result result = new StreamResult(target.createOutputStream());

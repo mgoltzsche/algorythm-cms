@@ -27,7 +27,7 @@ public interface IXmlFactory extends IXmlSourceResolver {
 
 	void parse(URI publicUri, ContentHandler handler, IRenderingContext ctx) throws IOException, SAXException, ParserConfigurationException, ResourceNotFoundException;
 	Templates compileTemplates(Collection<URI> xslSourceUris, IRenderingContext ctx) throws TransformerConfigurationException;
-	Templates compileTemplates(URI xslSourceUri, IRenderingContext ctx) throws TransformerConfigurationException, ResourceNotFoundException;
+	Templates compileTemplates(URI xslSourceUri, IRenderingContext ctx) throws TransformerConfigurationException, ResourceNotFoundException, IOException;
 	XMLReader createXMLReader() throws SAXException;
 	TransformerHandler createTransformerHandler(Templates templates, IRenderingContext ctx, String outputPath, IOutputTargetFactory outFactory) throws TransformerConfigurationException, IOException;
 	XMLEventReader createXMLEventReader(InputStream stream) throws XMLStreamException;

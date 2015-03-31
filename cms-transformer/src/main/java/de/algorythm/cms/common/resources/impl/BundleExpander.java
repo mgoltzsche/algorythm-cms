@@ -19,7 +19,7 @@ import de.algorythm.cms.common.model.entity.bundle.ITheme;
 import de.algorythm.cms.common.model.entity.impl.bundle.Bundle;
 import de.algorythm.cms.common.model.entity.impl.bundle.OutputConfig;
 import de.algorythm.cms.common.resources.IBundleExpander;
-import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 @Singleton
@@ -33,7 +33,7 @@ public class BundleExpander implements IBundleExpander {
 	}
 
 	@Override
-	public IBundle expandedBundle(final IBundle bundle, final ISourcePathResolver resolver) throws ResourceNotFoundException, IOException, JAXBException {
+	public IBundle expandedBundle(final IBundle bundle, final IInputResolver resolver) throws ResourceNotFoundException, IOException, JAXBException {
 		final URI uri = bundle.getUri();
 		final Bundle result = new Bundle(bundle);
 		final Map<Format, IOutputConfig> resultResources = result.getOutputMapping();
@@ -66,7 +66,7 @@ public class BundleExpander implements IBundleExpander {
 		return result;
 	}
 
-	private void collectTransitiveDependencies(final Map<URI, IBundle> includes, final Set<URI> dependencyUris, final IBundle bundle, final ISourcePathResolver resolver) throws ResourceNotFoundException, IOException, JAXBException {
+	private void collectTransitiveDependencies(final Map<URI, IBundle> includes, final Set<URI> dependencyUris, final IBundle bundle, final IInputResolver resolver) throws ResourceNotFoundException, IOException, JAXBException {
 		for (URI dependencyUri : bundle.getDependencies()) {
 			final URI normalizedUri = dependencyUri.normalize();
 			
@@ -80,22 +80,22 @@ public class BundleExpander implements IBundleExpander {
 	}
 
 	private void extend(IBundle bundle, IBundle dependency) {
+		final Map<Format, IOutputConfig> map = bundle.getOutputMapping();
 		bundle.getSupportedLocales().addAll(dependency.getSupportedLocales());
-
-		for (IOutputConfig src : dependency.getOutputMapping().values()) {
-			final Map<Format, IOutputConfig> map = bundle.getOutputMapping();
-			final Format format = src.getFormat();
-			final IModule srcModule = src.getModule();
-			IOutputConfig target = map.get(format);
+		
+		for (Format format : bundle.getOutputMapping().keySet()) {
+			final IOutputConfig src = dependency.getOutputMapping().get(format);
 			
-			if (src.getTheme() == null)
-				throw new IllegalStateException("Missing theme declaration in " + bundle.getUri() + " for output format " + format);
-			
-			if (target == null)
-				map.put(format, target = new OutputConfig(src));
-			
-			if (srcModule != null)
-				extendModule(target.getModule(), srcModule);
+			if (src != null) {
+				final IModule srcModule = src.getModule();
+				final IOutputConfig target = map.get(format);
+				
+				if (src.getTheme() == null)
+					throw new IllegalStateException("Missing theme declaration in " + bundle.getUri() + " for output format " + format);
+				
+				if (srcModule != null)
+					extendModule(target.getModule(), srcModule);
+			}
 		}
 	}
 

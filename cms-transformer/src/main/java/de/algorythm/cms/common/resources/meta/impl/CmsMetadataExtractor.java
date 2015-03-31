@@ -1,13 +1,13 @@
 package de.algorythm.cms.common.resources.meta.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.inject.Inject;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -17,8 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import de.algorythm.cms.common.model.entity.IMetadata;
 import de.algorythm.cms.common.model.entity.impl.Metadata;
-import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
+import de.algorythm.cms.common.resources.IInputSource;
+import de.algorythm.cms.common.resources.IInputResolver;
+import de.algorythm.cms.common.resources.IWriteableResources;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
@@ -35,49 +37,60 @@ public class CmsMetadataExtractor implements IMetadataExtractor {
 	}
 	
 	@Override
-	public IMetadata extractMetadata(final URI uri, final IRenderingContext ctx) throws ResourceNotFoundException, MetadataExtractionException {
-		final Path xmlFile = ctx.resolveSource(uri);
+	public IMetadata extractMetadata(final URI uri, final IInputResolver resolver, final IWriteableResources tmp) throws ResourceNotFoundException, MetadataExtractionException, IOException {
+		final IInputSource source = resolver.resolveResource(uri);
+		final Metadata m = new Metadata(source.getCreationTime(), source.getLastModifiedTime());
 		
-		try {
-			final Metadata m = new Metadata(xmlFile);
+		try (InputStream stream = source.createInputStream()) {
+			final XMLEventReader reader;
 			
-			try (InputStream stream = Files.newInputStream(xmlFile)) {
-				final XMLEventReader reader = xmlFactory.createXMLEventReader(stream);
-				
-				try {
-					while (reader.hasNext()) {
-						final XMLEvent evt = reader.nextEvent();
-						
-						if (evt.isStartElement()) {
-							final StartElement element = evt.asStartElement();
-							final Attribute attTitle = element.getAttributeByName(new QName("title"));
-							final Attribute attShortTitle = element.getAttributeByName(new QName("short-title"));
-							
-							if (attTitle != null)
-								m.setTitle(attTitle.getValue());
-							
-							if (attShortTitle != null)
-								m.setShortTitle(attShortTitle.getValue());
-							
-							break;
-						}
+			try {
+				reader = xmlFactory.createXMLEventReader(stream);
+			} catch (XMLStreamException e1) {
+				throw new MetadataExtractionException(e1);
+			}
+			
+			try {
+				while (reader.hasNext()) {
+					final XMLEvent evt;
+					
+					try {
+						evt = reader.nextEvent();
+					} catch (XMLStreamException e) {
+						throw new MetadataExtractionException(e);
 					}
-				} finally {
+					
+					if (evt.isStartElement()) {
+						final StartElement element = evt.asStartElement();
+						final Attribute attTitle = element.getAttributeByName(new QName("title"));
+						final Attribute attShortTitle = element.getAttributeByName(new QName("short-title"));
+						
+						if (attTitle != null)
+							m.setTitle(attTitle.getValue());
+						
+						if (attShortTitle != null)
+							m.setShortTitle(attShortTitle.getValue());
+						
+						break;
+					}
+				}
+			} finally {
+				try {
 					reader.close();
+				} catch (XMLStreamException e) {
+					log.error("Cannot close source reader", e);
 				}
 			}
-			
-			if (m.getTitle() == null || m.getTitle().isEmpty()) {
-				log.warn("Missing page title of " + xmlFile);
-				m.setTitle(xmlFile.getFileName().toString());
-			}
-			
-			if (m.getShortTitle() == null)
-				m.setShortTitle(m.getTitle());
-			
-			return m;
-		} catch(Exception e) {
-			throw new MetadataExtractionException("Cannot extract metadata from " + xmlFile, e);
 		}
+		
+		if (m.getTitle() == null || m.getTitle().isEmpty()) {
+			log.warn("Missing page title of " + uri);
+			m.setTitle(source.getName());
+		}
+		
+		if (m.getShortTitle() == null)
+			m.setShortTitle(m.getTitle());
+		
+		return m;
 	}
 }

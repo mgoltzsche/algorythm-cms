@@ -6,18 +6,23 @@ import java.lang.reflect.Proxy;
 
 import org.junit.Test;
 
+import de.algorythm.cms.common.impl.TimeMeter;
+import de.algorythm.cms.common.scheduling.impl.Future;
+
 public class TestProxy {
 
 	static private interface IDummy {
 		
-		void doSth(String arg);
+		Future<String> doSth(String arg);
 	}
 	
 	static private class DummyImpl implements IDummy {
 
 		@Override
-		public void doSth(String arg) {
-			System.out.println(arg);
+		public Future<String> doSth(String arg) {
+			System.out.println("doSth(" + arg + ")");
+			
+			return new Future<>(arg);
 		}
 	}
 	
@@ -32,19 +37,36 @@ public class TestProxy {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args)
 				throws Throwable {
-			return method.invoke(delegator, args);
+			if (method.getReturnType() == Future.class) {
+				Future<?> result = (Future<?>) method.invoke(delegator, args);
+				return new Future<Object>(result.getResult());
+			} else {
+				return null;
+			}
 		}
 	}
 	
 	@Test
 	public void testProxy() {
-		final DummyImpl dummyImpl = new DummyImpl();
-		final InvocationHandler handler = new SynchronousInvocationHandler(dummyImpl);
-		final ClassLoader loader = getClass().getClassLoader();
-		final Class<?>[] interfaces = new Class<?>[] {IDummy.class};
+		DummyImpl dummyImpl = new DummyImpl();
+		InvocationHandler handler = new SynchronousInvocationHandler(dummyImpl);
+		ClassLoader loader = getClass().getClassLoader();
+		Class<?>[] interfaces = new Class<?>[] {IDummy.class};
 		
-		final IDummy dummy = (IDummy) Proxy.newProxyInstance(loader, interfaces, handler);
+		TimeMeter meter = TimeMeter.meter("proxy creation 1");
+		IDummy dummy = (IDummy) Proxy.newProxyInstance(loader, interfaces, handler);
+		meter.finish();
 		
-		dummy.doSth("asdf");
+		meter = TimeMeter.meter("proxy creation 2");
+		dummy = (IDummy) Proxy.newProxyInstance(loader, interfaces, handler);
+		meter.finish();
+		
+		meter = TimeMeter.meter("proxy invocation 1");
+		System.out.println(dummy.doSth("asdf").getResult());
+		meter.finish();
+		
+		meter = TimeMeter.meter("proxy invocation 2");
+		System.out.println(dummy.doSth("asdf").getResult());
+		meter.finish();
 	}
 }

@@ -1,11 +1,10 @@
 package de.algorythm.cms.common.rendering.pipeline;
 
-import java.nio.file.Path;
-
-import de.algorythm.cms.common.scheduling.IFuture;
+import de.algorythm.cms.common.model.entity.bundle.Format;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
 
 public interface IRenderer {
 
-	IFuture<Void> render(Path outputDirectory);
+	void renderAll(Format format, IOutputTargetFactory outFactory) throws Exception;
 	//byte[] renderPage(String path, OutputFormat format);
 }

@@ -1,45 +1,47 @@
 package de.algorythm.cms.common.rendering.pipeline.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Locale;
 
-import de.algorythm.cms.common.model.entity.bundle.IBundle;
-import de.algorythm.cms.common.model.entity.IPageConfig;
+import de.algorythm.cms.common.model.entity.bundle.IPage;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
-import de.algorythm.cms.common.resources.IOutputTarget;
-import de.algorythm.cms.common.resources.IOutputTargetFactory;
-import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.IInputResolver;
+import de.algorythm.cms.common.resources.IInputSource;
+import de.algorythm.cms.common.resources.IWriteableResources;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.FileOutputTargetFactory;
-import de.algorythm.cms.common.resources.impl.ResourceResolver;
 
 public class RenderingContext implements IRenderingContext {
 
-	private final IBundle bundle;
+	private final String name;
 	private final URI resourcePrefix;
-	private final ISourcePathResolver sourceResolver;
-	private final IOutputTargetFactory tmpOutputStreamFactory;
-	private Collection<IPageConfig> renderPages;
+	private final IInputResolver sourceResolver;
+	private final IWriteableResources tmp, meta;
+	private Collection<IPage> renderPages;
 
-	public RenderingContext(final IBundle bundle, final Path tmpDirectory, final URI resourcePrefix) {
-		this.bundle = bundle;
+	public RenderingContext(String name, Path tmpDirectory, Path metaDirectory, URI resourcePrefix, IInputResolver sourceResolver) {
+		this.name = name;
 		this.resourcePrefix = resourcePrefix;
-		this.sourceResolver = new ResourceResolver(bundle, tmpDirectory);
-		this.tmpOutputStreamFactory = new FileOutputTargetFactory(tmpDirectory);
-	}
-
-	public Collection<IPageConfig> getRenderPages() {
-		return renderPages;
-	}
-
-	public void setRenderPages(Collection<IPageConfig> renderPages) {
-		this.renderPages = renderPages;
+		this.sourceResolver = sourceResolver;
+		this.tmp = new FileOutputTargetFactory(tmpDirectory);
+		this.meta = new FileOutputTargetFactory(metaDirectory);
 	}
 
 	@Override
-	public IBundle getBundle() {
-		return bundle;
+	public String getName() {
+		return name;
+	}
+
+	public Collection<IPage> getRenderPages() {
+		return renderPages;
+	}
+
+	public void setRenderPages(Collection<IPage> renderPages) {
+		this.renderPages = renderPages;
 	}
 
 	@Override
@@ -48,12 +50,23 @@ public class RenderingContext implements IRenderingContext {
 	}
 
 	@Override
-	public IOutputTarget createOutputTarget(String publicPath) {
-		return tmpOutputStreamFactory.createOutputTarget(publicPath);
+	public IWriteableResources getMetaResources() {
+		return meta;
 	}
 
 	@Override
-	public Path resolveSource(URI uri) throws ResourceNotFoundException {
-		return sourceResolver.resolveSource(uri);
+	public IWriteableResources getTmpResources() {
+		return tmp;
+	}
+
+	@Override
+	public InputStream createInputStream(URI publicUri) throws ResourceNotFoundException, IOException {
+		return sourceResolver.createInputStream(publicUri);
+	}
+
+	@Override
+	public IInputSource resolveResource(URI publicUri)
+			throws ResourceNotFoundException, IOException {
+		return sourceResolver.resolveResource(publicUri);
 	}
 }

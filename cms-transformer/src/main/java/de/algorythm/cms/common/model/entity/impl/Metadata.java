@@ -1,9 +1,5 @@
 package de.algorythm.cms.common.model.entity.impl;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -25,11 +21,9 @@ public class Metadata implements IMetadata {
 
 	public Metadata() {}
 
-	public Metadata(Path file) throws IOException {
-		title = file.getFileName().toString();
-		BasicFileAttributes attr = Files.readAttributes(file, BasicFileAttributes.class);
-		creationTime = new Date(attr.creationTime().toMillis());
-		lastModifiedTime = new Date(attr.creationTime().toMillis());
+	public Metadata(Date creationTime, Date lastModifiedTime) {
+		this.creationTime = creationTime;
+		this.lastModifiedTime = lastModifiedTime;
 	}
 
 	@Override

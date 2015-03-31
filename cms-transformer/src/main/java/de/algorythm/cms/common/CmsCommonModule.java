@@ -10,7 +10,7 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import de.algorythm.cms.common.impl.CmsCommonFacade;
 import de.algorythm.cms.common.impl.RendererFactory;
 import de.algorythm.cms.common.model.entity.impl.Bundle;
-import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
+import de.algorythm.cms.common.model.entity.impl.DerivedPage;
 import de.algorythm.cms.common.model.entity.impl.LocaleInfos;
 import de.algorythm.cms.common.model.entity.impl.Metadata;
 import de.algorythm.cms.common.model.entity.impl.PageFeed;
@@ -24,10 +24,8 @@ import de.algorythm.cms.common.rendering.pipeline.impl.XmlSourceResolverProvider
 import de.algorythm.cms.common.resources.IArchiveExtractor;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IBundleLoader;
-import de.algorythm.cms.common.resources.IDependencyLoader;
 import de.algorythm.cms.common.resources.impl.BundleExpander;
 import de.algorythm.cms.common.resources.impl.BundleLoader;
-import de.algorythm.cms.common.resources.impl.ClasspathDependencyLoader;
 import de.algorythm.cms.common.resources.impl.SynchronizedZipArchiveExtractor;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler;
@@ -43,7 +41,6 @@ public class CmsCommonModule extends AbstractModule {
 			bindIProcessScheduler(bind(IProcessScheduler.class));
 			bindIBundleLoader(bind(IBundleLoader.class));
 			bindIBundleExpander(bind(IBundleExpander.class));
-			bindIDependencyLoader(bind(IDependencyLoader.class));
 			bindXMLInputFactory(bind(XMLInputFactory.class));
 			bindJAXBContext(bind(JAXBContext.class));
 			bindIXmlSourceResolverProvider(bind(IXmlSourceResolverProvider.class));
@@ -79,17 +76,13 @@ public class CmsCommonModule extends AbstractModule {
 		bind.to(BundleExpander.class);
 	}
 	
-	protected void bindIDependencyLoader(AnnotatedBindingBuilder<IDependencyLoader> bind) {
-		bind.to(ClasspathDependencyLoader.class);
-	}
-	
 	protected void bindXMLInputFactory(AnnotatedBindingBuilder<XMLInputFactory> bind) {
 		bind.toInstance(XMLInputFactory.newInstance());
 	}
 	
 	protected void bindJAXBContext(AnnotatedBindingBuilder<JAXBContext> bind) {
 		try {
-			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageFeed.class, LocaleInfos.class, Sources.class, Metadata.class, DerivedPageConfig.class));
+			bind.toInstance(JAXBContext.newInstance(Bundle.class, PageFeed.class, LocaleInfos.class, Sources.class, Metadata.class, DerivedPage.class));
 		} catch (JAXBException e) {
 			throw new RuntimeException("Cannot initialize JAXB context", e);
 		}

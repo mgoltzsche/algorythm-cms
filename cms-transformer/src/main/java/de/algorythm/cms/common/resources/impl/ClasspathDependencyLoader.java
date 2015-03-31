@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.resources.impl;
+/*package de.algorythm.cms.common.resources.impl;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,13 +18,13 @@ public class ClasspathDependencyLoader implements IDependencyLoader {
 
 	private final IBundleLoader loader;
 	private final ZipArchiveUtil zipUtil;
-	
+
 	@Inject
 	public ClasspathDependencyLoader(IBundleLoader loader, ZipArchiveUtil zipUtil) {
 		this.loader = loader;
 		this.zipUtil = zipUtil;
 	}
-	
+
 	@Override
 	public IBundle loadDependency(final String bundleName, final Path tmpDirectory) {
 		final String path = name2path(bundleName);
@@ -40,7 +40,7 @@ public class ClasspathDependencyLoader implements IDependencyLoader {
 			
 			//final FileSystem fs = FileSystems.newFileSystem(Paths.get("zip:/home/max/development/java/algorythm-cms/target/algorythm-cms-jar-with-dependencies.jar"), null);
 			//return loader.getBundle(fs.getPath(path)); // same like next line
-			return loader.getBundle(bundleFilePath);
+			return loader.loadBundle(bundleFilePath);
 		} catch(Exception e) {
 			throw new IllegalStateException("Cannot load bundle '" + bundleName + '\'', e);
 		}
@@ -71,4 +71,4 @@ public class ClasspathDependencyLoader implements IDependencyLoader {
 		
 		return resolvedFile;
 	}
-}
+}*/

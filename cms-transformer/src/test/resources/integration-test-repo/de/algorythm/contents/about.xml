@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Über mich">
+	<h1>Über mich</h1>
+	<p>
+		Softwareentwicklung ist meine Leidenschaft.
+		Während meiner Schulzeit schrieb ich in meiner Freizeit erste kleine Programme in Delphi.
+		Etwas später lernte ich PHP, JavaScript und Markupsprachen kennen und entwickelte zunächst selbstständig einige Webseiten im Auftrag.
+		Seit Beginn meines Studiums der Medieninformatik an der <a href="http://www.beuth-hochschule.de" title="Hochschulseite">Beuth Hochschule für Technik Berlin</a> arbeite ich hauptsächlich mit Java-Technologien. 
+	</p>
+	<h2>Kenntnisse</h2>
+	<grid columns-sm="2">
+		<cell>
+			<h3>Fremdsprachen</h3>
+			<ul>
+				<li>Englisch</li>
+				<li>Französisch (Grundlagen)</li>
+			</ul>
+			<h3>Technologische Schwerpunkte</h3>
+			<ul>
+				<li>Relationale Datenbanken: PostgreSQL, MySQL, SQLight, HSQLDB</li>
+				<li>Java, Java EE</li>
+				<li>JavaScript, JSON, AJAX</li>
+				<li>XML, XSD, XSLT, HTML, CSS</li>
+			</ul>
+		</cell>
+		<cell>
+			<h3>Weitere technologische Kenntnisse</h3>
+			<ul>
+				<li>UML, Xtext</li>
+				<li>Linux (Debian / Ubuntu, CentOS), Windows</li>
+				<li>chef-solo</li>
+				<li>Eclipse</li>
+				<li>Apache Maven, cmake</li>
+				<li>git, Subversion</li>
+				<li>„NoSQL“-Datenbanken: Neo4j, OrientDB, Redis, MongoDB, HDFS</li>
+				<li>JAQL / Apache Hadoop</li>
+				<li>Python</li>
+				<li>C#</li>
+				<li>C, C++</li>
+				<li>PHP</li>
+				<li>ActionScript 3, Flex</li>
+				<li>Delphi</li>
+			</ul>
+		</cell>
+	</grid>
+	<spacer />
+	<spacer />
+	<h2>Kontakt</h2>
+	<properties>
+		<property name="Name">Max Goltzsche</property>
+		<property name="Anschrift">Voigtstraße 42<br />10247 Berlin</property>
+		<property name="Telefonnummer"><bot-secure value="015737449652" /></property>
+		<property name="Email"><bot-secure value="max.goltzsche@algorythm.de" /></property>
+	</properties>
+</article>

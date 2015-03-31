@@ -19,10 +19,10 @@ import de.algorythm.cms.common.impl.jaxb.adapter.LocaleXmlAdapter;
 import de.algorythm.cms.common.model.entity.IBundle;
 import de.algorythm.cms.common.model.entity.IDependency;
 import de.algorythm.cms.common.model.entity.IOutputConfig;
-import de.algorythm.cms.common.model.entity.IPageConfig;
 import de.algorythm.cms.common.model.entity.IParam;
 import de.algorythm.cms.common.model.entity.ISchemaSource;
 import de.algorythm.cms.common.model.entity.ISupportedLocale;
+import de.algorythm.cms.common.model.entity.bundle.IPage;
 
 @XmlRootElement(name="bundle", namespace="http://cms.algorythm.de/common/Bundle")
 public class Bundle implements IBundle {
@@ -55,7 +55,7 @@ public class Bundle implements IBundle {
 	@XmlTransient
 	private Map<String, IOutputConfig> outputMap;
 	@XmlElementRef(type = Page.class)
-	private IPageConfig startPage;
+	private IPage startPage;
 
 	@Override
 	public String getName() {
@@ -173,12 +173,12 @@ public class Bundle implements IBundle {
 	}
 
 	@Override
-	public IPageConfig getStartPage() {
+	public IPage getStartPage() {
 		return startPage;
 	}
 	
 	@Override
-	public void setStartPage(IPageConfig startPage) {
+	public void setStartPage(IPage startPage) {
 		this.startPage = startPage;
 	}
 

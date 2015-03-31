@@ -25,7 +25,7 @@ import de.algorythm.cms.common.model.entity.impl.bundle.Bundle;
 import de.algorythm.cms.common.model.entity.impl.bundle.Module;
 import de.algorythm.cms.common.model.entity.impl.bundle.OutputConfig;
 import de.algorythm.cms.common.model.entity.impl.bundle.Theme;
-import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.IInputResolver;
 
 public class TestBundleLoader {
 
@@ -34,9 +34,9 @@ public class TestBundleLoader {
 		BundleLoader testee = new BundleLoader();
 		URL bundleFileUrl = getClass().getResource("/");
 		Path bundlePath = Paths.get(bundleFileUrl.toURI());
-		ISourcePathResolver resolver = new ResourceResolver(Collections.singletonList(bundlePath));
+		IInputResolver resolver = new FileInputSourceResolver(Collections.singletonList(bundlePath));
 		URI bundleUri = URI.create("/bundle-reference-models/bundle.xml");
-		IBundle bundle = testee.getBundle(bundleUri, resolver);
+		IBundle bundle = testee.loadBundle(bundleUri, resolver);
 		
 		assertNotNull("bundle", bundle);
 		assertEquals("baseUri", bundleUri, bundle.getUri());
@@ -55,6 +55,10 @@ public class TestBundleLoader {
 		assertEquals("1st HTML output template", URI.create("/bundle-reference-models/html/theme/transformations/MyPage.xsl"), theme.getTemplates().iterator().next());
 		assertEquals("1st HTML output style", URI.create("/bundle-reference-models/css/style1.scss"), theme.getStyles().iterator().next());
 		assertEquals("1st HTML output script", URI.create("/bundle-reference-models/js/script1.js"), theme.getScripts().iterator().next());
+		
+		assertNotNull("start page", bundle.getStartPage());
+		assertEquals("start page source", URI.create("/bundle-reference-models/contents/welcome.xml"), bundle.getStartPage().getSource());
+		assertEquals("1st-level children", 2, bundle.getStartPage().getPages().size());
 	}
 
 	@Test

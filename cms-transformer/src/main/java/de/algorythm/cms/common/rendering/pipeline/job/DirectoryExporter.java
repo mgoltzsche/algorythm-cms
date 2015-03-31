@@ -1,4 +1,4 @@
-package de.algorythm.cms.common.rendering.pipeline.job;
+/*package de.algorythm.cms.common.rendering.pipeline.job;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,10 +27,10 @@ public class DirectoryExporter {
 	static private final int BUFFER_SIZE = 8192;
 
 	public void exportDirectories(final IRenderingContext ctx, final List<URI> directories, final IOutputTargetFactory targetFactory) throws Exception {
-		final Path rootDir = ctx.resolveSource(URI.create("/"));
+		final Path rootDir = ctx.createInputStream(URI.create("/"));
 		
 		for (URI dirURI : directories) {
-			Path dirPath = ctx.resolveSource(dirURI);
+			Path dirPath = ctx.createInputStream(dirURI);
 
 			if (!Files.exists(dirPath))
 				log.warn("Cannot export directory " + dirPath + " because it does not exist");
@@ -65,4 +65,4 @@ public class DirectoryExporter {
 		}
 		return nread;
 	}
-}
+}*/

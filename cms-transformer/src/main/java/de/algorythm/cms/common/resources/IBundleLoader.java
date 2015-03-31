@@ -9,5 +9,5 @@ import de.algorythm.cms.common.model.entity.bundle.IBundle;
 
 public interface IBundleLoader {
 
-	IBundle loadBundle(URI publicUri, ISourcePathResolver resolver) throws ResourceNotFoundException, IOException, JAXBException;
+	IBundle loadBundle(URI publicUri, IInputResolver resolver) throws ResourceNotFoundException, IOException, JAXBException;
 }

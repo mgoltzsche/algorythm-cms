@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementRef;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -23,6 +24,7 @@ import de.algorythm.cms.common.impl.jaxb.adapter.UriXmlAdapter;
 import de.algorythm.cms.common.model.entity.bundle.IBundle;
 import de.algorythm.cms.common.model.entity.bundle.IOutputConfig;
 import de.algorythm.cms.common.model.entity.bundle.Format;
+import de.algorythm.cms.common.model.entity.bundle.IPage;
 import de.algorythm.cms.common.model.entity.impl.Page;
 
 @XmlRootElement(name="bundle", namespace="http://cms.algorythm.de/common/Bundle")
@@ -54,7 +56,8 @@ public class Bundle implements IBundle {
 	@XmlElement(name = "output-mapping", namespace = "http://cms.algorythm.de/common/Bundle", required = false)
 	@XmlJavaTypeAdapter(OutputMapXmlAdapter.class)
 	private final Map<Format, IOutputConfig> outputMapping = new HashMap<>();
-	private Page startPage;
+	@XmlElementRef(type = Page.class)
+	private IPage startPage;
 
 	public Bundle() {}
 	
@@ -65,6 +68,9 @@ public class Bundle implements IBundle {
 		defaultLocale = src.getDefaultLocale();
 		supportedLocales.addAll(src.getSupportedLocales());
 		supportedLocales.add(defaultLocale);
+		
+		for (IOutputConfig output : src.getOutputMapping().values())
+			outputMapping.put(output.getFormat(), new OutputConfig(output));
 	}
 	
 	@Override
@@ -100,7 +106,7 @@ public class Bundle implements IBundle {
 	}
 
 	@Override
-	public Page getStartPage() {
+	public IPage getStartPage() {
 		return startPage;
 	}
 
@@ -117,7 +123,7 @@ public class Bundle implements IBundle {
 	public Map<Format, IOutputConfig> getOutputMapping() {
 		return outputMapping;
 	}
-	
+
 	@Override
 	public String toString() {
 		return uri == null ? "Bundle" : uri.toString();

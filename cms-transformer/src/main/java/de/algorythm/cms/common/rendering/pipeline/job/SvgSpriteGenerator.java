@@ -3,6 +3,7 @@ package de.algorythm.cms.common.rendering.pipeline.job;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,7 +11,6 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.sax.TransformerHandler;
 
 import de.algorythm.cms.common.impl.TimeMeter;
-import de.algorythm.cms.common.model.entity.ISupportedLocale;
 import de.algorythm.cms.common.model.entity.impl.Sources;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
@@ -29,12 +29,11 @@ public class SvgSpriteGenerator {
 		this.xmlFactory = xmlFactory;
 	}
 
-	public void generateSvgSprite(final IRenderingContext ctx, final List<URI> svg, final URI flagDirectory, final boolean includeFlags, final IOutputTargetFactory targetFactory) throws Exception {
-		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
+	public void generateSvgSprite(final IRenderingContext ctx, final List<URI> svg, final Set<Locale> supportedLocales, final URI flagDirectory, final IOutputTargetFactory targetFactory) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(ctx.getName() + ' ' + this);
 		
-		if (includeFlags) {
-			for (ISupportedLocale supportedLocale : ctx.getBundle().getSupportedLocales()) {
-				final Locale locale = supportedLocale.getLocale();
+		if (!supportedLocales.isEmpty()) {
+			for (Locale locale : supportedLocales) {
 				final String country = locale.getCountry().toLowerCase();
 				
 				if (country.isEmpty())

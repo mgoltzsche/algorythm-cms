@@ -2,14 +2,14 @@ package de.algorythm.cms.common.rendering.pipeline.job;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 
 import javax.inject.Singleton;
@@ -39,7 +39,7 @@ public class ScssCompiler {
 	private boolean compress = false;
 
 	public void compileScss(final IRenderingContext ctx, final Collection<URI> sources, final IOutputTargetFactory targetFactory) throws Exception {
-		final TimeMeter meter = TimeMeter.meter(ctx.getBundle().getName() + ' ' + this);
+		final TimeMeter meter = TimeMeter.meter(ctx.getName() + ' ' + this);
 		final String scss = createIncludingSCSS(sources);
 		
 		compileSource(scss, ctx, targetFactory);
@@ -101,9 +101,9 @@ public class ScssCompiler {
 				final Reader reader;
 				
 				try {
-					final Path resolvedPath = ctx.resolveSource(publicUri);
-					reader = Files.newBufferedReader(resolvedPath, StandardCharsets.UTF_8);
-				} catch (ResourceNotFoundException | IOException e) {
+					final InputStream stream = ctx.createInputStream(publicUri);
+					reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+				} catch (IOException | ResourceNotFoundException e) {
 					throw new RuntimeException(e);
 				}
 				

@@ -15,15 +15,17 @@ import org.apache.commons.lang.StringUtils;
 
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.IMetadata;
-import de.algorythm.cms.common.model.entity.IPageConfig;
-import de.algorythm.cms.common.model.entity.ISupportedLocale;
-import de.algorythm.cms.common.model.entity.impl.DerivedPageConfig;
+import de.algorythm.cms.common.model.entity.bundle.IPage;
+import de.algorythm.cms.common.model.entity.impl.DerivedPage;
+import de.algorythm.cms.common.rendering.pipeline.IMetadataExtractorProvider;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
+import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.IOutputTarget;
+import de.algorythm.cms.common.resources.IOutputTargetFactory;
+import de.algorythm.cms.common.resources.IWriteableResources;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.meta.IMetadataExtractor;
 import de.algorythm.cms.common.resources.meta.MetadataExtractionException;
-import de.algorythm.cms.common.scheduling.IExecutor;
 
 @Singleton
 public class PageIndexer {
@@ -32,50 +34,28 @@ public class PageIndexer {
 	private final IMetadataExtractor metadataExtractor;
 
 	@Inject
-	public PageIndexer(JAXBContext jaxbContext, IMetadataExtractor metadataExtractor) {
-		this.jaxbContext = jaxbContext;
-		this.metadataExtractor = metadataExtractor;
+	public PageIndexer(IMetadataExtractorProvider metadataExtractorProvider) throws JAXBException {
+		this.jaxbContext = JAXBContext.newInstance(DerivedPage.class);
+		this.metadataExtractor = metadataExtractorProvider.getMetadataExtractor();
 	}
 
-	public void indexPages(final IRenderingContext ctx, final IExecutor executor) throws Exception {
+	public void indexPages(final IPage startPage, final Locale locale, final IRenderingContext ctx) throws Exception {
 		final TimeMeter meter = TimeMeter.meter(this + " initialization");
-		final String name = ctx.getBundle().getName();
-		final IPageConfig unlocalizedStartPage = ctx.getBundle().getStartPage();
+		final DerivedPage localizedStartPage = deriveLocalizedPage(startPage, StringUtils.EMPTY, locale, ctx, ctx.getTmpResources());
 		
-		if (unlocalizedStartPage == null)
-			throw new IllegalStateException("Missing start page for '" + ctx.getBundle().getName() + "'");
+		localizedStartPage.setName("start-page");
 		
-		for (ISupportedLocale supportedLocale : ctx.getBundle().getSupportedLocales()) {
-			final Locale locale = supportedLocale.getLocale();
-			
-			executor.execute(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						DerivedPageConfig localizedStartPage = deriveLocalizedPage(unlocalizedStartPage, StringUtils.EMPTY, ctx, locale);
-						
-						localizedStartPage.setName(name);
-						
-						for (IPageConfig child : unlocalizedStartPage.getPages()) {
-							deriveLocalizedChildren(localizedStartPage, child, ctx, locale);
-						}
-						
-						writePageXml(localizedStartPage, ctx, locale);
-					} catch (ResourceNotFoundException
-							| MetadataExtractionException | IOException
-							| JAXBException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			});
-		}
+		for (IPage child : startPage.getPages())
+			deriveLocalizedChildren(localizedStartPage, child, locale, ctx, ctx.getTmpResources());
+		
+		writePageXml(localizedStartPage, locale, ctx.getTmpResources());
 		
 		meter.finish();
 	}
-	
-	private void writePageXml(final DerivedPageConfig page, final IRenderingContext ctx, final Locale locale) throws JAXBException, IOException {
+
+	private void writePageXml(final DerivedPage page, final Locale locale, final IOutputTargetFactory outputFactory) throws JAXBException, IOException {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
-		final IOutputTarget target = ctx.createOutputTarget('/' + locale.toLanguageTag() + "/pages.xml");
+		final IOutputTarget target = outputFactory.createOutputTarget('/' + locale.toLanguageTag() + "/pages.xml");
 		
 		try (OutputStream out = target.createOutputStream()) {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -83,32 +63,32 @@ public class PageIndexer {
 		}
 	}
 
-	private void deriveLocalizedChildren(final DerivedPageConfig localizedParent, final IPageConfig unlocalizedChild, final IRenderingContext ctx, final Locale locale) throws ResourceNotFoundException, MetadataExtractionException {
+	private void deriveLocalizedChildren(final DerivedPage localizedParent, final IPage unlocalizedChild, final Locale locale, final IInputResolver resolver, final IWriteableResources tmp) throws ResourceNotFoundException, MetadataExtractionException, IOException {
 		final String name = unlocalizedChild.getName();
 		
 		if (name == null || name.isEmpty())
 			throw new IllegalStateException("Undefined page name");
 		
 		final String path = localizedParent.getPath() + '/' + name;
-		final DerivedPageConfig derivedPage = deriveLocalizedPage(unlocalizedChild, path, ctx, locale);
+		final DerivedPage derivedPage = deriveLocalizedPage(unlocalizedChild, path, locale, resolver, tmp);
 		
 		localizedParent.getPages().add(derivedPage);
 		
-		for (IPageConfig child : unlocalizedChild.getPages())
-			deriveLocalizedChildren(derivedPage, child, ctx, locale);
+		for (IPage child : unlocalizedChild.getPages())
+			deriveLocalizedChildren(derivedPage, child, locale, resolver, tmp);
 	}
 
-	private DerivedPageConfig deriveLocalizedPage(final IPageConfig page, final String path, final IRenderingContext ctx, final Locale locale) throws ResourceNotFoundException, MetadataExtractionException {
-		final IMetadata metadata = extractMetadata(ctx, page, locale);
+	private DerivedPage deriveLocalizedPage(final IPage page, final String path, final Locale locale, final IInputResolver resolver, final IWriteableResources tmp) throws ResourceNotFoundException, MetadataExtractionException, IOException {
+		final IMetadata metadata = extractMetadata(page, locale, resolver, tmp);
 		
-		return new DerivedPageConfig(path, page, metadata);
+		return new DerivedPage(path, page, metadata);
 	}
 
-	private IMetadata extractMetadata(final IRenderingContext ctx, final IPageConfig page, final Locale locale) throws ResourceNotFoundException, MetadataExtractionException {
+	private IMetadata extractMetadata(final IPage page, final Locale locale, final IInputResolver resolver, final IWriteableResources tmp) throws ResourceNotFoundException, MetadataExtractionException, IOException {
 		try {
-			return metadataExtractor.extractMetadata(URI.create('/' + locale.toLanguageTag() + page.getSource().getPath()), ctx);
+			return metadataExtractor.extractMetadata(URI.create('/' + locale.toLanguageTag() + page.getSource().getPath()), resolver, tmp);
 		} catch(ResourceNotFoundException e) {
-			return metadataExtractor.extractMetadata(URI.create(page.getSource().getPath()), ctx);
+			return metadataExtractor.extractMetadata(URI.create(page.getSource().getPath()), resolver, tmp);
 		}
 	}
 

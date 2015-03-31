@@ -9,12 +9,18 @@ import java.util.zip.ZipInputStream;
 
 public class ZipArchiveUtil {
 
-	public void unzip(final Path zipFile, final Path destinationDirectory)
+	/**
+	 * Extracts the given ZIP file's contents from stream and writes them into destinationDirectory.
+	 * The given stream is closed afterwards.
+	 * @param zipFileStream Streamed ZIP file
+	 * @param destinationDirectory Extraction target directory
+	 * @throws IOException
+	 */
+	public void unzip(final InputStream zipFileStream, final Path destinationDirectory)
 			throws IOException {
 		Files.createDirectories(destinationDirectory);
-		InputStream stream = Files.newInputStream(zipFile);
 		
-		try (ZipInputStream zipStream = new ZipInputStream(stream)) {
+		try (ZipInputStream zipStream = new ZipInputStream(zipFileStream)) {
 			ZipEntry entry = zipStream.getNextEntry();
 			
 			while (entry != null) {

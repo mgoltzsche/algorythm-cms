@@ -14,8 +14,13 @@ public class TemplateErrorListener implements ErrorListener {
 	
 	static private final Logger log = LoggerFactory.getLogger(TemplateErrorListener.class);
 	
-	private List<TransformerException> warnings = new LinkedList<TransformerException>();
-	private List<TransformerException> errors = new LinkedList<TransformerException>();
+	private final String sourceId;
+	private final List<TransformerException> warnings = new LinkedList<TransformerException>();
+	private final List<TransformerException> errors = new LinkedList<TransformerException>();
+	
+	public TemplateErrorListener(String sourceId) {
+		this.sourceId = sourceId;
+	}
 	
 	@Override
 	public void warning(TransformerException exception)
@@ -38,6 +43,9 @@ public class TemplateErrorListener implements ErrorListener {
 	public void evaluateErrors() {
 		if (!errors.isEmpty()) {
 			final String msg = errorsToString("Errors:", errors);
+			
+			for (Exception error : errors)
+				log.debug("Transformation of " + sourceId + " failed", error);
 			
 			throw new IllegalStateException(msg);
 		} else if (!warnings.isEmpty()) {

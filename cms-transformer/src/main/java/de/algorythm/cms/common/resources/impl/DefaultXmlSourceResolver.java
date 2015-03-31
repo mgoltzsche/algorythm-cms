@@ -22,6 +22,6 @@ public class DefaultXmlSourceResolver extends AbstractXmlSourceResolver {
 
 	@Override
 	protected Source createXmlSourceInternal(URI uri, IRenderingContext ctx) throws IOException, ResourceNotFoundException {
-		return new XmlSource(uri, ctx.resolveSource(uri));
+		return new XmlSource(uri, ctx.createInputStream(uri));
 	}
 }

@@ -1,7 +1,7 @@
-package de.algorythm.cms.common.rendering.pipeline.impl;
+/*package de.algorythm.cms.common.rendering.pipeline.impl;
 
+import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,7 +33,7 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 			this.pendingSize = jobs.size();
 		}
 	}
-	
+
 	private final IRenderingContext context;
 	private final Iterator<PipelinePhase> phaseIter;
 	private PipelinePhase currentPhase;
@@ -88,11 +88,6 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public IBundle getBundle() {
-		return context.getBundle();
-	}
-
-	@Override
 	public URI getResourcePrefix() {
 		return context.getResourcePrefix();
 	}
@@ -103,8 +98,8 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 	}
 
 	@Override
-	public Path resolveSource(URI publicUri) throws ResourceNotFoundException {
-		return context.resolveSource(publicUri);
+	public InputStream createInputStream(URI publicUri) throws ResourceNotFoundException {
+		return context.createInputStream(publicUri);
 	}
 
 	@Override
@@ -112,3 +107,4 @@ public class RenderingProcess implements IProcess, IRenderingContext {
 		return context.createOutputTarget(publicPath);
 	}
 }
+*/

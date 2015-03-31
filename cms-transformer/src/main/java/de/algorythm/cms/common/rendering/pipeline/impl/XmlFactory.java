@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 
 import javax.inject.Inject;
@@ -48,9 +46,10 @@ import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
 import de.algorythm.cms.common.rendering.pipeline.IXmlSourceResolverProvider;
+import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.IOutputTarget;
 import de.algorythm.cms.common.resources.IOutputTargetFactory;
-import de.algorythm.cms.common.resources.ISourcePathResolver;
+import de.algorythm.cms.common.resources.IWriteableResources;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.XmlSource;
 
@@ -112,9 +111,8 @@ public class XmlFactory implements IXmlFactory {
 		reader.parse(source);
 	}
 	
-	private InputSource createInputSource(final URI publicUri, final IRenderingContext ctx) throws IOException, ResourceNotFoundException {
-		final Path path = ctx.resolveSource(publicUri);
-		final InputStream stream = Files.newInputStream(path);
+	private InputSource createInputSource(final URI publicUri, final IRenderingContext ctx) throws ResourceNotFoundException, IOException {
+		final InputStream stream = ctx.createInputStream(publicUri);
 		final InputSource source = new InputSource(stream);
 		
 		source.setSystemId(publicUri.toString());
@@ -128,16 +126,9 @@ public class XmlFactory implements IXmlFactory {
 	}
 	
 	@Override
-	public Templates compileTemplates(final URI xslSourceUri, final IRenderingContext ctx) throws TransformerConfigurationException, ResourceNotFoundException {
-		final Path path = ctx.resolveSource(xslSourceUri);
-		
-		if (path == null)
-			throw new TransformerConfigurationException("Cannot resolve " + xslSourceUri);
-		
-		try {
-			return compileTemplates(new XmlSource(xslSourceUri, path), ctx);
-		} catch (IOException e) {
-			throw new TransformerConfigurationException(e);
+	public Templates compileTemplates(final URI xslSourceUri, final IRenderingContext ctx) throws TransformerConfigurationException, ResourceNotFoundException, IOException {
+		try (InputStream stream = ctx.createInputStream(xslSourceUri)) {
+			return compileTemplates(new XmlSource(xslSourceUri, stream), ctx);
 		}
 	}
 	
@@ -168,7 +159,7 @@ public class XmlFactory implements IXmlFactory {
 	private Templates compileTemplates(final Source xslSource, final IRenderingContext ctx) throws TransformerConfigurationException {
 		final TimeMeter meter = TimeMeter.meter("template compilation");
 		//final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
-		final TemplateErrorListener errorListener = new TemplateErrorListener();
+		final TemplateErrorListener errorListener = new TemplateErrorListener(ctx.getName());
 		final Templates templates;
 		
 		transformerFactory.setErrorListener(errorListener);
@@ -188,7 +179,7 @@ public class XmlFactory implements IXmlFactory {
 	
 	@Override
 	public TransformerHandler createTransformerHandler(final Templates templates, final IRenderingContext ctx, final String outputPath, final IOutputTargetFactory targetFactory) throws IOException, TransformerConfigurationException {
-		final TransformerHandler transformerHandler = createTransformerHandler(templates, targetFactory, ctx);
+		final TransformerHandler transformerHandler = createTransformerHandler(templates, targetFactory, ctx.getTmpResources());
 		final IOutputTarget target = targetFactory.createOutputTarget(outputPath);
 		final Result result = new StreamResult(target.createOutputStream());
 		
@@ -199,12 +190,12 @@ public class XmlFactory implements IXmlFactory {
 		return transformerHandler;
 	}
 
-	private TransformerHandler createTransformerHandler(final Templates templates, final IOutputTargetFactory outFactory, final IRenderingContext ctx) throws IOException, TransformerConfigurationException {
+	private TransformerHandler createTransformerHandler(final Templates templates, final IOutputTargetFactory out, final IWriteableResources tmp) throws IOException, TransformerConfigurationException {
 		final SAXTransformerFactory transformerFactory = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
 		final TransformerHandler transformerHandler = transformerFactory.newTransformerHandler(templates);
 		final Transformer transformer = transformerHandler.getTransformer();
 		final Controller trnsfrmCtrl = ((TransformerImpl) transformer).getUnderlyingController();
-		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(outFactory, ctx);
+		final OutputURIResolver outputUriResolverAdapter = new CmsOutputURIResolver(out, tmp);
 		
 		trnsfrmCtrl.setOutputURIResolver(outputUriResolverAdapter);
 		
@@ -225,16 +216,15 @@ public class XmlFactory implements IXmlFactory {
 		return new StreamSource(new StringReader(xslt.toString()));
 	}
 
-	private Schema createSchema(final Collection<URI> schemaLocationUris, final ISourcePathResolver sourcePathResolver) throws Exception {
+	private Schema createSchema(final Collection<URI> schemaLocationUris, final IInputResolver inputResolver) throws Exception {
 		final SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		final Source[] sources = new Source[schemaLocationUris.size()];
 		int i = 0;
 		
-		schemaFactory.setResourceResolver(new CmsSchemaResolver(sourcePathResolver));
+		schemaFactory.setResourceResolver(new CmsSchemaResolver(inputResolver));
 		
 		for (URI schemaLocationUri : schemaLocationUris) {
-			final Path schemaLocation = sourcePathResolver.resolveSource(schemaLocationUri);
-			final InputStream stream = Files.newInputStream(schemaLocation);
+			final InputStream stream = inputResolver.createInputStream(schemaLocationUri);
 			final Source source = new StreamSource(stream);
 			sources[i++] = source;
 			

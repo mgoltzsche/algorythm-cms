@@ -1,5 +1,6 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -7,14 +8,13 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.inject.Singleton;
 
+import org.apache.commons.io.IOUtils;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
@@ -89,8 +89,8 @@ public class JavascriptCompressor {
 		final StringBuilder scriptBuilder = new StringBuilder();
 		
 		for (URI source : sources) {
-			Path file = ctx.resolveSource(source);
-			byte[] bytes = Files.readAllBytes(file);
+			InputStream stream = ctx.createInputStream(source);
+			byte[] bytes = IOUtils.toByteArray(stream);
 			String script = new String(bytes, StandardCharsets.UTF_8);
 			
 			if (compress) {
