@@ -20,17 +20,15 @@ import org.mozilla.javascript.EvaluatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
-
 import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.resources.IOutputTarget;
 import de.algorythm.cms.common.resources.IOutputTargetFactory;
 
 @Singleton
-public class JavascriptCompressor {
+public class JavaScriptCompressor {
 
-	static private final Logger log = LoggerFactory.getLogger(JavascriptCompressor.class);
+	static private final Logger log = LoggerFactory.getLogger(JavaScriptCompressor.class);
 	static private final URI MAIN_JS = URI.create("main.js");
 	
 	static private class JsErrorReporter implements ErrorReporter {
@@ -96,20 +94,22 @@ public class JavascriptCompressor {
 			if (compress) {
 				final Reader reader = new StringReader(script);
 				final JsErrorReporter reporter = new JsErrorReporter();
-				final JavaScriptCompressor compressor = new JavaScriptCompressor(reader, reporter);
+				final com.yahoo.platform.yui.compressor.JavaScriptCompressor compressor = new com.yahoo.platform.yui.compressor.JavaScriptCompressor(reader, reporter);
 				final Writer writer = new StringWriter();
 				compressor.compress(writer, 0, munge, verbose, preserveAllSemiColons, disableOptimizations);
 				
 				for (String warning : reporter.warnings)
 					log.warn(warning);
 				
-				script = writer.toString().replace("\n", "");
+				script = writer.toString();
 			}
 			
 			scriptBuilder.append(script).append("\n");
 		}
 		
-		final String scripts = scriptBuilder.toString();
+		final String scripts = compress
+				? scriptBuilder.toString().replace("\n", "")
+				: scriptBuilder.toString();
 		final IOutputTarget target = targetFactory.createOutputTarget(jsPath);
 		
 		try (OutputStream outStream = target.createOutputStream()) {

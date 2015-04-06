@@ -103,6 +103,7 @@ public class BundleExpander implements IBundleExpander {
 		module.getTemplates().addAll(base.getTemplates());
 		module.getStyles().addAll(base.getStyles());
 		module.getScripts().addAll(base.getScripts());
+		module.getSvgIcons().addAll(base.getSvgIcons());
 	}
 	
 	private void extendTheme(ITheme theme, ITheme base, Format format, Map<URI, IBundle> includes, Set<URI> alreadyExtended) {

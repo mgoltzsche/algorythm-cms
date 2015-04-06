@@ -8,4 +8,5 @@ public interface IModule {
 	Set<URI> getTemplates();
 	Set<URI> getStyles();
 	Set<URI> getScripts();
+	Set<URI> getSvgIcons();
 }

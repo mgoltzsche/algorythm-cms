@@ -2,6 +2,7 @@ package de.algorythm.cms.common.resources.impl;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -30,6 +31,9 @@ public class OdtXmlSourceResolver extends AbstractXmlSourceResolver {
 			throws IOException, ResourceNotFoundException {
 		final Path extractedOdtDirectory = archiveExtractor.unzip(uri, ctx, ctx.getTmpResources());
 		final Path contentXmlFile = extractedOdtDirectory.resolve("content.xml");
+		
+		if (!Files.exists(contentXmlFile))
+			throw new ResourceNotFoundException("Cannot find context.xml in contents of ODT archive at " + uri);
 		
 		return new XmlSource(uri.getPath() + "/content.xml", contentXmlFile);
 	}

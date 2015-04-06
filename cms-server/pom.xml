@@ -5,8 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>cms-server</artifactId>
-	<packaging>war</packaging>
-	<name>algorythm CMS server</name>
+	<packaging>jar</packaging>
+	<name>algorythm CMS preview verticle</name>
 
 	<parent>
 		<artifactId>cms-parent</artifactId>
@@ -14,63 +14,201 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<build>
-		<finalName>algorythm-cms</finalName>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<plugins>
-			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<webXml>src/main/resources/WEB-INF/web.xml</webXml>
-					<!--<webResources>
-						<resource>
-							<directory>src/main/webapp</directory>
-						</resource>
-					</webResources>-->
-				</configuration>
-			</plugin>
-			<!-- To run with Apache Tomcat use mvn tomcat7:run -->
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<path>/algorythm-cms</path>
-					<warSourceDirectory>${project.build.outputDirectory}/../algorythm-cms</warSourceDirectory>
-				</configuration>
-			</plugin>
-		</plugins>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
-			</testResource>
-		</testResources>
-	</build>
+		<!-- Set pullInDeps to true if you want any modules specified in the 'includes' 
+			and 'deploys' fields in your mod.json to be automatically pulled in during 
+			packaging and added inside your module. Doing this means your module won't 
+			download and install those dependencies at run-time when they're first requested. -->
+		<vertx.pullInDeps>true</vertx.pullInDeps>
+
+		<!-- Set createFatJar to true if you want to create a fat executable jar 
+			which contains the Vert.x binaries along with the module so it can be run 
+			with java -jar <jarname> -->
+		<vertx.createFatJar>true</vertx.createFatJar>
+
+		<!--Vertx module name -->
+		<module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
+
+		<!-- The directory where the module will be assembled - you can override 
+			this on the command line with -Dmods.directory=mydir -->
+		<mods.directory>target/mods</mods.directory>
+
+		<!--Dependency versions -->
+		<vertx.version>2.1.5</vertx.version>
+		<vertx.testtools.version>2.0.3-final</vertx.testtools.version>
+		<junit.version>4.11</junit.version>
+
+		<!--Plugin versions -->
+		<maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
+		<maven.jar.plugin.version>2.6</maven.jar.plugin.version>
+		<maven.resources.plugin.version>2.6</maven.resources.plugin.version>
+		<maven.vertx.plugin.version>2.0.11-final</maven.vertx.plugin.version>
+		<maven.surefire.plugin.version>2.14</maven.surefire.plugin.version>
+		<maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
+		<maven.surefire.report.plugin.version>2.14</maven.surefire.report.plugin.version>
+		<maven.javadoc.plugin.version>2.9</maven.javadoc.plugin.version>
+		<maven.dependency.plugin.version>2.7</maven.dependency.plugin.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>de.algorythm.cms</groupId>
 			<artifactId>cms-transformer</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<!--<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>-->
+			<!--<exclusions> <exclusion> <groupId>org.slf4j</groupId> <artifactId>slf4j-log4j12</artifactId> 
+				</exclusion> </exclusions> -->
 		</dependency>
+		<!--Vertx provided dependencies -->
 		<dependency>
-			<groupId>com.google.inject.extensions</groupId>
-			<artifactId>guice-servlet</artifactId>
-			<version>3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-core</artifactId>
+			<version>${vertx.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-platform</artifactId>
+			<version>${vertx.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-hazelcast</artifactId>
+			<version>${vertx.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!--Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>testtools</artifactId>
+			<version>${vertx.testtools.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<!-- The vert.x Maven plugin -->
+			<plugin>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-maven-plugin</artifactId>
+				<version>${maven.vertx.plugin.version}</version>
+				<!-- You can specify extra config to the plugin as required here <configuration> 
+					<configFile>/path/to/MyVerticle.conf</configFile> <instances>1</instances> 
+					<classpath>src/main/resources/:src/test/resources/:target/classes/:target/test-classes/</classpath> 
+					</configuration> -->
+				<!-- Make sure that the plugin uses the vert.x versions from this pom.xml 
+					not from its own pom.xml -->
+				<dependencies>
+					<dependency>
+						<groupId>io.vertx</groupId>
+						<artifactId>vertx-platform</artifactId>
+						<version>${vertx.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>io.vertx</groupId>
+						<artifactId>vertx-core</artifactId>
+						<version>${vertx.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>io.vertx</groupId>
+						<artifactId>vertx-hazelcast</artifactId>
+						<version>${vertx.version}</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>PullInDeps</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>pullInDeps</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>CreateFatJar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>fatJar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven.resources.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>copy-mod-to-target</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<overwrite>true</overwrite>
+							<outputDirectory>${mods.directory}/${module.name}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>target/classes</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>${maven.dependency.plugin.version}</version>
+				<executions>
+					<execution>
+						<id>copy-mod-dependencies-to-target</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${mods.directory}/${module.name}/lib</outputDirectory>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-mod-dependencies-to-target-dependencies</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/dependencies</outputDirectory>
+							<includeScope>runtime</includeScope>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/mod.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>assemble</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

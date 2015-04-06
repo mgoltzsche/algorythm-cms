@@ -9,17 +9,17 @@ public interface IInputResolver {
 	static public final IInputResolver DEFAULT = new IInputResolver() {
 		@Override
 		public IInputSource resolveResource(URI publicUri)
-				throws ResourceNotFoundException, IOException {
-			throw new ResourceNotFoundException("Cannot resolve " + publicUri);
+				throws IOException {
+			return null;
 		}
 		
 		@Override
 		public InputStream createInputStream(URI publicUri)
-				throws ResourceNotFoundException, IOException {
-			throw new ResourceNotFoundException("Cannot resolve resource URI " + publicUri);
+				throws IOException {
+			return null;
 		}
 	};
 	
-	IInputSource resolveResource(URI publicUri) throws ResourceNotFoundException, IOException;
-	InputStream createInputStream(URI publicUri) throws ResourceNotFoundException, IOException;
+	IInputSource resolveResource(URI publicUri) throws IOException;
+	InputStream createInputStream(URI publicUri) throws IOException;
 }

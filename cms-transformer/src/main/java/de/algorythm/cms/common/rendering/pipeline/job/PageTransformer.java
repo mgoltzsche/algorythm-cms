@@ -97,11 +97,11 @@ public class PageTransformer {
 	}
 
 	private String relativeRootPath(final String path) {
-		final StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder(".");
 		
-		for (int i = 1; i < path.length(); i++)
+		for (int i = 0; i < path.length(); i++)
 			if (path.charAt(i) == '/')
-				sb.append("../");
+				sb.append("/..");
 		
 		return sb.toString();
 	}

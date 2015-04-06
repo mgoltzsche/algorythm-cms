@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 public interface IOutputTarget {
 
-	String getPublicPath();
+	//String getPublicPath();
 	boolean exists();
 	OutputStream createOutputStream() throws IOException;
 }

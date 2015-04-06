@@ -41,6 +41,13 @@ public class Module implements IModule {
 		@XmlElement(name = "script", namespace = "http://cms.algorythm.de/common/Bundle")
 	})
 	private final Set<URI> scripts = new LinkedHashSet<>();
+	@XmlJavaTypeAdapter(value = UriXmlAdapter.class)
+	@XmlSchemaType(name = "anyURI")
+	@XmlElementWrapper(name = "icons", namespace = "http://cms.algorythm.de/common/Bundle")
+	@XmlElements({
+		@XmlElement(name = "icon", namespace = "http://cms.algorythm.de/common/Bundle")
+	})
+	private final Set<URI> svgIcons = new LinkedHashSet<>();
 
 	public Module() {}
 
@@ -48,6 +55,7 @@ public class Module implements IModule {
 		templates.addAll(src.getTemplates());
 		styles.addAll(src.getStyles());
 		scripts.addAll(src.getScripts());
+		svgIcons.addAll(src.getSvgIcons());
 	}
 
 	@Override
@@ -63,5 +71,10 @@ public class Module implements IModule {
 	@Override
 	public Set<URI> getScripts() {
 		return scripts;
+	}
+
+	@Override
+	public Set<URI> getSvgIcons() {
+		return svgIcons;
 	}
 }

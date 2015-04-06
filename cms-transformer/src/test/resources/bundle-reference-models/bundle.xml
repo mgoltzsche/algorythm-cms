@@ -16,14 +16,6 @@
 				<templates>
 					<template>html/theme/transformations/MyPage.xsl</template>
 					<template>html/theme/transformations/MyMenu.xsl</template>
-					<!-- <template>transformations/html/Theme.xsl</template>
-					<template>transformations/html/Article.xsl</template>
-					<template>transformations/html/Markup.xsl</template>
-					<template>transformations/html/Menu.xsl</template>
-					<template>transformations/html/SubNavigation.xsl</template>
-					<template>transformations/html/Breadcrumbs.xsl</template>
-					<template>transformations/html/Grid.xsl</template>
-					<template>transformations/Include.xsl</template>-->
 				</templates>
 				<styles>
 					<style>css/style1.scss</style>

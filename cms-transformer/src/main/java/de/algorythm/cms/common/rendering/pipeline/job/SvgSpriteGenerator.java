@@ -1,7 +1,7 @@
 package de.algorythm.cms.common.rendering.pipeline.job;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Set;
 
@@ -14,13 +14,14 @@ import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.model.entity.impl.Sources;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
+import de.algorythm.cms.common.resources.IInputSource;
 import de.algorythm.cms.common.resources.IOutputTargetFactory;
 
 @Singleton
 public class SvgSpriteGenerator {
 
-	static public final URI FLAG_DIRECTORY = URI.create("/images/flags/");
-	static private final URI XSL_URI = URI.create("/transformations/de.algorythm.cms.common/SvgSprites.xsl");
+	static public final URI FLAG_DIR_URI = URI.create("/de/algorythm/cms/common/icons/flags/");
+	static private final URI XSL_URI = URI.create("/de/algorythm/cms/common/transformations/SvgSprites.xsl");
 
 	private final IXmlFactory xmlFactory;
 
@@ -29,26 +30,31 @@ public class SvgSpriteGenerator {
 		this.xmlFactory = xmlFactory;
 	}
 
-	public void generateSvgSprite(final IRenderingContext ctx, final List<URI> svg, final Set<Locale> supportedLocales, final URI flagDirectory, final IOutputTargetFactory targetFactory) throws Exception {
-		final TimeMeter meter = TimeMeter.meter(ctx.getName() + ' ' + this);
+	public void generateSvgSprite(final IRenderingContext ctx, final Collection<URI> svgs, final Set<Locale> supportedLocales, final IOutputTargetFactory outFactory) throws Exception {
+		final TimeMeter meter = TimeMeter.meter(this.toString());
 		
 		if (!supportedLocales.isEmpty()) {
 			for (Locale locale : supportedLocales) {
 				final String country = locale.getCountry().toLowerCase();
+				final URI flagUri = FLAG_DIR_URI.resolve(country + ".svg");
+				final IInputSource flag = ctx.resolveResource(flagUri);
 				
 				if (country.isEmpty())
-					throw new IllegalStateException("Undefined country in locale " + locale);
+					throw new IllegalStateException("Undefined country in locale: " + locale);
 				
-				svg.add(flagDirectory.resolve(country + ".svg"));
+				if (flag == null)
+					throw new IllegalStateException("Missing file: " + flagUri);
+				
+				svgs.add(flagUri);
 			}
 		}
 		
-		if (!svg.isEmpty()) {
-			final String outputPath = ctx.getResourcePrefix() + "/sprites.svg";
+		if (!svgs.isEmpty()) {
+			final String outputPath = ctx.getResourcePrefix() + "sprites.svg";
 			final Templates templates = xmlFactory.compileTemplates(XSL_URI, ctx);
-			final TransformerHandler handler = xmlFactory.createTransformerHandler(templates, ctx, outputPath, targetFactory);
+			final TransformerHandler handler = xmlFactory.createTransformerHandler(templates, ctx, outputPath, outFactory);
 			
-			xmlFactory.createMarshaller().marshal(new Sources(svg), handler);
+			xmlFactory.createMarshaller().marshal(new Sources(svgs), handler);
 		}
 		
 		meter.finish();

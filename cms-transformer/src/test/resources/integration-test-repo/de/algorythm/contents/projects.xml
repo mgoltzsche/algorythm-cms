@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 		title="Projekte">
-	<include href="/templates/project-template.xml">
+	<include href="/de/algorythm/templates/project-template.xml">
 		<replace placeholder="title"></replace>
 		<replace placeholder="content">
 			<p>

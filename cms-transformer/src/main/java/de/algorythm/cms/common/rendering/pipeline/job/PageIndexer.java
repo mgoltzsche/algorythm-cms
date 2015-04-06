@@ -40,7 +40,7 @@ public class PageIndexer {
 	}
 
 	public void indexPages(final IPage startPage, final Locale locale, final IRenderingContext ctx) throws Exception {
-		final TimeMeter meter = TimeMeter.meter(this + " initialization");
+		final TimeMeter meter = TimeMeter.meter(this.toString());
 		final DerivedPage localizedStartPage = deriveLocalizedPage(startPage, StringUtils.EMPTY, locale, ctx, ctx.getTmpResources());
 		
 		localizedStartPage.setName("start-page");
@@ -55,7 +55,7 @@ public class PageIndexer {
 
 	private void writePageXml(final DerivedPage page, final Locale locale, final IOutputTargetFactory outputFactory) throws JAXBException, IOException {
 		final Marshaller marshaller = jaxbContext.createMarshaller();
-		final IOutputTarget target = outputFactory.createOutputTarget('/' + locale.toLanguageTag() + "/pages.xml");
+		final IOutputTarget target = outputFactory.createOutputTarget("/i18n/" + locale.toLanguageTag() + "/pages.xml");
 		
 		try (OutputStream out = target.createOutputStream()) {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);

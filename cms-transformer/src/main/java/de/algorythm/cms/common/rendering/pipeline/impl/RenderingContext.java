@@ -5,14 +5,12 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Locale;
 
 import de.algorythm.cms.common.model.entity.bundle.IPage;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.IInputSource;
 import de.algorythm.cms.common.resources.IWriteableResources;
-import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.FileOutputTargetFactory;
 
 public class RenderingContext implements IRenderingContext {
@@ -60,13 +58,13 @@ public class RenderingContext implements IRenderingContext {
 	}
 
 	@Override
-	public InputStream createInputStream(URI publicUri) throws ResourceNotFoundException, IOException {
+	public InputStream createInputStream(URI publicUri) throws IOException {
 		return sourceResolver.createInputStream(publicUri);
 	}
 
 	@Override
 	public IInputSource resolveResource(URI publicUri)
-			throws ResourceNotFoundException, IOException {
+			throws IOException {
 		return sourceResolver.resolveResource(publicUri);
 	}
 }

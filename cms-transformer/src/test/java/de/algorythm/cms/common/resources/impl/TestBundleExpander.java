@@ -10,7 +10,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.Locale;
 
 import org.junit.Test;
@@ -26,9 +25,9 @@ public class TestBundleExpander {
 	public void expandBundle_should_expand_bundle() throws Exception {
 		BundleLoader loader = new BundleLoader();
 		BundleExpander testee = new BundleExpander(loader);
-		URL rootDirectoryUrl = getClass().getResource("/");
-		Path rootDirectory = Paths.get(rootDirectoryUrl.toURI());
-		IInputResolver resolver = new FileInputSourceResolver(Collections.singletonList(rootDirectory));
+		URL inputDirectoryUrl = getClass().getResource("/");
+		Path inputDirectory = Paths.get(inputDirectoryUrl.toURI());
+		IInputResolver resolver = new FileInputSourceResolver(inputDirectory);
 		URI bundleUri = URI.create("/bundle-reference-models/expandable/bundle.xml");
 		IBundle plain = loader.loadBundle(bundleUri, resolver);
 		IBundle bundle = testee.expandedBundle(plain, resolver);

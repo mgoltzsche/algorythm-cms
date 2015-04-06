@@ -19,8 +19,9 @@
 				<scripts>
 					<script>js/angular-route.min.js</script>
 				</scripts>
-				<!--<param id="svg" value="/images/adobe-example.svg" />
-					<param id="svg" value="/images/logo.svg" />-->
+				<icons>
+					<icon>icons/logo.svg</icon>
+				</icons>
 			</theme>
 			<module>
 				<templates>

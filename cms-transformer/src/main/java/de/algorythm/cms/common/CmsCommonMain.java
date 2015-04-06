@@ -4,8 +4,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -28,31 +26,24 @@ public class CmsCommonMain {
 	
 	static public void main(String[] args) {
 		if (args.length != 3) {
-			System.err.println("Invalid usage. Parameters: ROOT_DIRECTORIES BUNDLE_URI OUTPUT_DIRECTORY");
+			System.err.println("Invalid usage. Parameters: INPUT_DIRECTORY BUNDLE_URI OUTPUT_DIRECTORY");
 			System.exit(1);
 		}
 		
-		final String[] rootDirs = args[0].split(":");
+		final Path inputDirectory = Paths.get(args[0]);
 		final URI bundleUri = URI.create(args[1]);
 		final Path outputDirectory = Paths.get(args[2]);
-		final List<Path> rootPathes = new LinkedList<>();
 		
-		for (String rootDir : rootDirs) {
-			final Path rootPath = Paths.get(rootDir);
-			
-			if (!Files.exists(rootPath)) {
-				System.err.println("Resource root path " + rootPath + " does not exist");
-				System.exit(2);
-			}
-			
-			rootPathes.add(rootPath);
+		if (!Files.exists(inputDirectory)) {
+			System.err.println("Resource root path " + inputDirectory + " does not exist");
+			System.exit(2);
 		}
 		
 		try {
 			final Module module = new CmsCommonModule();
 			final CmsCommonMain main = new CmsCommonMain(module);
 			
-			main.generate(bundleUri, rootPathes, outputDirectory);
+			main.generate(bundleUri, inputDirectory, outputDirectory);
 			main.shutdown();
 		} catch(Throwable e) {
 			log.error("XML transformation failed", e);
@@ -70,8 +61,8 @@ public class CmsCommonMain {
 		meter.finish();
 	}
 
-	public void generate(final URI bundleUri, final List<Path> resourceRootPathes, final Path outputDirectory) throws Throwable {
-		final IInputResolver resolver = facade.createInputResolver(resourceRootPathes);
+	public void generate(final URI bundleUri, final Path inputDirectory, final Path outputDirectory) throws Throwable {
+		final IInputResolver resolver = facade.createInputResolver(inputDirectory);
 		final IBundle bundle = facade.loadBundle(bundleUri, resolver);
 		final IRenderer renderer = facade.createRenderer(bundle, resolver);
 		

@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 		title="Travel Ant">
-	<include href="/templates/project-template.xml">
+	<include href="/de/algorythm/templates/project-template.xml">
 		<replace placeholder="title">Travel Ant - der Ameisenalgorithmus</replace>
 		<replace placeholder="content">
 			<img src="/files/travel-ant/travel-ant.png" title="Travel Ant Screenshot" align="right" />

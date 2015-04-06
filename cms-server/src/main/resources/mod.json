@@ -1,0 +1,16 @@
+{
+  "main":"de.algorythm.cms.verticle.CmsVerticle",
+
+  // If your module is going to be registered in the Vert.x module registry you will also need the following
+  // mandatory fields
+  "description":"Shows live rendered previews of CMS content",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "Max Goltzsche",
+
+  // Optional fields
+  "developers": ["Max Goltzsche"],
+  "keywords": ["cms", "xsl", "scss", "css", "js", "preview"],
+  "homepage": "http://algorythm.de",
+
+  "auto-redeploy": true
+}

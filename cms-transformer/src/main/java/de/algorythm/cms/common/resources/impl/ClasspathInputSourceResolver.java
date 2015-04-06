@@ -7,7 +7,6 @@ import java.util.Date;
 
 import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.IInputSource;
-import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class ClasspathInputSourceResolver implements IInputResolver {
 
@@ -25,7 +24,7 @@ public class ClasspathInputSourceResolver implements IInputResolver {
 
 	@Override
 	public IInputSource resolveResource(URI publicUri)
-			throws ResourceNotFoundException, IOException {
+			throws IOException {
 		final String resourceName = toClasspathResourceName(publicUri);
 		
 		return getClass().getResource(resourceName) == null
@@ -35,7 +34,7 @@ public class ClasspathInputSourceResolver implements IInputResolver {
 
 	@Override
 	public InputStream createInputStream(URI publicUri)
-			throws ResourceNotFoundException, IOException {
+			throws IOException {
 		final String resourceName = toClasspathResourceName(publicUri);
 		final InputStream stream = getClass().getResourceAsStream(resourceName);
 		

@@ -39,6 +39,10 @@ public class CmsMetadataExtractor implements IMetadataExtractor {
 	@Override
 	public IMetadata extractMetadata(final URI uri, final IInputResolver resolver, final IWriteableResources tmp) throws ResourceNotFoundException, MetadataExtractionException, IOException {
 		final IInputSource source = resolver.resolveResource(uri);
+		
+		if (source == null)
+			throw new ResourceNotFoundException("Cannot find XML file for metadata extraction at " + uri);
+		
 		final Metadata m = new Metadata(source.getCreationTime(), source.getLastModifiedTime());
 		
 		try (InputStream stream = source.createInputStream()) {

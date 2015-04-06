@@ -176,7 +176,7 @@ public class XmlFactory implements IXmlFactory {
 		
 		return templates;
 	}
-	
+
 	@Override
 	public TransformerHandler createTransformerHandler(final Templates templates, final IRenderingContext ctx, final String outputPath, final IOutputTargetFactory targetFactory) throws IOException, TransformerConfigurationException {
 		final TransformerHandler transformerHandler = createTransformerHandler(templates, targetFactory, ctx.getTmpResources());
@@ -243,7 +243,7 @@ public class XmlFactory implements IXmlFactory {
 			throws ResourceNotFoundException, IOException {
 		return xmlSourceResolverProvider.getXmlSourceResolver().createXmlSource(uri, ctx);
 	}
-	
+
 	@Override
 	public Marshaller createMarshaller() throws JAXBException {
 		return jaxbContext.createMarshaller();

@@ -52,6 +52,8 @@ public abstract class AbstractXmlSourceResolver implements IXmlSourceResolver {
 							final IMetadata metadata = metadataExtractor.extractMetadata(uri, ctx, ctx.getTmpResources());
 							final Marshaller marshaller = xmlFactory.createMarshaller();
 							
+							Files.createDirectories(metaFile.getParent());
+							
 							try (OutputStream out = Files.newOutputStream(metaFile)) {
 								marshaller.marshal(metadata, new StreamResult(out));
 							}

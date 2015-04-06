@@ -29,6 +29,9 @@ public class SynchronizedZipArchiveExtractor implements IArchiveExtractor {
 		if (!Files.exists(destinationDirectory)) {
 			final InputStream zipStream = resolver.createInputStream(zipFileUri);
 			
+			if (zipStream == null)
+				throw new IllegalStateException("Cannot find ZIP archive at " + zipFileUri);
+			
 			zipArchiveUtil.unzip(zipStream, destinationDirectory);
 		}
 		

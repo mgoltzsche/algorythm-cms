@@ -8,7 +8,7 @@
 	<xsl:param name="page.path" />
 	<xsl:param name="page.locale" />
 
-	<xsl:variable name="c:pages" select="document(concat('/', $page.locale, '/pages.xml'))" />
+	<xsl:variable name="c:pages" select="document(concat('/i18n/', $page.locale, '/pages.xml'))" />
 	<!-- <xsl:key name="pageIndex" match="p:page" use="concat(@path, '/')"/>-->
 	
 	<xsl:template name="c:menu-html">

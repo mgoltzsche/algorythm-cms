@@ -5,56 +5,47 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.IInputSource;
-import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class FileInputSourceResolver implements IInputResolver {
 
-	private final List<Path> rootPathes;
+	private final Path rootDirectory;
 	private final IInputResolver delegate;
 
-	public FileInputSourceResolver(final List<Path> locations, final IInputResolver delegate) {
-		this.rootPathes = locations;
+	public FileInputSourceResolver(final Path rootDirectory, final IInputResolver delegate) {
+		this.rootDirectory = rootDirectory;
 		this.delegate = delegate;
 	}
-	
-	public FileInputSourceResolver(final List<Path> locations) {
-		this.rootPathes = locations;
+
+	public FileInputSourceResolver(final Path rootDirectory) {
+		this.rootDirectory = rootDirectory;
 		this.delegate = IInputResolver.DEFAULT;
 	}
 
 	@Override
-	public InputStream createInputStream(final URI publicUri) throws ResourceNotFoundException, IOException {
+	public InputStream createInputStream(final URI publicUri) throws IOException {
 		final Path file = asPath(publicUri);
 		
-		return file == null
-				? delegate.createInputStream(publicUri)
-				: Files.newInputStream(asPath(publicUri));
+		return Files.exists(file)
+				? Files.newInputStream(asPath(publicUri))
+				: delegate.createInputStream(publicUri);
 	}
 
 	@Override
-	public IInputSource resolveResource(URI publicUri) throws ResourceNotFoundException, IOException {
+	public IInputSource resolveResource(URI publicUri) throws IOException {
 		final Path file = asPath(publicUri);
 		
-		return file == null
-				? delegate.resolveResource(publicUri)
-				: new FileInputSource(file);
+		return Files.exists(file)
+				? new FileInputSource(file)
+				: delegate.resolveResource(publicUri);
 	}
 
 	private Path asPath(URI publicUri) {
 		final String relativePath = relativize(publicUri.normalize());
 		
-		for (Path rootPath : rootPathes) {
-			final Path file = rootPath.resolve(relativePath);
-			
-			if (Files.exists(file))
-				return file;
-		}
-		
-		return null;
+		return rootDirectory.resolve(relativePath);
 	}
 
 	private String relativize(URI publicUri) {

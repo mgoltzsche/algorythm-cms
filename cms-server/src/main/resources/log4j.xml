@@ -13,7 +13,7 @@
     </logger>
 
     <root>
-        <priority value ="TRACE" />
+        <priority value="TRACE" />
         <appender-ref ref="console" />
     </root>
 </log4j:configuration>

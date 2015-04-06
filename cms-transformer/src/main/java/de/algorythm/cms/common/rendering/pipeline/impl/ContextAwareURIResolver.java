@@ -15,12 +15,12 @@ public class ContextAwareURIResolver implements URIResolver {
 
 	private final IRenderingContext ctx;
 	private final IXmlSourceResolver xmlSourceResolver;
-	
+
 	public ContextAwareURIResolver(final IRenderingContext ctx, final IXmlSourceResolver xmlSourceResolver) {
 		this.ctx = ctx;
 		this.xmlSourceResolver = xmlSourceResolver;
 	}
-	
+
 	@Override
 	public Source resolve(final String href, final String base) throws TransformerException {
 		final URI baseUri = URI.create(base);

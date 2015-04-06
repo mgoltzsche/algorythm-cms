@@ -15,7 +15,7 @@
 	<xsl:param name="site.param.testparam" />
 	
 	<xsl:template match="p:page">
-		<xsl:variable name="page.title" select="document(concat('metadata:', @content))/*/@title" />
+		<xsl:variable name="page.title" select="@title" />
 		<xsl:variable name="content">
 			<xsl:variable name="includedContent">
 				<xsl:call-template name="c:include-localized">
@@ -38,15 +38,15 @@
 					<xsl:value-of select="$page.title" />
 				</title>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<link rel="stylesheet" href="{$resourceBaseURL}/main.css" />
+				<link rel="stylesheet" href="{$resourceBaseURL}main.css" />
 				<script type="text/javascript">var cms = {'baseUrl': '<xsl:value-of select="$relativeBaseURL"></xsl:value-of>'};</script>
-				<script src="{$resourceBaseURL}/main.js"></script>
+				<script src="{$resourceBaseURL}main.js"></script>
 			</head>
 			<body class="ng-cloak">
 				<header id="header" class="collapsed">
 					<xsl:if test="$site.internationalized">
 						<ul class="locale-switch">
-							<xsl:for-each select="document(concat('/', $page.locale, '/supported-locales.xml'))/l:locales/l:locale">
+							<xsl:for-each select="document(concat('/i18n/', $page.locale, '/supported-locales.xml'))/l:locales/l:locale">
 								<li>
 									<xsl:if test="@active = true()">
 										<xsl:attribute name="class" select="'active'" />

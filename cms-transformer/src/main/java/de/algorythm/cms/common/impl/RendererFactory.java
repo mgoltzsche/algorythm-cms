@@ -7,7 +7,7 @@ import de.algorythm.cms.common.IRendererFactory;
 import de.algorythm.cms.common.model.entity.bundle.IBundle;
 import de.algorythm.cms.common.rendering.pipeline.IRenderer;
 import de.algorythm.cms.common.rendering.pipeline.impl.Renderer;
-import de.algorythm.cms.common.rendering.pipeline.job.JavascriptCompressor;
+import de.algorythm.cms.common.rendering.pipeline.job.JavaScriptCompressor;
 import de.algorythm.cms.common.rendering.pipeline.job.PageIndexer;
 import de.algorythm.cms.common.rendering.pipeline.job.PageTransformer;
 import de.algorythm.cms.common.rendering.pipeline.job.ScssCompiler;
@@ -23,7 +23,7 @@ public class RendererFactory implements IRendererFactory {
 	private final SupportedLocalesXmlGenerator localesXmlGenerator;
 	private final PageIndexer indexer;
 	private final PageTransformer transformer;
-	private final JavascriptCompressor jsCompressor;
+	private final JavaScriptCompressor jsCompressor;
 	private final ScssCompiler scssCompiler;
 	private final SvgSpriteGenerator svgSpriteGenerator;
 
@@ -32,7 +32,7 @@ public class RendererFactory implements IRendererFactory {
 			final SupportedLocalesXmlGenerator localesXmlGenerator,
 			final PageIndexer indexer,
 			final PageTransformer transformer,
-			final JavascriptCompressor jsCompressor,
+			final JavaScriptCompressor jsCompressor,
 			final ScssCompiler scssCompiler,
 			final SvgSpriteGenerator svgSpriteGenerator) {
 		this.templateCompiler = templateCompiler;

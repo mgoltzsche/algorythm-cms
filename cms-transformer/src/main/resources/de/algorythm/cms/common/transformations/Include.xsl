@@ -17,29 +17,12 @@
 			<xsl:message terminate="yes">Error: Undefined include URI!</xsl:message>
 		</xsl:if>
 		<xsl:variable name="absoluteUri" select="resolve-uri($uri, $baseUri)" />
-		<xsl:variable name="schemelessAbsoluteUri" select="substring-after($absoluteUri, ':')" />
-		<xsl:variable name="internationalizedUri" select="concat('/internationalized/', $page.locale, $schemelessAbsoluteUri)" />
-		<xsl:choose>
-			<xsl:when test="document($internationalizedUri)">
-				<xsl:apply-templates mode="c:include" select="document($internationalizedUri)">
-					<xsl:with-param name="baseUri" select="$absoluteUri" />
-					<xsl:with-param name="customContent" select="." />
-				</xsl:apply-templates>
-			</xsl:when>
-			<xsl:when test="document($absoluteUri)">
-				<xsl:apply-templates mode="c:include" select="document($absoluteUri)">
-					<xsl:with-param name="baseUri" select="$absoluteUri" />
-					<xsl:with-param name="customContent" select="." />
-				</xsl:apply-templates>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:message>Warn: Content not found: <xsl:value-of select="$absoluteUri" />. Referred by: <xsl:value-of select="$baseUri" />. Locale: <xsl:value-of select="$page.locale" /></xsl:message>
-				<c:article>
-					Content <xsl:value-of select="$absoluteUri" /> not found!
-				</c:article>
-				<!-- <xsl:message terminate="true">Error: Missing document</xsl:message>-->
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:variable name="absolutePath" select="substring-after($absoluteUri, ':')" />
+		<xsl:variable name="i18nUri" select="if (starts-with($absolutePath, '/i18n/')) then $absoluteUri else concat('file:/i18n/', $page.locale, $absolutePath)" />
+		<xsl:apply-templates mode="c:include" select="document($i18nUri)">
+			<xsl:with-param name="baseUri" select="$i18nUri" />
+			<xsl:with-param name="customContent" select="." />
+		</xsl:apply-templates>
 	</xsl:template>
 	
 	<xsl:template mode="c:include" match="c:include">

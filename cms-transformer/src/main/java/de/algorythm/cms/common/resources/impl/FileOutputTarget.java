@@ -18,11 +18,6 @@ public class FileOutputTarget implements IOutputTarget {
 	}
 
 	@Override
-	public String getPublicPath() {
-		return publicPath;
-	}
-
-	@Override
 	public OutputStream createOutputStream() throws IOException {
 		Files.createDirectories(file.getParent());
 		

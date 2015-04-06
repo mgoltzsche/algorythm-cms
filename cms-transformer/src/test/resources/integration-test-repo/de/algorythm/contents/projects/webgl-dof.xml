@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 		title="WebGL und DOF-Postprocessing">
-	<include href="/templates/project-template.xml">
+	<include href="/de/algorythm/templates/project-template.xml">
 		<replace placeholder="title">WebGL und DOF-Postprocessing</replace>
 		<replace placeholder="content">
 			<img src="/files/webgl-dof/DOF-naive.png" title="Naive DOF-Implementierung mit Depth Discontinuity Artefakten" align="right" />

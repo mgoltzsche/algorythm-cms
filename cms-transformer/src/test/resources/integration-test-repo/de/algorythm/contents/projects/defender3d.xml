@@ -2,7 +2,7 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 		title="Defender">
-	<include href="/templates/project-template.xml">
+	<include href="/de/algorythm/templates/project-template.xml">
 		<replace placeholder="title">Defender</replace>
 		<replace placeholder="content">
 			<img src="/files/defender3d/defender_screenshot.png" title="Screenshot aus der Defender 3D-Implementierung" />

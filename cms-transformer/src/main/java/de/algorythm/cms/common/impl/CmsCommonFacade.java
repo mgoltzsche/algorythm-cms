@@ -3,7 +3,6 @@ package de.algorythm.cms.common.impl;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBException;
@@ -18,6 +17,7 @@ import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 import de.algorythm.cms.common.resources.impl.ClasspathInputSourceResolver;
 import de.algorythm.cms.common.resources.impl.FileInputSourceResolver;
+import de.algorythm.cms.common.resources.impl.I18nInputSourceResolver;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 
 public class CmsCommonFacade implements ICmsCommonFacade {
@@ -39,8 +39,8 @@ public class CmsCommonFacade implements ICmsCommonFacade {
 	}
 
 	@Override
-	public IInputResolver createInputResolver(List<Path> rootDirectories) {
-		return new FileInputSourceResolver(rootDirectories, new ClasspathInputSourceResolver());
+	public IInputResolver createInputResolver(Path repoDirectory) {
+		return new I18nInputSourceResolver(new FileInputSourceResolver(repoDirectory, new ClasspathInputSourceResolver()));
 	}
 
 	@Override

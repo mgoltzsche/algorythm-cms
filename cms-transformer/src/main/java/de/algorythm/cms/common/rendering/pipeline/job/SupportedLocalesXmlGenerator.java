@@ -32,7 +32,7 @@ public class SupportedLocalesXmlGenerator {
 		
 		for (Locale locale : supportedLocales) {
 			final LocaleInfos locales = createLocaleInfos(supportedLocales, locale);
-			final IOutputTarget target = targetFactory.createOutputTarget('/' + locale.toLanguageTag() + "/supported-locales.xml");
+			final IOutputTarget target = targetFactory.createOutputTarget("/i18n/" + locale.toLanguageTag() + "/supported-locales.xml");
 			
 			try (OutputStream out = target.createOutputStream()) {
 				marshaller.marshal(locales, out);

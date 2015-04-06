@@ -10,7 +10,6 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import de.algorythm.cms.common.resources.IInputResolver;
-import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 public class CmsSchemaResolver implements LSResourceResolver {
 
@@ -29,9 +28,12 @@ public class CmsSchemaResolver implements LSResourceResolver {
 		
 		try {
 			stream = inputResolver.createInputStream(publicUri);
-		} catch (ResourceNotFoundException | IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		
+		if (stream == null)
+			throw new IllegalStateException("Cannot find XMLSchema: " + publicUri);
 		
 		return new XsdInput(publicUri, stream);
 	}

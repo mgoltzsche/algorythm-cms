@@ -9,6 +9,7 @@
 	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>algorythm CMS parent</name>
+	<url>http://algorythm.de</url>
 
 	<modules>
 		<module>cms-transformer</module>

@@ -9,7 +9,6 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.Locale;
 
 import javax.xml.bind.JAXBContext;
@@ -18,9 +17,9 @@ import javax.xml.bind.Marshaller;
 import org.junit.Test;
 
 import de.algorythm.cms.common.impl.jaxb.adapter.UriXmlAdapter;
+import de.algorythm.cms.common.model.entity.bundle.Format;
 import de.algorythm.cms.common.model.entity.bundle.IBundle;
 import de.algorythm.cms.common.model.entity.bundle.ITheme;
-import de.algorythm.cms.common.model.entity.bundle.Format;
 import de.algorythm.cms.common.model.entity.impl.bundle.Bundle;
 import de.algorythm.cms.common.model.entity.impl.bundle.Module;
 import de.algorythm.cms.common.model.entity.impl.bundle.OutputConfig;
@@ -32,9 +31,9 @@ public class TestBundleLoader {
 	@Test
 	public void loadBundle_should_load_bundle() throws Exception {
 		BundleLoader testee = new BundleLoader();
-		URL bundleFileUrl = getClass().getResource("/");
-		Path bundlePath = Paths.get(bundleFileUrl.toURI());
-		IInputResolver resolver = new FileInputSourceResolver(Collections.singletonList(bundlePath));
+		URL inputDirectoryUri = getClass().getResource("/");
+		Path inputDirectory = Paths.get(inputDirectoryUri.toURI());
+		IInputResolver resolver = new FileInputSourceResolver(inputDirectory);
 		URI bundleUri = URI.create("/bundle-reference-models/bundle.xml");
 		IBundle bundle = testee.loadBundle(bundleUri, resolver);
 		

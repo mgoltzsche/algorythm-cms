@@ -1,6 +1,7 @@
 package de.algorythm.cms.common.resources.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 
 import javax.inject.Inject;
@@ -22,6 +23,11 @@ public class DefaultXmlSourceResolver extends AbstractXmlSourceResolver {
 
 	@Override
 	protected Source createXmlSourceInternal(URI uri, IRenderingContext ctx) throws IOException, ResourceNotFoundException {
-		return new XmlSource(uri, ctx.createInputStream(uri));
+		final InputStream stream = ctx.createInputStream(uri);
+		
+		if (stream == null)
+			throw new ResourceNotFoundException("Cannot find XML source at " + uri);
+		
+		return new XmlSource(uri, stream);
 	}
 }

@@ -20,13 +20,13 @@ import de.algorythm.cms.common.rendering.pipeline.IXmlFactory;
 import de.algorythm.cms.common.rendering.pipeline.IXmlSourceResolverProvider;
 import de.algorythm.cms.common.rendering.pipeline.impl.MetadataExtractorFactory;
 import de.algorythm.cms.common.rendering.pipeline.impl.XmlFactory;
-import de.algorythm.cms.common.rendering.pipeline.impl.XmlSourceResolverProvider;
 import de.algorythm.cms.common.resources.IArchiveExtractor;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IBundleLoader;
 import de.algorythm.cms.common.resources.impl.BundleExpander;
 import de.algorythm.cms.common.resources.impl.BundleLoader;
 import de.algorythm.cms.common.resources.impl.SynchronizedZipArchiveExtractor;
+import de.algorythm.cms.common.resources.impl.XmlSourceResolverProvider;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
 import de.algorythm.cms.common.scheduling.impl.RoundRobinProcessScheduler;
 

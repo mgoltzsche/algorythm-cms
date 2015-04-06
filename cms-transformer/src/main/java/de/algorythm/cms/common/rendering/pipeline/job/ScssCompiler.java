@@ -29,7 +29,6 @@ import de.algorythm.cms.common.impl.TimeMeter;
 import de.algorythm.cms.common.rendering.pipeline.IRenderingContext;
 import de.algorythm.cms.common.resources.IOutputTarget;
 import de.algorythm.cms.common.resources.IOutputTargetFactory;
-import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 @Singleton
 public class ScssCompiler {
@@ -39,7 +38,7 @@ public class ScssCompiler {
 	private boolean compress = false;
 
 	public void compileScss(final IRenderingContext ctx, final Collection<URI> sources, final IOutputTargetFactory targetFactory) throws Exception {
-		final TimeMeter meter = TimeMeter.meter(ctx.getName() + ' ' + this);
+		final TimeMeter meter = TimeMeter.meter(this.toString());
 		final String scss = createIncludingSCSS(sources);
 		
 		compileSource(scss, ctx, targetFactory);
@@ -98,15 +97,18 @@ public class ScssCompiler {
 				final URI href = URI.create(identifier);
 				final URI base = URI.create(parentStylesheet.getFileName());
 				final URI publicUri = base.resolve(href);
-				final Reader reader;
+				final InputStream stream;
 				
 				try {
-					final InputStream stream = ctx.createInputStream(publicUri);
-					reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-				} catch (IOException | ResourceNotFoundException e) {
+					stream = ctx.createInputStream(publicUri);
+				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
 				
+				if (stream == null)
+					throw new IllegalStateException("Cannot find stylesheet at '" + publicUri + "' that was referred in '" + base + "'");
+				
+				final Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
 				final InputSource source = new InputSource(reader);
 				
 				source.setURI(publicUri.toString());

@@ -85,4 +85,11 @@ public class TemplateErrorListener implements ErrorListener {
 		
 		return sb.toString();
 	}
+	
+	private Throwable rootCause(Throwable e) {
+		while (e.getCause() != null)
+			e = e.getCause();
+		
+		return e;
+	}
 }

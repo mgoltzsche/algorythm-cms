@@ -23,7 +23,12 @@ public class XmlSourceResolverDelegator implements IXmlSourceResolver {
 	@Override
 	public Source createXmlSource(URI uri, IRenderingContext ctx)
 			throws ResourceNotFoundException, IOException {
-		final String extension = FilenameUtils.getExtension(uri.getPath()).toLowerCase();
+		final String path = uri.getPath();
+		
+		if (path == null)
+			throw new IllegalStateException("URI " + uri + " does not define path");
+		
+		final String extension = FilenameUtils.getExtension(path).toLowerCase();
 		
 		if (extension.isEmpty())
 			throw new IllegalArgumentException(uri + " does not define a file extension");
