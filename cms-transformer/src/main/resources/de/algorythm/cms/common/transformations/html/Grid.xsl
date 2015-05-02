@@ -64,21 +64,31 @@
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:variable name="styleClasses">
-			pure-u-<xsl:value-of select="$suffix" />
+			<xsl:text disable-output-escaping="yes">pure-u-</xsl:text>
+			<xsl:value-of select="$suffix" />
+			<xsl:text disable-output-escaping="yes"> </xsl:text>
 			<xsl:if test="$suffixSm != $suffix">
-				pure-u-sm-<xsl:value-of select="$suffixSm" />
+				<xsl:text disable-output-escaping="yes">pure-u-sm-</xsl:text>
+				<xsl:value-of select="$suffixSm" />
+				<xsl:text disable-output-escaping="yes"> </xsl:text>
 			</xsl:if>
 			<xsl:if test="$suffixMd != $suffixSm">
-				pure-u-md-<xsl:value-of select="$suffixMd" />
+				<xsl:text disable-output-escaping="yes">pure-u-md-</xsl:text>
+				<xsl:value-of select="$suffixMd" />
+				<xsl:text disable-output-escaping="yes"> </xsl:text>
 			</xsl:if>
 			<xsl:if test="$suffixLg != $suffixMd">
-				pure-u-lg-<xsl:value-of select="$suffixLg" />
+				<xsl:text disable-output-escaping="yes">pure-u-lg-</xsl:text>
+				<xsl:value-of select="$suffixLg" />
+				<xsl:text disable-output-escaping="yes"> </xsl:text>
 			</xsl:if>
 			<xsl:if test="$suffixXl != $suffixLg">
-				pure-u-xl-<xsl:value-of select="$suffixXl" />
+				<xsl:text disable-output-escaping="yes">pure-u-xl-</xsl:text>
+				<xsl:value-of select="$suffixXl" />
+				<xsl:text disable-output-escaping="yes"> </xsl:text>
 			</xsl:if>
 		</xsl:variable>
-		<div class="{normalize-space($styleClasses)}">
+		<div class="{$styleClasses}">
 			<xsl:choose>
 				<xsl:when test="not(../@spacing) or @spacing = true()">
 					<div>

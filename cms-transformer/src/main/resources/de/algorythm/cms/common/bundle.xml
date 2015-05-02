@@ -26,6 +26,7 @@
 			<module>
 				<templates>
 					<template>transformations/Include.xsl</template>
+					<template>transformations/Functions.xsl</template>
 					<template>transformations/html/Article.xsl</template>
 					<template>transformations/html/Markup.xsl</template>
 					<template>transformations/html/Grid.xsl</template>

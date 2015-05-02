@@ -46,25 +46,34 @@
 	<xsl:template match="c:li">
 		<li>
 			<xsl:apply-templates />
+			<span><xsl:value-of select="c:path(.)" /></span>
 		</li>
 	</xsl:template>
 	
 	<xsl:template match="c:position">
 		<xsl:variable name="position">
 			<xsl:if test="@left">
-				left: <xsl:value-of select="@left" />;
+				<xsl:text disable-output-escaping="yes">left:</xsl:text>
+				<xsl:value-of select="@left" />
+				<xsl:text disable-output-escaping="yes">;</xsl:text>
 			</xsl:if>
 			<xsl:if test="@right">
-				right: <xsl:value-of select="@right" />;
+				<xsl:text disable-output-escaping="yes">right:</xsl:text>
+				<xsl:value-of select="@right" />
+				<xsl:text disable-output-escaping="yes">;</xsl:text>
 			</xsl:if>
 			<xsl:if test="@top">
-				top: <xsl:value-of select="@top" />;
+				<xsl:text disable-output-escaping="yes">top:</xsl:text>
+				<xsl:value-of select="@top" />
+				<xsl:text disable-output-escaping="yes">;</xsl:text>
 			</xsl:if>
 			<xsl:if test="@bottom">
-				bottom: <xsl:value-of select="@bottom" />;
+				<xsl:text disable-output-escaping="yes">bottom:</xsl:text>
+				<xsl:value-of select="@bottom" />
+				<xsl:text disable-output-escaping="yes">;</xsl:text>
 			</xsl:if>
 		</xsl:variable>
-		<div style="position: absolute; {normalize-space($position)}">
+		<div style="position: absolute; {$position}">
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>

@@ -1,5 +1,7 @@
 package de.algorythm.cms.common;
 
+import static org.junit.Assert.assertTrue;
+
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,9 +55,10 @@ public class ITRenderer {
 		meter = TimeMeter.meter("renderArtifact 2");
 		String output = new String(renderer.renderArtifact(URI.create("/content.html")), StandardCharsets.UTF_8);
 		meter.finish();
-		System.out.println(output);
+		
 		facade.shutdown();
 		deadlockDetection.stop();
+		assertTrue("Output should not be empty", !output.trim().isEmpty());
 	}
 	
 	private IRenderer initRenderer() throws Exception {
