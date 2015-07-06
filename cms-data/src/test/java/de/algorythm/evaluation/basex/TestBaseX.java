@@ -54,7 +54,7 @@ public class TestBaseX {
 			session.execute(new InfoStorage());
 			callCustomPackageXQuery(session);
 			showXsltProcessor(session);
-			//callCustomPackageXSLT(session);
+			callCustomPackageXSLT(session);
 			session.close();
 		} finally {
 			context.close();

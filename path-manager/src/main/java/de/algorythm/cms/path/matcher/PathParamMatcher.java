@@ -11,6 +11,7 @@ public class PathParamMatcher<K,R> extends Matcher<K,R> {
 	@Override
 	public boolean match(UrlMatchingState<K,R> state) {
 		state.addParameterValue(state.getSuffix());
+		matchedPositiveFinally(state);
 		return true;
 	}
 	@Override

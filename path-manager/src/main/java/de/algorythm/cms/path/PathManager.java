@@ -1,5 +1,6 @@
 package de.algorythm.cms.path;
 
+
 public class PathManager<K,R> implements IPathManager<K,R> {
 	
 	private final Matcher<K,R> matcher;

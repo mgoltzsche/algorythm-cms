@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.algorythm.cms.path.matcher.EmptySegmentMatcher;
 import de.algorythm.cms.path.matcher.NegativeMatcher;
 import de.algorythm.cms.path.matcher.PathParamMatcher;
 import de.algorythm.cms.path.matcher.SegmentMatcher;
@@ -39,7 +40,7 @@ public class PathManagerBuilder<K,R> {
 		final Set<K> keySet = new HashSet<>();
 		final Map<String, Matcher<K,R>> matcherMap = new HashMap<>();
 		final Matcher<K,R> negativeMatcher = new NegativeMatcher<>(defaultResource);
-		final Matcher<K,R> rootMatcher = new SegmentMatcher<>(null, "//", "//", negativeMatcher);
+		final Matcher<K,R> rootMatcher = new EmptySegmentMatcher<>(true, null, "//", negativeMatcher);
 		
 		for (PathRule<K, R> rule : sortedByDepth(rules)) {
 			if (!keySet.add(rule.getKey()))
@@ -51,9 +52,9 @@ public class PathManagerBuilder<K,R> {
 			compile(rule, rootMatcher, negativeMatcher, matcherMap);
 		}
 		
-		System.out.println(rootMatcher.child);
+		System.out.println(rootMatcher.getChild());
 		
-		return new PathManager<K, R>(rootMatcher.child);
+		return new PathManager<K, R>(rootMatcher.getChild());
 	}
 	
 	private List<PathRule<K, R>> sortedByDepth(List<PathRule<K, R>> rules) {
@@ -65,18 +66,17 @@ public class PathManagerBuilder<K,R> {
 	}
 	
 	private void compile(PathRule<K, R> rule, Matcher<K,R> rootMatcher, Matcher<K,R> defaultMatcher, Map<String, Matcher<K,R>> matcherMap) {
-		final String[] segments = UrlUtil.normalizedPath(rule.getPattern()).split("/");
-		Matcher<K,R> currentMatcher = rootMatcher;
+		final PathSegmentIterator segmentIter = new PathSegmentIterator(rule.getPattern());
 		final StringBuilder prefixBuilder = new StringBuilder();
 		final List<String> paramNames = new LinkedList<>();
+		Matcher<K,R> currentMatcher = rootMatcher;
 		
-		for (int i = 0; i < segments.length; i++) {
-			final String segment = segments[i];
-			final boolean finalSegment = i == segments.length - 1;
+		while (segmentIter.hasNextSegment()) {
+			final String segment = segmentIter.nextSegment();
+			final boolean finalSegment = !segmentIter.hasNextSegment();
 			final PathRule<K, R> ruleFinal = finalSegment ? rule : null;
 			
 			Matcher<K,R> segmentMatcher = parseSegment(segment, ruleFinal, prefixBuilder, paramNames, defaultMatcher);
-
 			final Matcher<K,R> existingMatcher = matcherMap.get(segmentMatcher.patternPrefix);
 			
 			if (existingMatcher == null) { // Add child if matcher does not yet exist
@@ -88,30 +88,35 @@ public class PathManagerBuilder<K,R> {
 				currentMatcher = existingMatcher;
 				
 				if (finalSegment && existingMatcher.finalMatcher)
-					throw new IllegalStateException("Amiguous pattern " + existingMatcher.patternPrefix + " and " + segmentMatcher.patternPrefix);
+					throw new IllegalStateException("Amiguous pattern " + existingMatcher.patternPrefix + " and " + segmentMatcher.patternPrefix + "\n\tDecision tree: " + rootMatcher.toString());
 			}
 		}
 	}
 	
 	private Matcher<K,R> parseSegment(String segment, PathRule<K, R> rule, StringBuilder prefixBuilder, List<String> paramNames, Matcher<K, R> defaultMatcher) {
-		prefixBuilder.append('/');
-		
-		if (segment.length() > 2 && segment.charAt(0) == '{' && segment.charAt(segment.length() - 1) == '}') {
+		if (segment.isEmpty()) {
+			final boolean firstSegment = prefixBuilder.length() == 0;
+			
+			if (!firstSegment)
+				prefixBuilder.append('/');
+			
+			return new EmptySegmentMatcher<K, R>(firstSegment, rule, prefixBuilder.toString(), defaultMatcher);
+		} else if (segment.length() > 2 && segment.charAt(0) == '{' && segment.charAt(segment.length() - 1) == '}') {
 			if (segment.length() > 3 && segment.charAt(segment.length() - 2) == '+') {
 				// {param+}
 				String paramName = segment.substring(1, segment.length() - 2);
 				paramNames.add(paramName);
-				return new PathParamMatcher<K,R>(rule, prefixBuilder.append("**").toString(), defaultMatcher);
+				return new PathParamMatcher<K, R>(rule, prefixBuilder.append("/*").toString(), defaultMatcher);
 			} else {
 				// {param}
 				String paramName = segment.substring(1, segment.length() - 1);
 				paramNames.add(paramName);
-				return new SegmentParamMatcher<K,R>(rule, prefixBuilder.append('*').toString(), defaultMatcher);
+				return new SegmentParamMatcher<K,R>(rule, prefixBuilder.append("/*").toString(), defaultMatcher);
 			}
 		} else {
 			// segment
-			return new SegmentMatcher<K,R>(rule, segment,
-					prefixBuilder.append(segment).toString(), defaultMatcher);
+			return new SegmentMatcher<K, R>(rule, segment,
+					prefixBuilder.append('/').append(segment).toString(), defaultMatcher);
 		}
 	}
 }
