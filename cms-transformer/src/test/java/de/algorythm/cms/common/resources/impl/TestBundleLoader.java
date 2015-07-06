@@ -30,7 +30,7 @@ public class TestBundleLoader {
 
 	@Test
 	public void loadBundle_should_load_bundle() throws Exception {
-		BundleLoader testee = new BundleLoader();
+		BundleLoaderFileSystem testee = new BundleLoaderFileSystem();
 		URL inputDirectoryUri = getClass().getResource("/");
 		Path inputDirectory = Paths.get(inputDirectoryUri.toURI());
 		IInputResolver resolver = new FileInputSourceResolver(inputDirectory);

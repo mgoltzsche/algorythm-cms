@@ -31,7 +31,7 @@ public class XmlSourceResolverDelegator implements IXmlSourceResolver {
 		final String extension = FilenameUtils.getExtension(path).toLowerCase();
 		
 		if (extension.isEmpty())
-			throw new IllegalArgumentException(uri + " does not define a file extension");
+			throw new IllegalArgumentException(uri + " does not define a file handler");
 		
 		final IXmlSourceResolver resolver = extensionMap.get(extension);
 		

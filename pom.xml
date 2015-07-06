@@ -7,13 +7,17 @@
 	<groupId>de.algorythm.cms</groupId>
 	<artifactId>cms-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>algorythm CMS parent</name>
 	<url>http://algorythm.de</url>
 
 	<modules>
 		<module>cms-transformer</module>
 		<module>cms-server</module>
+		<module>cms-data</module>
+		<module>path-manager</module>
+		<module>xar-builder</module>
+		<module>xar-maven-plugin</module>
 	</modules>
 
 	<organization>
@@ -29,13 +33,6 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.5.1</version>
@@ -48,7 +45,7 @@
 		</plugins>
 		<testResources>
 			<testResource>
-				<directory>src/test/resources</directory>
+				<directory>src/test/components</directory>
 				<filtering>true</filtering>
 			</testResource>
 		</testResources>
@@ -59,14 +56,28 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.10</version>
+			<version>1.7.12</version>
 		</dependency>
 		<!-- JUnit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>snapshots</id>
+			<url>http://repository.algorythm.de/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://repository.algorythm.de/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>

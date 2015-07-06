@@ -19,11 +19,11 @@ import de.algorythm.cms.common.resources.IInputResolver;
 import de.algorythm.cms.common.resources.ResourceNotFoundException;
 
 @Singleton
-public class BundleLoader implements IBundleLoader {
+public class BundleLoaderFileSystem implements IBundleLoader {
 
 	private final JAXBContext jaxbContext;
 
-	public BundleLoader() throws JAXBException {
+	public BundleLoaderFileSystem() throws JAXBException {
 		jaxbContext = JAXBContext.newInstance(Bundle.class);
 	}
 

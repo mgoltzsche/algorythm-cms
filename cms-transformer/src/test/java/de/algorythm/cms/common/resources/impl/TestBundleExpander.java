@@ -23,7 +23,7 @@ public class TestBundleExpander {
 
 	@Test
 	public void expandBundle_should_expand_bundle() throws Exception {
-		BundleLoader loader = new BundleLoader();
+		BundleLoaderFileSystem loader = new BundleLoaderFileSystem();
 		BundleExpander testee = new BundleExpander(loader);
 		URL inputDirectoryUrl = getClass().getResource("/");
 		Path inputDirectory = Paths.get(inputDirectoryUrl.toURI());

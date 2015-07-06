@@ -24,7 +24,7 @@ import de.algorythm.cms.common.resources.IArchiveExtractor;
 import de.algorythm.cms.common.resources.IBundleExpander;
 import de.algorythm.cms.common.resources.IBundleLoader;
 import de.algorythm.cms.common.resources.impl.BundleExpander;
-import de.algorythm.cms.common.resources.impl.BundleLoader;
+import de.algorythm.cms.common.resources.impl.BundleLoaderFileSystem;
 import de.algorythm.cms.common.resources.impl.SynchronizedZipArchiveExtractor;
 import de.algorythm.cms.common.resources.impl.XmlSourceResolverProvider;
 import de.algorythm.cms.common.scheduling.IProcessScheduler;
@@ -69,7 +69,7 @@ public class CmsCommonModule extends AbstractModule {
 	}
 	
 	protected void bindIBundleLoader(AnnotatedBindingBuilder<IBundleLoader> bind) {
-		bind.to(BundleLoader.class);
+		bind.to(BundleLoaderFileSystem.class);
 	}
 	
 	protected void bindIBundleExpander(AnnotatedBindingBuilder<IBundleExpander> bind) {

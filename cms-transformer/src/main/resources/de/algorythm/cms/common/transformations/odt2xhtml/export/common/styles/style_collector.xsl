@@ -596,7 +596,7 @@
 		   <!-- create XHTML file -->
 			<xsl:otherwise>
 			   <!-- to access the variable like a node-set it is necessary to convert it
-					from a result-tree-fragment (RTF) to a node set using the James Clark extension -->
+					from a result-tree-fragment (RTF) to a node set using the James Clark handler -->
 				<xsl:variable name="globalDataRTF">
 				   <!-- raw properties still needed for table width attribute creation -->
 					<xsl:copy-of select="$globalData" />

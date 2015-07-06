@@ -1,0 +1,29 @@
+<component-set>
+	<components>
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>xar</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+			<configuration>
+				<phases>
+					<package>de.algorythm.cms:xar-maven-plugin:build-xar</package>
+					<install>org.apache.maven.plugins:maven-install-plugin:install</install>
+					<deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
+				</phases>
+			</configuration>
+		</component>
+		<component>
+			<role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+			<!-- Used as POM packaging 'expath' and as type for dependency lookup -->
+			<role-hint>xar</role-hint>
+			<implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+			<configuration>
+				<!-- This should always be consistent with the role-hint, to be safe. -->
+				<type>xar</type>
+				<extension>xar</extension>
+				<language>xml</language>
+				<addedToClasspath>true</addedToClasspath>
+			</configuration>
+		</component>
+	</components>
+</component-set>

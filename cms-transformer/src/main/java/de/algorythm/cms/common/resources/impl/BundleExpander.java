@@ -25,10 +25,10 @@ import de.algorythm.cms.common.resources.ResourceNotFoundException;
 @Singleton
 public class BundleExpander implements IBundleExpander {
 
-	private final BundleLoader loader;
+	private final BundleLoaderFileSystem loader;
 
 	@Inject
-	public BundleExpander(BundleLoader loader) {
+	public BundleExpander(BundleLoaderFileSystem loader) {
 		this.loader = loader;
 	}
 

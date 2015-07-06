@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>xar-builder</artifactId>
+	<packaging>jar</packaging>
+	<name>XAR builder</name>
+
+	<parent>
+		<artifactId>cms-parent</artifactId>
+		<groupId>de.algorythm.cms</groupId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<build>
+		<testResources>
+			<testResource>
+				<directory>${project.basedir}/src/test/resources</directory>
+			</testResource>
+		</testResources>
+	</build>
+
+	<dependencies>
+		<!-- Guice -->
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>4.0</version>
+		</dependency>
+		<!-- Saxon HE XSLT -->
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+			<version>9.6.0-6</version>
+		</dependency>
+		<!-- Apache Xerces schema validator-->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId> 
+			<version>2.11.0</version>
+		</dependency>
+		<!-- Xalan <dependency> <groupId>xalan</groupId> 
+			<artifactId>xalan</artifactId> <version>2.7.2</version> </dependency>-->
+		<!-- RelaxNG schema -->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-jing</artifactId>
+			<version>2.15.2</version>
+		</dependency>
+		<!-- Apache commons-io (FileUtils) -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+		<!-- Apache commons-lang (StringEscapeUtils) -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<!-- Google Guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+		<!-- Logging impl -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+	</dependencies>
+</project>

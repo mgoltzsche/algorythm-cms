@@ -11,7 +11,7 @@
 	<parent>
 		<artifactId>cms-parent</artifactId>
 		<groupId>de.algorythm.cms</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
@@ -43,7 +43,7 @@
 		<!--Plugin versions -->
 		<maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
 		<maven.jar.plugin.version>2.6</maven.jar.plugin.version>
-		<maven.resources.plugin.version>2.6</maven.resources.plugin.version>
+		<maven.components.plugin.version>2.6</maven.components.plugin.version>
 		<maven.vertx.plugin.version>2.0.11-final</maven.vertx.plugin.version>
 		<maven.surefire.plugin.version>2.14</maven.surefire.plugin.version>
 		<maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
@@ -53,12 +53,15 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
+		<!--<dependency>
 			<groupId>de.algorythm.cms</groupId>
 			<artifactId>cms-transformer</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<!--<exclusions> <exclusion> <groupId>org.slf4j</groupId> <artifactId>slf4j-log4j12</artifactId> 
-				</exclusion> </exclusions> -->
+		</dependency>-->
+		<dependency>
+			<groupId>de.algorythm.cms</groupId>
+			<artifactId>cms-data</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<!--Vertx provided dependencies -->
 		<dependency>
@@ -83,7 +86,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -103,7 +106,7 @@
 				<version>${maven.vertx.plugin.version}</version>
 				<!-- You can specify extra config to the plugin as required here <configuration> 
 					<configFile>/path/to/MyVerticle.conf</configFile> <instances>1</instances> 
-					<classpath>src/main/resources/:src/test/resources/:target/classes/:target/test-classes/</classpath> 
+					<classpath>src/main/components/:src/test/components/:target/classes/:target/test-classes/</classpath>
 					</configuration> -->
 				<!-- Make sure that the plugin uses the vert.x versions from this pom.xml 
 					not from its own pom.xml -->
@@ -141,28 +144,28 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>${maven.resources.plugin.version}</version>
+			<!--<plugin>
+				<artifactId>maven-components-plugin</artifactId>
+				<version>${maven.components.plugin.version}</version>
 				<executions>
 					<execution>
 						<id>copy-mod-to-target</id>
 						<phase>process-classes</phase>
 						<goals>
-							<goal>copy-resources</goal>
+							<goal>copy-components</goal>
 						</goals>
 						<configuration>
 							<overwrite>true</overwrite>
 							<outputDirectory>${mods.directory}/${module.name}</outputDirectory>
-							<resources>
+							<components>
 								<resource>
 									<directory>target/classes</directory>
 								</resource>
-							</resources>
+							</components>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>

@@ -27,12 +27,12 @@ public class MetadataExtractor implements IMetadataExtractor {
 		final String extension = FilenameUtils.getExtension(uri.getPath());
 		
 		if (extension.isEmpty())
-			throw new IllegalArgumentException("Cannot infer metadata extractor from URI without extension: " + uri);
+			throw new IllegalArgumentException("Cannot infer metadata extractor from URI without handler: " + uri);
 		
 		final IMetadataExtractor mdExtractor = extensionMap.get(extension);
 		
 		if (mdExtractor == null)
-			throw new UnsupportedOperationException("Unsupported metadata extraction extension: " + extension);
+			throw new UnsupportedOperationException("Unsupported metadata extraction handler: " + extension);
 		
 		return mdExtractor.extractMetadata(uri, resolver, tmp);
 	}
