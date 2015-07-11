@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
+import de.algorythm.cms.path.PathSegmentIterator;
 import static org.junit.Assert.*;
 
 public class TestPathSegmentIterator {
@@ -18,9 +19,18 @@ public class TestPathSegmentIterator {
 		assertSegments("/web/", "", "web", "");
 		assertSegments("/web/welcome", "", "web", "welcome");
 		assertSegments("/web/welcome/page1", "", "web", "welcome", "page1");
-		assertEquals("Last prefix", "/web/welcome", testee.getLastPrefix());
 		assertSegments("asdf", "asdf");
 		assertSegments("/web/c/{param}", "", "web", "c", "{param}");
+		
+		assertEquals("Last prefix", "/web/c/{param}", testee.getCurrentPrefix());
+		
+		testee = new PathSegmentIterator("/web/welcome/page1");
+		testee.nextSegment();
+		testee.nextSegment();
+		testee.nextSegment();
+		
+		assertEquals("Current prefix", "/web/welcome", testee.getCurrentPrefix());
+		assertEquals("Current prefix", "welcome/page1", testee.getCurrentSuffix());
 	}
 	
 	private void assertSegments(String path, String... expectedSegments) {

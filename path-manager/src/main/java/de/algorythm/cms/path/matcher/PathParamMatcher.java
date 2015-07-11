@@ -1,21 +1,23 @@
 package de.algorythm.cms.path.matcher;
 
-import de.algorythm.cms.path.Matcher;
+import de.algorythm.cms.path.PathRuleException;
 import de.algorythm.cms.path.PathRule;
-import de.algorythm.cms.path.UrlMatchingState;
 
-public class PathParamMatcher<K,R> extends Matcher<K,R> {
-	public PathParamMatcher(PathRule<K, R> rule, String patternPrefix, Matcher<K,R> defaultMatcher) {
-		super(rule, false, true, false, "**", patternPrefix, defaultMatcher);
+public class PathParamMatcher<K, R> extends PathMatcher<K, R> {
+
+	public PathParamMatcher(PathRule<K, R> rule, String[] paramNames, String patternPrefix, PathMatcher<K, R> defaultMatcher) {
+		super(rule, false, false, true, "**", paramNames, patternPrefix, defaultMatcher);
 	}
+
 	@Override
-	public boolean match(UrlMatchingState<K,R> state) {
+	protected boolean match(MatchState<K,R> state) {
 		state.addParameterValue(state.getSuffix());
 		matchedPositiveFinally(state);
 		return true;
 	}
+
 	@Override
-	public void addChild(Matcher<K,R> matcher) {
-		throw new IllegalStateException(patternPrefix + " cannot have child " + matcher.getPatternPrefix() + " due to ambiguity");
+	public void addChild(PathMatcher<K,R> matcher) throws PathRuleException {
+		throw new PathRuleException(getPatternPrefix() + " cannot have child " + matcher.getPatternPrefix() + " due to ambiguity");
 	}
 }

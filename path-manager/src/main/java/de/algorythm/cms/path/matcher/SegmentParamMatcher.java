@@ -4,16 +4,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-import de.algorythm.cms.path.Matcher;
 import de.algorythm.cms.path.PathRule;
-import de.algorythm.cms.path.UrlMatchingState;
 
-public class SegmentParamMatcher<K,R> extends Matcher<K,R> {
-	public SegmentParamMatcher(PathRule<K, R> rule, String patternPrefix, Matcher<K,R> defaultMatcher) {
-		super(rule, false, rule != null, false, "*", patternPrefix, defaultMatcher);
+public class SegmentParamMatcher<K, R> extends PathMatcher<K, R> {
+
+	public SegmentParamMatcher(PathRule<K, R> rule, String[] paramNames, String patternPrefix, PathMatcher<K, R> defaultMatcher) {
+		super(rule, false, false, rule != null, "*", paramNames, patternPrefix, defaultMatcher);
 	}
+
 	@Override
-	public boolean match(UrlMatchingState<K, R> state) {
+	protected boolean match(MatchState<K, R> state) {
 		final String pathSegment = state.getCurrentSegment();
 		
 		try {

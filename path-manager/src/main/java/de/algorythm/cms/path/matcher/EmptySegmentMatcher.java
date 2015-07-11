@@ -1,22 +1,20 @@
 package de.algorythm.cms.path.matcher;
 
-import de.algorythm.cms.path.Matcher;
 import de.algorythm.cms.path.PathRule;
-import de.algorythm.cms.path.UrlMatchingState;
 
-public class EmptySegmentMatcher<K,R> extends Matcher<K,R> {
-	
+public class EmptySegmentMatcher<K,R> extends PathMatcher<K,R> {
+
 	static private final String EMPTY = "";
 	
 	private final boolean firstSegment;
 	
-	public EmptySegmentMatcher(boolean firstSegment, PathRule<K, R> rule, String patternPrefix, Matcher<K,R> defaultMatcher) {
-		super(rule, false, rule != null, true, EMPTY, patternPrefix, defaultMatcher);
-		this.firstSegment = firstSegment;
+	public EmptySegmentMatcher(PathRule<K, R> rule, String[] paramNames, String patternPrefix, PathMatcher<K,R> defaultMatcher) {
+		super(rule, false, true, rule != null, EMPTY, paramNames, patternPrefix, defaultMatcher);
+		this.firstSegment = patternPrefix.isEmpty();
 	}
 	
 	@Override
-	public boolean match(UrlMatchingState<K,R> state) {
+	protected boolean match(MatchState<K,R> state) {
 		if (state.getCurrentSegment().isEmpty())
 			return matchedPositive(state);
 		else

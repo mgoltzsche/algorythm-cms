@@ -4,7 +4,7 @@ public class PathSegmentIterator {
 
 	private final String path;
 	private final int maxPos;
-	private int segStartPos, segEndPos, lastValidPos;
+	private int lastSegStartPos, segStartPos, segEndPos;
 	private boolean hasNextSegment = true;
 	
 	public PathSegmentIterator(String path) {
@@ -17,7 +17,7 @@ public class PathSegmentIterator {
 	}
 	
 	public String nextSegment() {
-		lastValidPos = segEndPos;
+		lastSegStartPos = segStartPos;
 		segEndPos = path.indexOf('/', segStartPos);
 		hasNextSegment = segEndPos > -1;
 		
@@ -28,6 +28,7 @@ public class PathSegmentIterator {
 			return segment;
 		} else {
 			segEndPos = maxPos;
+			
 			return path.substring(segStartPos, maxPos);
 		}
 	}
@@ -36,11 +37,11 @@ public class PathSegmentIterator {
 		return path;
 	}
 	
-	public String getLastPrefix() {
-		return path.substring(0, lastValidPos);
+	public String getCurrentPrefix() {
+		return path.substring(0, segEndPos);
 	}
 	
-	public String getSuffix() {
-		return path.substring(segStartPos, maxPos);
+	public String getCurrentSuffix() {
+		return path.substring(lastSegStartPos, maxPos);
 	}
 }

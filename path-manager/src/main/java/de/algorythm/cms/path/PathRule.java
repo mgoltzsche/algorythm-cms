@@ -25,7 +25,7 @@ public class PathRule<K, R> implements Comparable<PathRule<K, R>> {
 		
 		this.key = key;
 		this.resource = resource;
-		this.depth = depth(pattern);
+		this.depth = pattern == null ? 0 : depth(pattern);
 		this.pattern = pattern;
 	}
 	

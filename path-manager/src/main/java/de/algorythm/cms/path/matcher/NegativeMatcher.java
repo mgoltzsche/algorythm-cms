@@ -1,18 +1,17 @@
 package de.algorythm.cms.path.matcher;
 
-import de.algorythm.cms.path.Matcher;
-import de.algorythm.cms.path.PathRule;
-import de.algorythm.cms.path.UrlMatchingState;
+public class NegativeMatcher<K, R> extends PathMatcher<K, R> {
 
-public class NegativeMatcher<K,R> extends Matcher<K,R> {
-	public NegativeMatcher(R defaultResource) {
-		super(new PathRule<K,R>(null, "/**", defaultResource), true, true, true, null, null, null);
+	public NegativeMatcher() {
+		super(null, true, true, true, null, null, null, null);
 	}
+
 	@Override
-	public boolean match(UrlMatchingState<K,R> state) {
-		state.setNegativeResult();
+	protected boolean match(MatchState<K, R> state) {
+		state.matchedNegative();
 		return false; // Stop matching unsuccessfully
 	}
+
 	@Override
 	public String toString() {
 		return "";
