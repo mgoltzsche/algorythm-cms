@@ -15,7 +15,7 @@
 		<module>cms-transformer</module>
 		<module>cms-server</module>
 		<module>cms-data</module>
-		<module>path-manager</module>
+		<module>url-manager</module>
 		<module>xar-builder</module>
 		<module>xar-maven-plugin</module>
 	</modules>

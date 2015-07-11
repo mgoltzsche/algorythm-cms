@@ -4,7 +4,6 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.algorythm.cms</groupId>
 	<artifactId>cms-data</artifactId>
 	<packaging>jar</packaging>
 	<name>Algorythm CMS data</name>
@@ -42,6 +41,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>url-manager</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- BaseX -->
 		<dependency>
 			<groupId>org.basex</groupId>

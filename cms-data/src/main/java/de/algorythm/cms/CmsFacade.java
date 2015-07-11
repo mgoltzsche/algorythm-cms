@@ -1,9 +1,14 @@
 package de.algorythm.cms;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,9 +19,8 @@ import org.basex.api.client.LocalSession;
 import org.basex.api.client.Session;
 import org.basex.core.Command;
 import org.basex.core.Context;
-import org.basex.core.cmd.InfoStorage;
 
-public class CmsFacade implements Closeable {
+public class CmsFacade implements AutoCloseable {
 
 	static private final Set<String> IMPORT_EXTENSIONS = new HashSet<>(Arrays.asList(new String[] {"xml"}));
 	final Session session;
