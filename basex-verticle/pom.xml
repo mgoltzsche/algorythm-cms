@@ -4,9 +4,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>cms-server</artifactId>
+	<artifactId>basex-verticle</artifactId>
 	<packaging>jar</packaging>
-	<name>algorythm CMS verticle</name>
+	<name>BaseX Verticle</name>
 
 	<parent>
 		<artifactId>cms-parent</artifactId>
@@ -53,15 +53,27 @@
 	</properties>
 
 	<dependencies>
+		<!-- BaseX -->
 		<dependency>
-			<groupId>de.algorythm.cms</groupId>
-			<artifactId>basex-verticle</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<groupId>org.basex</groupId>
+			<artifactId>basex</artifactId>
+			<version>8.1</version>
+		</dependency>
+		<!-- XQJ -->
+		<dependency>
+			<groupId>net.xqj</groupId>
+			<artifactId>basex-xqj</artifactId>
+			<version>1.4.0</version>
 		</dependency>
 		<dependency>
-			<groupId>de.algorythm.cms</groupId>
-			<artifactId>url-manager</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<groupId>com.xqj2</groupId>
+			<artifactId>xqj2</artifactId>
+			<version>0.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.xquery</groupId>
+			<artifactId>xqj-api</artifactId>
+			<version>1.0</version>
 		</dependency>
 		<!--Vertx provided dependencies -->
 		<dependency>
@@ -108,7 +120,7 @@
 					<cluster>true</cluster><!-- Run in cluster mode communicating with other verticles via hazelcast -->
 				</configuration>
 				<!-- You can specify extra config to the plugin as required here <configuration> 
-					<configFile>/path/to/MyVerticle.conf</configFile> <instances>1</instances> 
+					<configFile>src/main/resources/path/to/MyVerticle.conf</configFile> <instances>1</instances> 
 					<classpath>src/main/components/:src/test/components/:target/classes/:target/test-classes/</classpath> 
 					</configuration> -->
 				<!-- Make sure that the plugin uses the vert.x versions from this pom.xml 
@@ -281,4 +293,17 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>basex</id>
+			<name>BaseX Maven Repository</name>
+			<url>http://files.basex.org/maven</url>
+		</repository>
+		<repository>
+			<id>xqj</id>
+			<name>XQJ Maven Repository</name>
+			<url>http://xqj.net/maven</url>
+		</repository>
+	</repositories>
 </project>

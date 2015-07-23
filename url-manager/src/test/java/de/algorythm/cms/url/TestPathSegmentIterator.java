@@ -1,4 +1,4 @@
-package de.algorythm.cms.path;
+package de.algorythm.cms.url;
 
 import java.util.LinkedList;
 

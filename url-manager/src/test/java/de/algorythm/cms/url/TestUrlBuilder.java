@@ -1,4 +1,4 @@
-package de.algorythm.cms.path;
+package de.algorythm.cms.url;
 
 import static org.junit.Assert.assertEquals;
 

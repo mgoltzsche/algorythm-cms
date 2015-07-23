@@ -1,0 +1,4 @@
+<configuration xmlns="http://algorythm.de/common/URLRules">
+	<rule key="welcome" pattern="/welcome">Command A</rule>
+	<rule key="doc" pattern="/doc/**">Command B</rule>
+</configuration>

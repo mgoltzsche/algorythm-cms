@@ -5,23 +5,24 @@ import de.algorythm.cms.url.matcher.PathMatcherBuilder;
 
 public class UrlManagerBuilder<K, R> {
 
-	private final PathMatcherBuilder<K, R> pathMatcherBuilder;
-	private final UrlBuilderBuilder<K> urlBuilderBuilder;
+	private final PathMatcherBuilder<K, R> matcherBuilder;
+	private final UrlBuilderBuilder<K> builderBuilder;
 	
 	public UrlManagerBuilder(String urlPrefix) {
-		pathMatcherBuilder = new PathMatcherBuilder<K, R>();
-		urlBuilderBuilder = new UrlBuilderBuilder<K>(urlPrefix);
+		matcherBuilder = new PathMatcherBuilder<K, R>();
+		builderBuilder = new UrlBuilderBuilder<K>(urlPrefix);
 	}
 	
 	public UrlManagerBuilder<K, R> addRule(PathRule<K, R> rule) {
-		pathMatcherBuilder.addRule(rule);
-		urlBuilderBuilder.addRule(rule);
+		matcherBuilder.addRule(rule);
+		builderBuilder.addRule(rule);
+		
 		return this;
 	}
 	
 	public IUrlManager<K, R> build() throws PathRuleException {
-		IPathMatcher<K, R> pathMatcher = pathMatcherBuilder.build();
-		IUrlBuilder<K> urlBuilder = urlBuilderBuilder.build();
+		IPathMatcher<K, R> pathMatcher = matcherBuilder.build();
+		IUrlBuilder<K> urlBuilder =      builderBuilder.build();
 		
 		return new UrlManager<K, R>(pathMatcher, urlBuilder);
 	}

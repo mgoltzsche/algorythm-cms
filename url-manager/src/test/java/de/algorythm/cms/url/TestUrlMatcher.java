@@ -1,4 +1,4 @@
-package de.algorythm.cms.path;
+package de.algorythm.cms.url;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -122,6 +122,14 @@ public class TestUrlMatcher implements IPathMatchHandler<String, String> {
 		assertNegativeMatch("/k/a/x", "/k/a", "ka");
 		assertNegativeMatch("/x", "", "welcome");
 		assertNegativeMatch("/", "", "welcome");
+		
+		testee = new MatcherBuilder()
+			.addRule("all", "/{path+}")
+			.addRule("s", "/special")
+			.build();
+		
+		assertPositiveMatch("/some/path", "all", "path", "some/path");
+		assertPositiveMatch("/special", "s");
 	}
 	
 	@Test

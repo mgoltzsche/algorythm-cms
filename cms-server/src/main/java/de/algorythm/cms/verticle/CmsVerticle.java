@@ -1,115 +1,118 @@
 package de.algorythm.cms.verticle;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
-import de.algorythm.cms.CmsFacade;
-import de.algorythm.cms.IHandler;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.platform.Verticle;
 
+import de.algorythm.cms.url.IMatchState;
+import de.algorythm.cms.url.IPathMatchHandler;
+import de.algorythm.cms.url.IUrlManager;
+import de.algorythm.cms.url.PathRule;
+import de.algorythm.cms.url.PathRuleException;
+import de.algorythm.cms.url.UrlManagerBuilder;
+import de.algorythm.cms.url.config.UrlConfiguration;
+import de.algorythm.cms.url.config.UrlRule;
+
 public class CmsVerticle extends Verticle {
 
-	static private final Logger log = LoggerFactory.getLogger(CmsVerticle.class);
 	static private final URI ROOT = URI.create("/");
 
-	//@Inject private ICmsCommonFacade facade;
-	//private IRenderer renderer;
-	private CmsFacade facade;
-	private FrontController frontController;
-	private Path docRoot;
-
+	private int timeout;
+	private String hostname = "algorythm.de";
+	private IUrlManager<String, String> commandResolver;
+	
 	@Override
 	public void start() {
-		facade = new CmsFacade();
-		frontController = new FrontController();
-
+		// TODO: config
+		timeout = 10000;
+		
 		try {
-			frontController.registerController("^/(.*?)(/(index\\.html)?)?$", new XQueryController(facade, IOUtils.toString(getClass().getResourceAsStream("/xquery/load-document.xq")), "path"));
-			frontController.registerController(".*", new XQueryController(facade, "'Not Found'"));
-		} catch(IOException e) {
-			throw new IllegalStateException(e);
-		}
-
-		try {
-			docRoot = Files.createTempDirectory("cms-static-resources");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			initCommandResolver();
+		} catch (PathRuleException e) {
+			throw new IllegalStateException("URL command configuration error", e);
 		}
 		
-		/*try {
-			renderer = initRenderer();
-			renderer.expand();
-			renderer.renderStaticResources(Format.HTML, new FileOutputTargetFactory(docRoot));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}*/
+		//vertx.eventBus().send("de.algorythm.basex", "ADD mydatabase/vertx-example.xml <root>vertx example</root>");
 		
+		//container.deployModule("de.algorythm.cms~basex-verticle~1.0.0-SNAPSHOT");
 		vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
 			@Override
-			public void handle(HttpServerRequest req) {
+			public void handle(final HttpServerRequest req) {
 				final HttpServerResponse resp = req.response();
-				final String path = ROOT.resolve(req.absoluteURI()).normalize().getPath();
+				String path = req.path();
+				container.logger().info("REQUEST: " + path);
+				//resp.end("sent");
 				
-				if (path.length() > 4 && path.startsWith("/../") || path.equals("/..")) {
-					// Forbidden - Outside doc root
-					resp.headers().set("Content-Type", "text/html; charset=UTF-8");
-					resp.setStatusCode(403);
-					resp.setStatusMessage("Forbidden");
-					resp.end(errorHtml("Forbidden", "The requested URL " + path + " is outside the document root"));
-				} else if (path.startsWith("/r/")) {
-					returnStaticResource(path, resp);
-				} else {
-					returnPage(req, req.absoluteURI(), resp);
-				}
+				commandResolver.match(path, new IPathMatchHandler<String, String>() {
+					@Override
+					public void matchedPrefix(IMatchState<String, String> state) {}
+					
+					@Override
+					public void matchedPositive(IMatchState<String, String> state) {
+						execCommand(state.getResource(), req);
+					}
+					
+					@Override
+					public void matchedNegative(String path) {
+						notFound(req.response());
+					}
+				});
 			}
 		}).listen(8080);
-	}
-	
-	private void returnPage(final HttpServerRequest req, final URI absoluteUri, final HttpServerResponse resp) {
-		String path = absoluteUri.getPath();
-		path = path.charAt(path.length() - 1) == '/'
-				? path + "index.html" : path;
-
-		try {
-			frontController.run(req);
-		} catch (Exception e) { // Error
-			log.error("Request failed", e);
-			
-			final StringWriter stWriter = new StringWriter();
-			
-			e.printStackTrace(new PrintWriter(stWriter));
-			
-			final String stackTrace = stWriter.toString();
-			
-			resp.headers().set("Content-Type", "text/html; charset=UTF-8");
-			resp.setStatusCode(500);
-			resp.setStatusMessage("Internal Server Error");
-			resp.end(errorHtml("Internal Server Error", "<pre>" + stackTrace + "</pre>"));
-		}
-	}
-	
-	private void returnStaticResource(final String path, final HttpServerResponse resp) {
-		Path requestedFile = docRoot.resolve(path.substring(1));
 		
-		if (Files.exists(requestedFile)) {
-			resp.sendFile(requestedFile.toUri().getPath());
-		} else {
-			notFound(resp);
-		}
+		container.logger().info("CMS verticle started");
 	}
 
-	private void notFound(final HttpServerResponse resp) {
+	private void initCommandResolver() throws PathRuleException {
+		final UrlConfiguration urlConfig;
+		
+		try (InputStream in = getClass().getResourceAsStream("/url-config.xml")) {
+			urlConfig = UrlConfiguration.fromStream(in);
+		} catch(Exception e) {
+			throw new RuntimeException("Cannot load URL configuration", e);
+		}
+		
+		UrlManagerBuilder<String, String> builder = new UrlManagerBuilder<>("");
+		
+		for (UrlRule rule : urlConfig.getRules()) {
+			builder.addRule(new PathRule<String, String>(rule.getKey(), rule.getPattern(), rule.getCommand()));
+		}
+		
+		commandResolver = builder.build();
+	}
+	
+	private void execCommand(String command, HttpServerRequest req) {
+		final HttpServerResponse resp = req.response();
+		
+		vertx.eventBus().sendWithTimeout("de.algorythm.basex", command, timeout, new Handler<AsyncResult<Message<String>>>() {
+			@Override
+			public void handle(AsyncResult<Message<String>> event) {
+				container.logger().info("message received (within timeout)");
+				
+				resp.headers().set("Content-Type", "text/html; charset=UTF-8");
+				
+				if (event.succeeded()) {
+					resp.setStatusCode(200);
+					resp.setStatusMessage("OK");
+					resp.end(event.result().body());
+				} else {
+					resp.setStatusCode(500);
+					resp.setStatusMessage("Internal Server Error");
+					resp.end(errorHtml("Internal Server Error", "Service failure: " + event.failed()));
+				}
+			}
+		});
+	}
+	
+	private void notFound(HttpServerResponse resp) {
 		resp.headers().set("Content-Type", "text/html; charset=UTF-8");
 		resp.setStatusCode(404);
 		resp.setStatusMessage("Not Found");
@@ -118,7 +121,7 @@ public class CmsVerticle extends Verticle {
 	
 	private String errorHtml(String title, String msg) {
 		return new StringBuilder("<html><head><title>")
-			.append(title).append(" - algorythm CMS</title></head><body><h1>")
+			.append(title).append(" - ").append(hostname).append("</title></head><body><h1>")
 			.append(title).append("</h1><p>")
 			.append(msg).append("</p></body></html>").toString();
 	}

@@ -1,4 +1,4 @@
-package de.algorythm.cms.verticle;
+/*package de.algorythm.cms.verticle;
 
 import de.algorythm.cms.CmsFacade;
 import de.algorythm.cms.IHandler;
@@ -9,9 +9,6 @@ import org.vertx.java.core.http.HttpServerResponse;
 
 import java.io.IOException;
 
-/**
- * Created by max on 17.05.15.
- */
 public class XQueryController implements IController {
 
     private final CmsFacade db;
@@ -46,4 +43,4 @@ public class XQueryController implements IController {
             }
         });
     }
-}
+}*/

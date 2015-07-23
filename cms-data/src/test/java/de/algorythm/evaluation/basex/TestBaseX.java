@@ -9,6 +9,7 @@ import org.basex.api.client.Query;
 import org.basex.api.client.Session;
 import org.basex.core.Context;
 import org.basex.core.cmd.*;
+import org.basex.util.options.BooleanOption;
 import org.junit.Test;
 
 public class TestBaseX {
@@ -21,6 +22,8 @@ public class TestBaseX {
 
 		OutputStream out = System.out;
 		Context context = new Context();
+		System.setProperty("org.basex.CHOP", "false"); // preserves white spaces
+		//context.options.set(new BooleanOption("CHOP"), false);
 		//context.repo.pkgDict().get();
 
 
@@ -118,7 +121,7 @@ public class TestBaseX {
 
 	private void queryDocumentFromDB(Session session) throws Exception {
 		System.out.println("QUERY FROM DB");
-		xquery(session, "doc('mydatabase/example-entry1.xml')");
+		xquery(session, "doc('mydatabase/doc.xml')");
 	}
 
 	private void queryCollection(Session session) throws IOException {
