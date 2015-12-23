@@ -7,11 +7,18 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import java.net.URI;
 
 /**
- * Created by max on 31.05.15.
+ * Abstract expath package component description.
+ * @see <a href="http://expath.org/spec/pkg#expath-pkg.xsd">http://expath.org/spec/pkg#expath-pkg.xsd</a>
+ * @author Max Goltzsche <max.goltzsche@algorythm.de> 2015-08, BSD License
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public abstract class AbstractComponent {
 
+	static protected final String XQUERY = "xquery";
+	static protected final String XSLT = "xslt";
+	static protected final String XSD = "xsd";
+	static protected final String RESOURCE = "resource";
+	
     @XmlElement(name = "file", namespace = "http://expath.org/ns/pkg", required = true)
     @XmlSchemaType(name = "anyURI")
     private URI file;
@@ -22,6 +29,10 @@ public abstract class AbstractComponent {
         this.file = file;
     }
 
+    public abstract String getType();
+    
+    public abstract String getName();
+    
     public URI getFile() {
         return file;
     }

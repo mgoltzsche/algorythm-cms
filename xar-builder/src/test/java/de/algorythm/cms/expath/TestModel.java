@@ -15,7 +15,8 @@ import java.net.URI;
 import static org.junit.Assert.*;
 
 /**
- * Created by max on 31.05.15.
+ * expath package JAXB model test.
+ * @author Max Goltzsche <max.goltzsche@algorythm.de> 2015-08, BSD License
  */
 public class TestModel {
 

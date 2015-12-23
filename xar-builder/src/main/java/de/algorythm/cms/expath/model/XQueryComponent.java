@@ -4,10 +4,9 @@ import javax.xml.bind.annotation.*;
 import java.net.URI;
 
 /**
- * Mojo to generate an expath-pgk.xml and package it into a XAR archive.
- * 
- * @author <a href="mailto:max.goltzsche@algorythm.de">Max Goltzsche</a>
- * @version $Id$
+ * expath package xquery component description.
+ * @see <a href="http://expath.org/spec/pkg#expath-pkg.xsd">http://expath.org/spec/pkg#expath-pkg.xsd</a>
+ * @author Max Goltzsche <max.goltzsche@algorythm.de> 2015-08, BSD License
  */
 @XmlRootElement(name="xquery", namespace="http://expath.org/ns/pkg")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -22,6 +21,16 @@ public class XQueryComponent extends AbstractComponent {
 	public XQueryComponent(URI file, URI namespace) {
 		super(file);
 		this.namespace = namespace;
+	}
+
+	@Override
+	public String getType() {
+		return XQUERY;
+	}
+
+	@Override
+	public String getName() {
+		return namespace.toASCIIString();
 	}
 
 	public URI getNamespace() {

@@ -6,7 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by max on 31.05.15.
+ * expath package descriptor.
+ * @see <a href="http://expath.org/spec/pkg#expath-pkg.xsd">http://expath.org/spec/pkg#expath-pkg.xsd</a>
+ * @author Max Goltzsche <max.goltzsche@algorythm.de> 2015-08, BSD License
  */
 @XmlRootElement(name = "package", namespace = "http://expath.org/ns/pkg")
 @XmlAccessorType(XmlAccessType.FIELD)

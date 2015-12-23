@@ -1,14 +1,17 @@
 package de.algorythm.cms.expath;
 
 import de.algorythm.cms.expath.model.ExpathPackage;
+
 import org.junit.Test;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Created by max on 01.06.15.
+ * ExpathPackageManager test.
+ * @author Max Goltzsche <max.goltzsche@algorythm.de> 2015-08, BSD License
  */
 public class TestExpathPackageManager {
 
@@ -26,8 +29,8 @@ public class TestExpathPackageManager {
         final Path sourceDirectory = Paths.get(getClass().getResource('/' + pkg.getAbbrev()).toURI());
         final Path xarFile = Paths.get(getClass().getResource("/").toURI()).resolve("test.xar");
 
-        testee.deriveComponents(pkg, sourceDirectory);
-        testee.createXarArchive(xarFile, pkg, sourceDirectory);
+        testee.deriveComponents(pkg, StandardCharsets.UTF_8, sourceDirectory);
+        testee.createXarArchive(xarFile, StandardCharsets.UTF_8, pkg, sourceDirectory);
 
         /*for (AbstractComponent c : pkg.getComponents())
             derivedComponentUris.add(c.get)*/

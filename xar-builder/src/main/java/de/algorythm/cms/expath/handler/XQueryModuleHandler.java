@@ -1,28 +1,30 @@
 package de.algorythm.cms.expath.handler;
 
-import de.algorythm.cms.expath.IResourceHandler;
-import de.algorythm.cms.expath.model.ExpathPackage;
-import de.algorythm.cms.expath.model.XQueryComponent;
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
+
+import de.algorythm.cms.expath.IResourceHandler;
+import de.algorythm.cms.expath.model.ExpathPackage;
+import de.algorythm.cms.expath.model.XQueryComponent;
+
 /**
- * Created by max on 31.05.15.
+ * Derives an expath xquery component description.
+ * @author Max Goltzsche <max.goltzsche@algorythm.de> 2015-08, BSD License
  */
 public class XQueryModuleHandler implements IResourceHandler {
 
     static private final Pattern XQUERY_NS_PATTERN = Pattern.compile("^module\\s+namespace\\s+[\\w]+\\s*=\\s*\"([^\"]+)\"");
 
     @Override
-    public void registerResource(ExpathPackage pkg, URI localFile, URI packageRelativeFilePath) throws IOException {
-        String xquery = IOUtils.toString(Files.newInputStream(Paths.get(localFile)), StandardCharsets.UTF_8.displayName());
+    public void registerResource(ExpathPackage pkg, URI localFile, URI packageRelativeFilePath, Charset encoding) throws IOException {
+        String xquery = IOUtils.toString(Files.newInputStream(Paths.get(localFile)), encoding.name());
 
         if (xquery.isEmpty())
             throw new IllegalStateException("XQuery module " + localFile + " is empty");
