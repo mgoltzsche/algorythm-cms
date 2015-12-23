@@ -67,7 +67,7 @@
 									<includes>
 										<include>package.json</include>
 										<include>Gruntfile.js</include>
-										<include>bower.json</include>
+										<include>gulpfile.js</include>
 									</includes>
 									<targetPath></targetPath>
 								</resource>
@@ -114,11 +114,17 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>gulp build</id>
+						<goals>
+							<goal>gulp</goal>
+						</goals>
+					</execution>
+					<!--<execution>
 						<id>grunt build</id>
 						<goals>
 							<goal>grunt</goal>
 						</goals>
-					</execution>
+					</execution>-->
 				</executions>
 			</plugin>
 		</plugins>

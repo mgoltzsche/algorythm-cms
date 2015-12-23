@@ -1,6 +1,4 @@
 module.exports = function(grunt) {
-	
-
 	grunt.initConfig({
 		jshint: { /* JavaScript lint */
 			files: ['Gruntfile.js', '${basedir}/src/main/javascript/*.js']

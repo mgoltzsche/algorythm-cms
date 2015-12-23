@@ -14,7 +14,7 @@
 			<head>
 				<title ng-bind="pageTitle"><xsl:value-of select="@title" /></title>
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<link rel="stylesheet" href="{$rootPath}../resources/css/default-theme/main.css" />
+				<link rel="stylesheet" href="{$rootPath}../resources/css/default-theme.css" />
 				<script type="text/javascript">var cms = {'baseUrl': '<xsl:value-of select="$rootPath"/>'};</script>
 				<script type="text/javascript" src="{$rootPath}../resources/js/cms-api.min.js"></script>
 			</head>
