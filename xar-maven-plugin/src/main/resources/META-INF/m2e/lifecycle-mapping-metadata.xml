@@ -3,12 +3,16 @@
 		<pluginExecution>
 			<pluginExecutionFilter>
 				<goals>
-					<goal>compile</goal>
-					<goal>testCompile</goal>
+					<goal>build-xar</goal>
+					<goal>deploy-basex</goal>
 				</goals>
 			</pluginExecutionFilter>
 			<action>
 				<ignore />
+				<!--<execute>
+					<runOnIncremental>true</runOnIncremental>
+					<runOnConfiguration>true</runOnConfiguration>
+				</execute>-->
 			</action>
 		</pluginExecution>
 	</pluginExecutions>

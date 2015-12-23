@@ -17,12 +17,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- XAR builder -->
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>xar-builder</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- Java 5 Mojo annotations -->
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
@@ -58,6 +52,30 @@
 					<groupId>com.google.code.google-collections</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<!-- XAR builder -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>xar-builder</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- BaseX (for deploy-base goal) -->
+		<dependency>
+			<groupId>org.basex</groupId>
+			<artifactId>basex</artifactId>
+			<version>8.3.1-SNAPSHOT</version>
+		</dependency>
+		<!-- SASS compiler -->
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-sass-compiler</artifactId>
+			<version>0.9.12</version>
+		</dependency>
+		<!-- YUI Compressor (Minifying JS/CSS) -->
+		<dependency>
+			<groupId>com.yahoo.platform.yui</groupId>
+			<artifactId>yuicompressor</artifactId>
+			<version>2.4.8</version>
 		</dependency>
 	</dependencies>
 

@@ -1,33 +1,35 @@
 package de.algorythm.maven.xarPlugin;
 
-import de.algorythm.cms.expath.ExpathPackageManager;
-import de.algorythm.cms.expath.model.ExpathPackage;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugins.annotations.*;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.FileUtils;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashSet;
+
+import javax.xml.bind.JAXBException;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+
+import de.algorythm.cms.expath.ExpathPackageManager;
+import de.algorythm.cms.expath.model.AbstractComponent;
+import de.algorythm.cms.expath.model.ExpathPackage;
 
 /**
- * Mojo to generate an expath-pgk.xml and package it with its components into a XAR archive.
- * 
- * @author <a href="mailto:max.goltzsche@algorythm.de">Max Goltzsche</a>
+ * Mojo to generate an expath package descriptor (expath-pgk.xml) and
+ * write it with its components into a XAR archive.
+ * @author Max Goltzsche <max.goltzsche@algorythm.de> 2015-08, BSD License
  * @version $Id$
  */
-@Mojo(name = "build-xar", defaultPhase = LifecyclePhase.PACKAGE , requiresDependencyResolution = ResolutionScope.NONE, threadSafe = true)
-@Execute(goal = "build-xar", phase = LifecyclePhase.PACKAGE, lifecycle = "xarcycle")
+@Mojo(name = "build-xar", defaultPhase = LifecyclePhase.PACKAGE, requiresDependencyResolution = ResolutionScope.NONE, threadSafe = true)
 public class XarBuilderMojo extends AbstractMojo {
 
 	/**
@@ -52,8 +54,6 @@ public class XarBuilderMojo extends AbstractMojo {
 	 * @see org.apache.maven.plugin.Mojo#execute()
 	 */
 	public void execute() throws MojoExecutionException {
-		getLog().info("Execute expath builder\n" + project.getArtifact().getFile());
-
 		try {
 			Path xarFilePath = createXarFile();
 			File xarFile = new File(xarFilePath.toUri());
@@ -66,6 +66,7 @@ public class XarBuilderMojo extends AbstractMojo {
 	}
 
 	private Path createXarFile() throws IOException, JAXBException {
+		final Charset charset = Charset.forName(encoding);
 		final URI pkgUri = derivePackageName();
 		final String abbrev = project.getArtifactId();
 		final String title = project.getName();
@@ -74,34 +75,67 @@ public class XarBuilderMojo extends AbstractMojo {
 		final String xarName = finalName == null
 				? abbrev + '-' + version : finalName;
 		final Path xarFile = Paths.get(buildDirectory).resolve(xarName + ".xar");
-		final Path sourceDirectory = Paths.get(project.getBuild().getSourceDirectory());
+		final Path sourceDir = Paths.get(project.getBuild().getSourceDirectory());
+		final Path outputDir = Paths.get(project.getBuild().getOutputDirectory());
 		final ExpathPackage pkg = new ExpathPackage(pkgUri, abbrev, title, version);
 		final ExpathPackageManager xarManager = new ExpathPackageManager();
-
-		xarManager.deriveComponents(pkg, sourceDirectory);
+		final Path[] sourceDirectories = Files.isDirectory(outputDir)
+				? new Path[] {sourceDir, outputDir}
+				: new Path[] {sourceDir};
+		
+		xarManager.deriveComponents(pkg, charset, sourceDirectories);
 		Files.createDirectories(xarFile.getParent());
-		xarManager.createXarArchive(xarFile, pkg, sourceDirectory);
-
+		xarManager.createXarArchive(xarFile, charset, pkg, sourceDirectories);
+		
+		logPackage(pkg);
+		
 		return xarFile;
 	}
-
+	
 	private URI derivePackageName() {
 		final StringBuilder uri = new StringBuilder("http://");
 		final String[] groupIdSegments = project.getGroupId().split("\\.");
-
-		if (groupIdSegments.length < 2)
-			throw new IllegalStateException("Invalid group ID " + project.getGroupId() + ". Expecting a qualified name seperated by at least 2 dots.");
-
-		final String topLevel = groupIdSegments[0];
-		final String name = groupIdSegments[1];
-
-		uri.append(name).append('.').append(topLevel);
-
-		for (int i = 2; i < groupIdSegments.length; i++)
-			uri.append('/').append(groupIdSegments[i]);
+		
+		uri.append(groupIdSegments[groupIdSegments.length - 1]);
+		
+		for (int i = groupIdSegments.length - 2; i >= 0; i--) {
+			uri.append('.').append(groupIdSegments[i]);
+		}
 
 		uri.append('/').append(project.getArtifactId());
 
 		return URI.create(uri.toString());
+	}
+	
+	private void logPackage(ExpathPackage pkg) {
+		final String pkgMsg = "expath package '" + pkg.getName() + '\'';
+		if (getLog().isDebugEnabled())
+			getLog().debug(pkgMsg + " components:");
+		else
+			getLog().info(pkgMsg);
+		
+		if (getLog().isDebugEnabled()) {
+			for (String componentType : listComponentTypes(pkg)) {
+				getLog().debug(componentType + ": ");
+				
+				for (AbstractComponent comp : pkg.getComponents()) {
+					if (comp.getType().equals(componentType)) {
+						final String name = comp.getName();
+						final String file = comp.getFile().toString();
+						
+						getLog().debug(String.format("  %-60s %s", name, file));
+					}
+				}
+			}
+		}
+	}
+	
+	private LinkedHashSet<String> listComponentTypes(ExpathPackage pkg) {
+		final LinkedHashSet<String> types = new LinkedHashSet<>();
+		
+		for (AbstractComponent comp : pkg.getComponents())
+			types.add(comp.getType());
+		
+		return types;
 	}
 }
