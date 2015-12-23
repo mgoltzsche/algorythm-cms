@@ -1,0 +1,18 @@
+<site xmlns="http://cms.algorythm.de/common/Site"
+		name="algorythm.de"
+		title="algorythm.de"
+		default-locale="de-DE"
+		src="/contents/welcome.xml">
+	<projects src="/contents/projects.xml">
+		<algorythm-cms src="/contents/projects/algorythm-cms.xml" />
+		<goolap src="/contents/projects/goolap.xml" />
+		<mdsd-dsls src="/contents/projects/mdsd-dsls.xml" />
+		<java-desktop-database src="/contents/projects/jddb.xml" />
+		<webgl-dof src="/contents/projects/webgl-dof.xml" />
+		<defender3d src="/contents/projects/defender3d.xml" />
+		<ogre3d-hmd src="/contents/projects/ogre3d-hmd.xml" />
+		<travel-ant src="/contents/projects/travel-ant.xml" />
+	</projects>
+	<about src="/contents/about.xml" />
+	<imprint src="/contents/imprint.xml" nav-exclude="true" />
+</site>

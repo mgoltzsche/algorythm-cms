@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	<include schemaLocation="Types.xsd" />
+
+	<element name="article">
+        <complexType>
+			<complexContent>
+				<extension base="c:Markup">
+					<attribute name="title" type="string" use="optional" />
+				</extension>
+			</complexContent>
+		</complexType>
+    </element>
+</schema>

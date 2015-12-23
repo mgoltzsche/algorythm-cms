@@ -1,0 +1,172 @@
+body {
+	background: $backgroundColor;
+	color: $color;
+	font-family: sans-serif;
+	line-height: $lineHeight;
+}
+
+body, table {
+	font-size: 12px;
+}
+
+.menu {
+	font-size: 16px;
+}
+
+@include respond-to-sm {
+	body, table {
+		font-size: 14px;
+	}
+}
+
+@include respond-to-md {
+	body, table {
+		font-size: 16px;
+	}
+}
+
+header {
+	position: fixed;
+	top: 0;
+	z-index: 50;
+	width: 100%;
+	margin: 0;
+	background: $color;
+	color: $backgroundColor;
+	height: 100%;
+	@include transition(height 0.3s ease);
+	
+	&.collapsed {
+		display: block;
+		height: 2.57em;
+		overflow: hidden;
+	}
+}
+
+main, footer {
+	margin: 0 $spacing/2 $spacing/2 $spacing/2;
+}
+
+main {
+	margin-top: 4em;
+}
+
+footer {
+	font-size: 0.7em;
+	text-align: center;
+}
+
+@include respond-to-md {
+	header, header.collapsed {
+		position: static;
+		margin: $spacing;
+		width: auto;
+		height: auto;
+	}
+	main, footer {
+		margin: 0 $spacing $spacing $spacing;
+	}
+}
+
+a, .btn {
+	color: $primaryActionColor;
+	text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6, h7 {
+	line-height: $smallLineHeight;
+	margin: 0 0 $spacing 0;
+}
+
+p {
+	margin: 0 0 $spacing 0;
+}
+
+.locale-switch {
+	float: right;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	
+	li {
+		display: inline;
+		margin: 0;
+		padding: 0;
+		
+		svg {
+			width: 16px;
+			height: 11px;
+			padding: 2px;
+			@include opacity(70);
+		}
+		
+		&.active svg {
+			width: 20px;
+			height: 15px;
+			padding: 0;
+			@include opacity(100);
+		}
+	}
+}
+
+.icon {
+	width: 50px;
+	height: 50px;
+}
+
+#nav {
+	font-weight: bold;
+	border: none;
+	margin: 0;
+	
+	.logo {
+		display: inline-block;
+		height: $lineHeight;
+		width: 180px;
+		
+		svg {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	}
+	
+	ul {
+		background: $color;
+	}
+	
+	li {
+		&.selected > a, a:hover {
+			background: $backgroundColor;
+		}
+	}
+}
+
+#main-nav {
+	padding: 0 0 $spacing/2 0;
+}
+
+@include respond-to-md {
+	#main-nav {
+		padding: 0;
+	}
+}
+
+caption {
+	font-weight: bold;
+	margin: 0 0 $spacing/2;
+	text-align: left;
+}
+
+.properties-table {
+	border: none;
+	
+	th, td {
+		text-align: left;
+		vertical-align: top;
+	}
+	
+	th {
+		padding-right: $spacing;
+	}
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	<include schemaLocation="Types.xsd" />
+
+	<element name="grid">
+		<complexType>
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<element name="cell">
+					<complexType mixed="true">
+						<choice minOccurs="0" maxOccurs="unbounded">
+							<any />
+						</choice>
+						<attribute name="span" type="nonNegativeInteger" default="1" />
+						<attribute name="span-sm" type="nonNegativeInteger" />
+						<attribute name="span-md" type="nonNegativeInteger" />
+						<attribute name="span-lg" type="nonNegativeInteger" />
+						<attribute name="span-xl" type="nonNegativeInteger" />
+					</complexType>
+				</element>
+			</choice>
+			<attribute name="columns" type="nonNegativeInteger" default="1" />
+			<attribute name="columns-sm" type="nonNegativeInteger" />
+			<attribute name="columns-md" type="nonNegativeInteger" />
+			<attribute name="columns-lg" type="nonNegativeInteger" />
+			<attribute name="columns-xl" type="nonNegativeInteger" />
+			<attribute name="spacing" type="boolean" default="true" />
+		</complexType>
+	</element>
+</schema>

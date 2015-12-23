@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	<include schemaLocation="Types.xsd" />
+
+	<element name="page">
+		<complexType>
+			<sequence minOccurs="0">
+				<any />
+			</sequence>
+			<attribute name="title" type="token" />
+			<attribute name="nav-title" type="token" use="optional" />
+			<attribute name="nav-contained" type="boolean" default="true" />
+		</complexType>
+	</element>
+</schema>

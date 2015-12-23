@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:c="http://cms.algorythm.de/common/CMS"
+	targetNamespace="http://cms.algorythm.de/common/CMS"
+	elementFormDefault="qualified">
+	
+	<complexType name="Markup" mixed="true">
+		<choice minOccurs="0" maxOccurs="unbounded">
+			<any />
+		</choice>
+	</complexType>
+	
+	<element name="p" type="c:Markup" />
+	<element name="b" type="c:Markup" />
+	<element name="i" type="c:Markup" />
+	<element name="u" type="c:Markup" />
+	<element name="br" type="c:Markup" />
+	<element name="h1" type="c:Markup" />
+	<element name="h2" type="c:Markup" />
+	<element name="h3" type="c:Markup" />
+	<element name="h4" type="c:Markup" />
+	<element name="h5" type="c:Markup" />
+	<element name="h6" type="c:Markup" />
+	<element name="h7" type="c:Markup" />
+	<element name="ul">
+		<complexType>
+			<sequence minOccurs="0" maxOccurs="unbounded">
+				<element name="li" type="c:Markup" />
+			</sequence>
+		</complexType>
+	</element>
+	<element name="ol">
+		<complexType>
+			<sequence minOccurs="0" maxOccurs="unbounded">
+				<element name="li" type="c:Markup" />
+			</sequence>
+		</complexType>
+	</element>
+	<element name="spacer">
+		<complexType mixed="true">
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<any />
+			</choice>
+		</complexType>
+	</element>
+	<element name="a">
+		<complexType mixed="true">
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<any />
+			</choice>
+			<attribute name="href" type="anyURI" use="required" />
+			<attribute name="title" type="token" />
+		</complexType>
+	</element>
+	<element name="position">
+		<complexType mixed="true">
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<any />
+			</choice>
+			<attribute name="left" type="token" />
+			<attribute name="right" type="token" />
+			<attribute name="top" type="token" />
+			<attribute name="bottom" type="token" />
+		</complexType>
+	</element>
+	<element name="img">
+		<complexType>
+			<attribute name="src" type="anyURI" use="required" />
+			<attribute name="title" type="token" use="required" />
+			<attribute name="fill" type="boolean" default="false" />
+		</complexType>
+	</element>
+	<element name="file">
+		<complexType>
+			<attribute name="src" type="anyURI" use="required" />
+			<attribute name="title" type="token" />
+		</complexType>
+	</element>
+	<element name="code">
+		<complexType mixed="true">
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<any />
+			</choice>
+		</complexType>
+	</element>
+	<element name="properties">
+		<complexType>
+			<choice minOccurs="0" maxOccurs="unbounded">
+				<element name="property">
+					<complexType mixed="true">
+						<choice minOccurs="0" maxOccurs="unbounded">
+							<any />
+						</choice>
+						<attribute name="name" type="token" use="required"/>
+					</complexType>
+				</element>
+			</choice>
+			<attribute name="src" type="anyURI" use="required" />
+			<attribute name="title" type="token" />
+		</complexType>
+	</element>
+	<element name="bot-secure">
+		<complexType>
+			<attribute name="value" type="string" use="required" />
+		</complexType>
+	</element>
+</schema>

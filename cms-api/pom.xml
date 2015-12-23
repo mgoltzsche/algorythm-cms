@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.algorythm.cms</groupId>
+	<artifactId>cms-api</artifactId>
+	<version>0.0.1</version>
+	<packaging>xar</packaging>
+	<name>CMS API XAR package</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<build>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/xml</directory>
+			</resource>
+			<resource>
+				<directory>src/main/xq</directory>
+			</resource>
+			<resource>
+				<directory>src/main/xsl</directory>
+			</resource>
+			<resource>
+				<directory>src/main/xsd</directory>
+			</resource>
+			<resource>
+				<directory>src/main/javascript</directory>
+				<targetPath>${basedir}/frontend-work/js</targetPath>
+			</resource>
+			<resource>
+				<directory>src/main/css</directory>
+				<targetPath>css</targetPath>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>default-resources</id><!-- Overwrite default resources to copy them before frontend plugin execution -->
+						<phase>generate-resources</phase>
+						<goals>
+              				<goal>resources</goal>
+            			</goals>
+            		</execution>
+					<execution>
+						<id>copy-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+              				<goal>copy-resources</goal>
+            			</goals>
+            			<configuration>
+            				<outputDirectory>${basedir}/frontend-work</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>package.json</include>
+										<include>Gruntfile.js</include>
+										<include>bower.json</include>
+									</includes>
+									<targetPath></targetPath>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>de.algorythm.cms</groupId>
+				<artifactId>xar-maven-plugin</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<extensions>true</extensions>
+			</plugin>
+			<!--<plugin>
+				<groupId>de.algorythm.maven</groupId>
+				<artifactId>web-resources-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<id>compile-scss</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile-scss</goal>
+						</goals>
+						<configuration>
+							<scssSources>
+								<value>css/default-theme/main.scss</value>
+							</scssSources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>minify-js</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>minify-js</goal>
+						</goals>
+						<configuration>
+							<compress>false</compress>
+							<jsSources>
+								<value>dependencies/medium.js/dependencies/rangy-core.js</value>
+								<value>dependencies/medium.js/dependencies/rangy-classapplier.js</value>
+								<value>dependencies/medium.js/dependencies/undo.js</value>
+								<value>dependencies/medium.js/medium.js</value>
+								<value>dependencies/angular.js/angular.min.js</value>
+								<value>dependencies/angular.js/angular-touch.min.js</value>
+								<value>dependencies/angular.js/angular-animate.min.js</value>
+								<value>dependencies/angular.js/angular-route.js</value>
+								<value>js/algorythm-dialog.js</value>
+								<value>js/algorythm-cms.js</value>
+								<value>js/algorythm-editor.js</value>
+							</jsSources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>-->
+			<!-- Frontend Maven Plugin (see https://github.com/eirslett/frontend-maven-plugin/blob/master/frontend-maven-plugin/src/it/example%20project/pom.xml) -->
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<version>0.0.26</version>
+				<configuration>
+					<srcdir>${basedir}/src/main/javascript</srcdir>
+					<outputdir>${basedir}/target/classes</outputdir>
+					<workingDirectory>${basedir}/frontend-work</workingDirectory>
+					<installDirectory>${basedir}/frontend-work/node_installation</installDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<configuration>
+							<nodeVersion>v0.12.2</nodeVersion>
+							<npmVersion>2.7.6</npmVersion>
+						</configuration>
+					</execution>
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>bower install</id>
+						<goals>
+							<goal>bower</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>grunt build</id>
+						<goals>
+							<goal>grunt</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<!-- JUnit -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://repository.algorythm.de/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>
