@@ -1,7 +1,7 @@
-var angular = require('angular');
-require('angular-animate');
-
-(function(angular) {
+(function(require) {
+	var angular = require('angular');
+	require('angular-animate');
+	
 	var self = {};
 
 	angular.module('algorythm.dialog', ['ngAnimate']).
@@ -148,4 +148,4 @@ require('angular-animate');
 			window.on('resize', scope.$resizeDialog);
 		};
 	}]);
-})(angular);
+})(require);

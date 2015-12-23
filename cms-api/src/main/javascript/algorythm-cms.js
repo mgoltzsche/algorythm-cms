@@ -1,9 +1,9 @@
+(function(w, require) {
 var angular = require('angular');
 require('angular-route');
 require('./algorythm-dialog.js');
 require('./algorythm-editor.js');
 
-(function(w, angular) {
 var absoluteUrlRegex = /^(\/|[\w]+:\/\/).+/;
 var parentUrlRegex = /^(.*?)\/?[^\/#?]*([#?].*)?$/;
 var urlBackRegex = /\/[^\/]+\/\.\./g;
@@ -276,4 +276,4 @@ directive('cmsImageDialog', ['createDialog', function(createDialog) {
 		}
 	};
 }]);
-})(window, angular);
+})(window, require);

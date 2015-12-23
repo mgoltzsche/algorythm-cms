@@ -1,7 +1,7 @@
-var angular = require('angular');
-var Medium = require('medium-editor');
+(function(require) {
+	var angular = require('angular');
+	var Medium = require('medium-editor');
 
-(function(angular) {
 	angular.module('algorythm.editor', []).
 	directive('editPageTitle', ['$http', function($http) {
 		return {
@@ -60,4 +60,4 @@ var Medium = require('medium-editor');
 			}
 		};
 	}]);
-})(angular);
+})(require);
