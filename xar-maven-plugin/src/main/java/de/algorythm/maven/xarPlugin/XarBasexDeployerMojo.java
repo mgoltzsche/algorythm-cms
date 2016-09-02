@@ -41,16 +41,16 @@ public class XarBasexDeployerMojo extends AbstractMojo {
 	 */
 	@Parameter(property = "project.build.directory", alias = "buildDirectory")
 	private String buildDirectory;
-	
+
 	@Parameter(property = "basex.host", defaultValue = "localhost")
 	private String host;
-	
+
 	@Parameter(property = "basex.port", defaultValue = "1984")
 	private int port;
-	
+
 	@Parameter(property = "basex.user", defaultValue = "admin")
 	private String user;
-	
+
 	@Parameter(property = "basex.password", defaultValue = "admin")
 	private String password;
 
@@ -62,14 +62,14 @@ public class XarBasexDeployerMojo extends AbstractMojo {
 		final String xarName = finalName == null
 				? project.getArtifactId() + '-' + project.getVersion() : finalName;
 		final Path xarFile = Paths.get(buildDirectory).resolve(xarName + ".xar");
-		
+
 		try (ClientSession session = new ClientSession(host, port, user, password, System.out)) {
 			session.execute("REPO INSTALL " + escapeCsv(xarFile.toString()));
-			
+
 			String info = session.info();
 			if (info.endsWith("\n"))
 				info = info.substring(0, info.length() - "\n".length());
-			
+
 			getLog().info(info);
 		} catch(Throwable e) {
 			throw new MojoExecutionException("BaseX XAR deployment failed. " + e.getMessage() +

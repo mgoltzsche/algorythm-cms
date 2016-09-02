@@ -20,6 +20,20 @@
 				<directory>${project.basedir}/src/test/resources</directory>
 			</testResource>
 		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 	<dependencies>
@@ -35,14 +49,14 @@
 			<artifactId>Saxon-HE</artifactId>
 			<version>9.6.0-6</version>
 		</dependency>
-		<!-- Apache Xerces schema validator-->
+		<!-- Apache Xerces schema validator -->
 		<dependency>
 			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId> 
+			<artifactId>xercesImpl</artifactId>
 			<version>2.11.0</version>
 		</dependency>
-		<!-- Xalan <dependency> <groupId>xalan</groupId> 
-			<artifactId>xalan</artifactId> <version>2.7.2</version> </dependency>-->
+		<!-- Xalan <dependency> <groupId>xalan</groupId> <artifactId>xalan</artifactId> 
+			<version>2.7.2</version> </dependency> -->
 		<!-- RelaxNG schema -->
 		<dependency>
 			<groupId>org.apache.camel</groupId>

@@ -21,12 +21,12 @@ var normalizedUrl = function(url) {
 		lastUrl = url;
 		url = url.replace(urlThisRegex, '$1');
 	} while (url != lastUrl);
-	
+
 	do {
 		lastUrl = url;
 		url = url.replace(urlBackRegex, '');
 	} while (url != lastUrl);
-	
+
 	return url;
 };
 

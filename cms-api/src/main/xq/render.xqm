@@ -39,6 +39,21 @@ function render:request($path as xs:string) {
 				</page>
 			}), QName('', 'output'))
 		) else (
-			'Nooooo! '||$path||' not found'
+			map:get(fn:transform(map{
+				'stylesheet-location': $theme,
+				'source-node': <page name="" path="/{$path}" title="Page not found">
+					<breadcrumbs>
+						{cms:generate-breadcrumbs($site)}
+					</breadcrumbs>
+					<navigation>
+						{cms:generate-navigation($site,'')}
+					</navigation>
+					<content src="{$contentUri}">
+						<article>
+							Nooooo, {$path} not found!
+						</article>
+					</content>
+				</page>
+			}), QName('', 'output'))
 		)
 };

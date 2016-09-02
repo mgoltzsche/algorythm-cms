@@ -9,9 +9,12 @@
 	
 	<xsl:template match="c:article">
 		<article edit-rich-text="" contenteditable="false">
-			<xsl:value-of select="c:path(@title)" /><br/>
-			<xsl:value-of select="c:dynamic-path(/, substring-after(fn:string-join(c:path(@title), ''), '/'))" /><br/>
-			<xsl:value-of select="c:dynamic-path(/c:page, '*[3]/@src')" />
+			<xsl:if test="@title">
+				<!-- testing -->
+				<xsl:value-of select="c:path(@title)" /><br/>
+				<xsl:value-of select="c:dynamic-path(/, substring-after(fn:string-join(c:path(@title), ''), '/'))" /><br/>
+				<xsl:value-of select="c:dynamic-path(/c:page, '*[3]/@src')" />
+			</xsl:if>
 			<xsl:apply-templates />
 		</article>
 	</xsl:template>
