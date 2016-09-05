@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="algorythm CMS">
+	<include href="/templates/project-template.xml">
+		<replace placeholder="title">algorythm CMS</replace>
+		<replace placeholder="content">
+			<img src="/files/algorythm-cms/algorythm-project.png" title="Dateisystemstruktur eines Webseitenprojekts" align="right" />
+			<p>
+				Schon wieder ein CMS? Das algorythm CMS ist ein für Java 7 geschriebenes kompaktes CMS für kleine Webseiten.
+				Es kommt ganz ohne relationale Datenbank und serverseitige Scriptsprachen aus.
+				Mittels XSLT 2 transformiert es XML zu statischen HTML-Seiten.
+				Dadurch eignet es sich auch zum Betrieb mit einem Standard-Webspace ohne PHP &amp; Co.
+				Darüber hinaus kann es <a href="http://de.wikipedia.org/wiki/Sass_%28Stylesheet-Sprache%29" title="SASS auf Wikipedia">SASS/SCSS</a> zu CSS kompilieren, SVG-Sprites erzeugen und CSS und JavaScript komprimieren.
+				Eingabe für die Generierung ist ein Ordner, der wenigstens die XML-Projektkonfiguration enthält.
+				Die Verwendung des Dateisystems als Datenbank ermöglicht die Versionierung von Inhalten mittels bestehenden CVS wie git und soll sowohl Entwicklern als auch Benutzern den Umgang mit dem System erleichtern.
+			</p>
+			<p>
+				Dieses Projekt dient neben der Erzeugung dieser Webseite zur Evaluierung von XML- und neuen Web-Technologien.
+				Da dem System noch eine grafische Oberfläche fehlt, ist es bisher jedoch leider nur ein Webseitengenerator im frühen Alpha-Stadium.
+			</p>
+			<p>
+				Ziel ist eine Vielzahl von Formaten in eine XML-Repräsentation wandeln und neben HTML auch PDF-Dokumente mittels FOP ausgeben zu können.
+				Eine grafische Oberfläche sollte es Benutzern ermöglichen, interaktiv Inhalte verändern zu können.
+				Die Integration von Webanwendungen mittels <a href="https://angularjs.org/">AngularJS</a> und Webservices ist ebenfalls vorgesehen.
+			</p>
+			<p>
+				Der Quellcode des Systems wird hier veröffentlicht, sobald er sich in einem akzeptablen Zustand befindet.
+			</p>
+		</replace>
+	</include>
+</article>

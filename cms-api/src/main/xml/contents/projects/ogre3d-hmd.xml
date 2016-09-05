@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Ogre 3D-Demoszene für Oculus-DIY">
+	<include href="/templates/project-template.xml">
+		<replace placeholder="title">Ogre 3D-Demoszene für Oculus-DIY</replace>
+		<replace placeholder="content">
+			<img src="/files/ogre-hmd/oculus-diy.jpg" title="Fietz' HMD-Eigenbau" align="right" />
+			<img src="/files/ogre-hmd/ogre3d-hmd-demo-screenshot.jpg" title="Ogre 3D-Demoszene" align="right"/>
+			<p>
+				Die Oculus Rift ist ein Head Mounted Display (HMD) und lässt den Benutzer eine virtuelle Realität erleben - oder zumindest sehen.
+			</p>
+			<p>
+				Im Kurs "Interactive Systems" von Prof. Dr. Henrik Tramberend im Studiengang Medieninformatik Master an der <a href="http://www.beuth-hochschule.de" title="Hochschulseite">Beuth Hochschule für Technik Berlin</a> wurde die Oculus-Rift von meinem Kommilitonen Dennis Fietz nachgebaut. Ich erstellte dazu eine Demoanwendung in C++ mit Hilfe der Game Engine <a href="http://www.ogre3d.org/">Ogre 3D</a>.
+			</p>
+			<h2>Downloads</h2>
+			<ul>
+				<li><file src="/files/ogre-hmd/OgreHmdDemo.tar.bz2" title="Ogre-Demo Tarball" /></li>
+				<li><file src="/files/ogre-hmd/isy-ogre-kurzvortrag-max.odp" title="Kurzvortrag zur Ogre-Demo" /></li>
+			</ul>
+		</replace>
+	</include>
+</article>

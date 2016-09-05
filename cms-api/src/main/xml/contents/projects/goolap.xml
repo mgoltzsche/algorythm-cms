@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="GoOLAP">
+	<include href="/templates/project-template.xml">
+		<replace placeholder="title">GoOLAP - Gezieltes Beschaffen von Fakten aus dem Web</replace>
+		<replace placeholder="content">
+			<p>
+				Sie möchten wissen welche Unternehmen von Google akquiriert worden sind oder wer die Konkurrenz von Boeing ist?
+				Die meisten im Web enthaltenen Informationen sind unstrukturiert - beispielsweise in Form von Texten in natürlicher Sprache - und lassen sich daher schwer automatisiert in Hinblick auf ihre Semantik auffinden.
+				Mit herkömmlichen Suchmaschinen, die lediglich Schlüsselworte auf Dokumente in einem invertierten Index abbilden, benötigen Sie dazu mehrere Suchanfragen:
+				Mit einer Suche nach dem Unternehmensnamen mögen Sie die Unternehmensseite und den Wikipedia-Artikel finden. Viele andere Informationen sind jedoch über viele weitere Seiten im Web verteilt.
+				Um Ihre Suchergebnisse einzuschränken, kombinieren Sie in Ihren Suchanfragen den Unternehmensnamen mit Schlüsselworten und -phrasen, die repräsentativ für die jeweilige Unternehmensbeziehung sind.
+				Nachdem Sie noch die in den ersten n Suchergebnissen jeder Anfrage enthaltenen Dokumente durchgelesen haben, wissen Sie hoffentlich die Antwort auf Ihre Frage.
+				Dieser Prozess kann jedoch sehr viel Zeit und Arbeitskraft in Anspruch nehmen.
+			</p>
+			<h2>Anwendung</h2>
+			<img src="/files/goolap/goolap_loeser_arnold_fiehn.png" title="GoOLAP-Szenario" align="right" />
+			<p>
+				<a href="http://goolap.info/" title="GoOLAP-Produktivsystem">GoOLAP</a> kann diese Art der Suche, der <a href="http://en.wikipedia.org/wiki/Web_search_query" title="Web search query in der englischen Wikipedia">Informational Search</a>, deutlich vereinfachen.
+				Im Gegensatz zu dokumentorientierten Suchmaschinen wie Google stellt GoOLAP Suchergebnisse faktenorientiert dar.  
+				Es erlaubt einem Benutzer den Namen einer Entität wie beispielsweise eines bestimmten Unternehmens oder einer Person einzugeben und dabei mittels Autovervollständigung eine eindeutige Entität zu wählen.
+				Im Anschluss werden tabellarisch alle dem System zu der Entität bekannten Fakten per Fakttyp gruppiert aufgeführt. Damit der Benutzer seine Recherche jederzeit manuell auf den relevanten Webseiten fortsetzen kann, sind alle Fakten mit Quellenangaben versehen.
+			</p>
+			<h2>Implementierung</h2>
+			<p>
+				GoOLAP interpretiert den Zugriff eines Benutzers als Informationsbedürfnis und versucht daraufhin automatisch asynchron neue Fakten zu beschaffen. 
+				Neue Dokumente werden mit Hilfe der <a href="http://en.wikipedia.org/wiki/Main_Page">englischen Wikipedia</a>, der <a href="http://de.wikipedia.org/wiki/Metasuchmaschine" title="Metasuchmaschine in der deutschen Wikipedia">Metasuchmaschine</a> <a href="https://metager.de/">MetaGer</a> und der <a href="http://de.wikipedia.org/wiki/Peer-to-Peer" title="Peer-to-Peer in der deutschen Wikipedia">P2P</a>-Suchmaschine <a href="http://www.faroo.com/">Faroo</a> beschafft.
+				Die Suchanfragen an diese Datenquellen werden von GoOLAP dem oben beschriebenen Benutzervorgehen entsprechend generiert.
+				Dabei werden die zusätzlichen Schlüsselworte zur Einschränkung der Suche auf ein Thema bzw. einen Fakttyp und einen Entitätstyp einem bisher statischen Zwischenergebnis des <a href="http://webdb2011.rutgers.edu/papers/Paper%2026/WebDB2011.pdf" title="FactCrawl-Paper">FactCrawl</a>-Frameworks entnommen.
+				Die Extraktion strukturierter aus den unstrukturierten Informationen der Dokumente in einem Suchergebnis erfolgt derzeit unter Verwendung von OpenCalais.
+				Daher entspricht die Menge der von GoOLAP unterstützten Entitäts- und Fakttypen auch der dieses externen Dienstes. Eine vollständige Liste aller unterstützter Fakttypen kann der <a href="http://goolap.info/">GoOLAP-Startseite</a> entnommen werden.
+				Die extrahierten strukturierten Informationen werden in einer <a href="http://www.mysql.de/">MySQL-Datenbank</a> mit dynamisch erweiterten Tabellen gespeichert und für die Suche mittels <a href="https://lucene.apache.org/">Apache Lucene</a> indiziert.
+			</p>
+			<h2>Weiterentwicklung</h2>
+			<p>
+				GoOLAP ist 2011 unter der Leitung von <a href="https://prof.beuth-hochschule.de/loeser/">Prof. Dr. Alexander Löser</a> an der <a href="http://www.tu-berlin.de/">Technischen Universität Berlin</a> entworfen worden und wird nun an der <a href="http://www.beuth-hochschule.de/">Beuth Hochschule für Technik Berlin</a> weiterentwickelt.  
+				In meiner Masterarbeit portierte ich das GoOLAP-Faktbeschaffungssystem (<a href="http://de.wikipedia.org/wiki/Information_Retrieval" title="Information Retrieval in der deutschen Wikipedia">Information Retrieval</a> System) von <a href="http://www-01.ibm.com/software/data/infosphere/hadoop/jaql/">JAQL</a> in multi-threaded Java-Code, um es effizient auf einem modernen Multicore-Server betreiben zu können und optimierte den Faktbeschaffungsprozess in Hinblick auf eine schnellere erste Antwortzeit unter Verwendung von ereignisgetriebener Prozessauslösung und eines <a href="http://faculty.ucmerced.edu/sim3/papers/setfmultiple.pdf" title="Shortest-Elapsed-Time-First-Paper">Shortest-Elapsed-Time-First</a>-artigen Scheduling-Verfahrens.
+				Dabei integrierte ich auch die oben genannten Datenquellen. Auf Grund von zeitgetriebenen Ereignissen und <a href="http://de.wikipedia.org/wiki/Stapelverarbeitung" title="Stapelverarbeitung in der deutschen Wikipedia">Stapelverarbeitung</a> brauchte das alte GoOLAP-System zwischen einem halben bis zwei Tagen, um neue Fakten auf ein Benutzerereignis hin zu beschaffen. 
+				Durch die Optimierung wurden erste neue Fakten zu einem Thema unter Inkaufnahme von <a href="http://en.wikipedia.org/wiki/Resource_starvation" title="Resource Starvation in der englischen Wikipedia">Resource Starvation</a> länger laufender Faktbeschaffungsprozesse im besten Fall innerhalb von 27 Sekunden nach einem Benutzerzugriff bereitgestellt.
+			</p>
+			<h2>Links</h2>
+			<p>
+				<a href="http://goolap.info/">Das GoOLAP-Produktivsystem</a>
+			</p>
+		</replace>
+	</include>
+</article>

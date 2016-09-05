@@ -1,0 +1,5 @@
+<page xmlns="http://cms.algorythm.de/common/CMS"
+		path="page1"
+		title="Welcome page">
+	<p>page 1</p>
+</page>

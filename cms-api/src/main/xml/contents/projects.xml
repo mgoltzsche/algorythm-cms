@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Projekte">
+	<include href="/templates/project-template.xml">
+		<replace placeholder="title"></replace>
+		<replace placeholder="content">
+			<p>
+				Diese Seite präsentiert eine Auswahl meiner Projektergebnisse.
+				Viele davon sind im Rahmen eines Hochschulkurses entstandene Technologieevaluierungen und werden nicht mehr weiterentwickelt.
+			</p>
+			<p>
+				Weiterverbreitung und -verwendung der Projektquellen ist gestattet und erwünscht:
+				Alle Quellen sind unter der GPLv3-Lizenz veröffentlich.
+			</p>
+		</replace>
+	</include>
+</article>

@@ -1,18 +1,17 @@
 <site xmlns="http://cms.algorythm.de/common/Site"
-		name="algorythm.de"
 		title="algorythm.de"
-		default-locale="de-DE"
-		src="/contents/welcome.xml">
-	<projects src="/contents/projects.xml">
-		<algorythm-cms src="/contents/projects/algorythm-cms.xml" />
-		<goolap src="/contents/projects/goolap.xml" />
-		<mdsd-dsls src="/contents/projects/mdsd-dsls.xml" />
-		<java-desktop-database src="/contents/projects/jddb.xml" />
-		<webgl-dof src="/contents/projects/webgl-dof.xml" />
-		<defender3d src="/contents/projects/defender3d.xml" />
-		<ogre3d-hmd src="/contents/projects/ogre3d-hmd.xml" />
-		<travel-ant src="/contents/projects/travel-ant.xml" />
-	</projects>
-	<about src="/contents/about.xml" />
-	<imprint src="/contents/imprint.xml" nav-exclude="true" />
+		theme="cms:render-html"
+		renderer="cms:generate">
+	<page id="projects" src="contents/projects.xml" nav-hide="true">
+		<page id="algorythm-cms" src="/contents/projects/algorythm-cms.xml" />
+		<page id="goolap" src="/contents/projects/goolap.xml" />
+		<page id="mdsd-dsls" src="/contents/projects/mdsd-dsls.xml" />
+		<page id="java-desktop-database" src="/contents/projects/jddb.xml" />
+		<page id="webgl-dof" src="/contents/projects/webgl-dof.xml" />
+		<page id="defender3d" src="/contents/projects/defender3d.xml" />
+		<page id="ogre3d-hmd" src="/contents/projects/ogre3d-hmd.xml" />
+		<page id="travel-ant" src="/contents/projects/travel-ant.xml" />
+	</page>
+	<page id="about" src="/contents/about.xml" />
+	<page id="imprint" title="Impressum" src="/contents/imprint.xml" nav-exclude="true" />
 </site>

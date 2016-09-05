@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="Java Desktop Database">
+	<include href="/templates/project-template.xml">
+		<replace placeholder="title">Java Desktop Database</replace>
+		<replace placeholder="content">
+			<img src="/files/jddb/jddb-screenshot.png" title="Screenshot der Java Desktop Database" align="right" />
+			<p>
+				Java Desktop Database (JDDB) ist eine mit Java 8 und <a href="http://www.eclipse.org/xtend/">Xtend</a> entwickelte Datenbankanwendung zur Verwaltung von Entitäten und damit verknüpften (Bild-)Dateien in einer lokalen Graphdatenbank.
+				JDDB ist, wie der Name schon sagt, für den Desktopbetrieb ausgelegt.
+				Besonderer Fokus liegt neben der Darstellung großer Bilder auf dem dynamischen Datenmodell.
+			</p>
+			<p>
+				Das Datenmodell kann durch den Benutzer in der grafischen Oberfläche bearbeitet werden.
+				Es können dabei Entitätstypen und Eigenschaften hinzugefügt und angepasst werden.
+				Eigenschaften können den Wert eines der Primitivtypen boolean, date, decimal, file, real, string, text annehmen oder eine oder mehrere Entitäten eines Entitätstyps referenzieren oder enthalten.
+				Entitätstypen können jedoch nicht voneinander erben.
+			</p>
+			<p>
+				JDDB ging aus einer Evaluierung von <a href="http://www.orientechnologies.com/orientdb/">OrientDB</a>, <a href="http://neo4j.com/">Neo4j</a>, <a href="https://github.com/tinkerpop/blueprints/wiki">Tinkerpop Blueprints</a> und <a href="http://docs.oracle.com/javase/8/javase-clienttechnologies.htm">JavaFX</a> hervor und wird zunächst nicht weiterentwickelt.
+				Der produktive Einsatz der Anwendung ist auf eigene Gefahr hin möglich.
+				Auf Grund des Einsatzes von Neo4j braucht die Anwendung mind. 2GB Arbeitsspeicher.
+			</p>
+			<h2>Downloads</h2>
+			<ul>
+				<li><file src="/files/jddb/java-desktop-database.zip" title="Java Desktop Database" /></li>
+				<li><file src="/files/jddb/java-desktop-database-source.tar.bz2" title="Java Desktop Database Source Code" /></li>
+			</ul>
+		</replace>
+	</include>
+</article>

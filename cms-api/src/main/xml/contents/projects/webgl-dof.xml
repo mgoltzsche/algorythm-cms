@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<article xmlns="http://cms.algorythm.de/common/CMS"
+		title="WebGL und DOF-Postprocessing">
+	<include href="/templates/project-template.xml">
+		<replace placeholder="title">WebGL und DOF-Postprocessing</replace>
+		<replace placeholder="content">
+			<img src="/files/webgl-dof/DOF-naive.png" title="Naive DOF-Implementierung mit Depth Discontinuity Artefakten" align="right" />
+			<p>
+				Seit einiger Zeit ist dank WebGL die OpenGL ES-Schnittstelle für JavaScript in allen modernen Browsern zugänglich.
+				Dies erlaubt die Steuerung von Grafikhardware mit JavaScript und dadurch die Darstellung komplexer animierter 3D-Szenen im Browser.
+			</p>
+			<img src="/files/webgl-dof/DOF.png" title="Screenshot aus der WebGL-Implementierung" align="right" />
+			<p>
+				Die im Folgenden gezeigten beiden WebGL-Beispielanwendungen sind im zweiten Semester des Studiengangs Medieninformatik Master an der <a href="http://www.beuth-hochschule.de" title="Hochschulseite">Beuth Hochschule für Technik Berlin</a> im Kurs "Real-Time Rendering" von Prof. Dr. Henrik Tramberend in Zusammenarbeit mit meinem Kommilitonen <a href="http://nettundfroh.de/index.php?title=Aufgabe_5:_Depth_of_Field" title="Igor Marijanovics Projektwiki">Igor Marijanovic</a> entstanden.
+				Dabei wurde zum Einen unter Verwendung der <a href="https://github.com/greggman/tdl" title="TDL auf github">TDL</a>-Bibliothek ein WebGL-Szenegraph in JavaScript
+				und zum Anderen <a href="http://de.wikipedia.org/wiki/Sch%C3%A4rfentiefe" title="Schärfentiefe auf Wikipedia">Depth of Field (DOF)</a> als Postprocessing-Effekt implementiert.
+			</p>
+			<h2>Depth of Field (DOF)</h2>
+			<p>
+				DOF bezeichnet in der Fotografie die Zone, die sich aus den Bereichen vor und hinter einem fokussierten Objekt ergibt, in denen akzeptabel scharf abgebildet wird. DOF ist abhängig vom Typ der Kamera, der Blendenöffnung und der Fokussierung. Bereiche direkt vor und hinter der fokussierten Entfernung verlieren sofort, wenn auch nicht wahrnehmbar, an Schärfe. Der Übergang von scharf zu unscharf ist graduell. Der Circle of Confusion (CoC) definiert die Schärfe eines Punktes bei einer bestimmten Tiefe. Wenn der CoC sichtbar wird, ist diese Region außerhalb des DOF und somit nicht mehr scharf in einem akzeptablen Rahmen. 
+			</p>
+			<h2>Implementierung</h2>
+			<p>
+				Um den DOF-Effekt zu erreichen wurde ein Lösungsansatz gewählt, der sich an der Technik des Reverse-Mapping Z-Buffer Depth of Field orientiert. Charakteristiken und Probleme der einzelnen Techniken werden in der Ausarbeitung gegenübergestellt.
+			</p>
+			<p>
+				Das Bild einer Szene wird zunächst klar und weichgezeichnet in entsprechende Texturen gerendert. Darüber hinaus wird die Tiefeninformation am jeweiligen Punkt in einer 32Bit-Textur über die Erweiterung OES_texture_float mittels eines tdl.framebuffers.Float32Framebuffer-Objekts als normalisierter Wert zwischen 0 und 1 in eine Textur geschrieben. Die Farbwerte für den jeweiligen Pixel werden daraufhin unter Einbeziehung des Tiefenwertes aus den Texturen, die das klare und weichgezeichnete Bild der Szene enthalten, abgeleitet. Für den Weichzeichner wird eine Gaußsche Verteilung in zwei Rendering-Passes (horizontal und vertikal) genutzt. Bei der Implementierung zeigten sich jedoch deutliche Fragmente an Punkten mit unendlicher Tiefe (weichgezeichnete Ränder bei Objekten im Schärfebereich).
+			</p>
+			<p>
+				Unsere Implementierung enthält sechs Durchläufe (Passes) und fünf Postprozessoren mit entsprechenden Shadern.
+				Dabei hat sich gezeigt, dass auch eine minimale Implementierung mit drei Postprozessoren und vier Durchläufen möglich wäre.
+				Im Folgenden wird die in unserer Demo implementierte Postprozessor-Pipeline aufgeführt: 
+			</p>
+			<ol>
+				<li>
+					Color Post Processor: Hier wird ein klares Bild der Szene in einem Framebuffer abgelegt.
+				</li>
+				<li>
+					Depth Post Processor: Die Z-Werte der Punkte werden zu Tiefenwerten zwischen 0 und 1 normalisiert und als 32Bit-Fließkommazahl in einer Textur gespeichert.
+					Sie bildet die Grundlage für die Berechnung des CoC im Folgeschritt.
+					<i>Die Tiefenwerte könnten auch in den Alphakanal der ersten Textur geschrieben und so ein Durchlauf und teure Textur-Lookups vermieden werden.
+					Dann können innerhalb der Szene jedoch keine transparenten Objekte dargestellt werden.</i>
+				</li>
+				<li>
+					Color with Circle of Confusion Post Processor: Zu Demonstrationszwecken wurde in einem Durchlauf eine weitere Textur mit dem Ergebnis des ersten Durchlaufs befüllt und der aus der Tiefentextur des letzten Durchlaufs berechnete CoC in den Alphakanal geschrieben.
+					<i>Dieser Durchlauf kann ebenfalls entfallen, sofern der CoC im abschließenden Durchlauf direkt aus den Tiefenwerten berechnet wird.</i>
+				</li>
+				<li>
+					Circle of Confusion masked Blur Post Processor: Erzeugt ein Bild der Szene, das in Abhängigkeit des CoC am jeweiligen Punkt weichgezeichnet ist.
+					Innerhalb des Weichzeichnungsradius werden benachbarte Pixel betrachtet, um den Farbwert des aktuellen Pixels zu ermitteln.
+					Dabei bestimmt der CoC-Wert wie viel ein Texel auf seine Nachbarn abfärbt.
+					Jeder Farbwert wird mit seinem Alphakanal bzw. seinem CoC-Faktor multipliziert, bevor er in den durchschnittlichen Farbwert des betrachteten Pixel eingeht.
+					Dadurch färben fokussierte Objekte nicht auf den Hintergrund ab.
+					Dieser Postprozessor benötigt zwei Durchläufe: jeweils einen für den horizontalen und den vertikalen Blur.
+				</li>
+				<li>
+					DOF Post Processor: Die klare Textur mit CoC im Alphakanal aus dem dritten Durchlauf und die Textur, die als Ergebnis des letzten Durchlaufs entstanden ist, werden für Lookups verwendet.
+					Sie werden abhängig vom CoC für jeden Pixel interpoliert.
+				</li>
+			</ol>
+			<h2>Beispielszenen</h2>
+			<ul>
+				<li><file src="/files/webgl-dof/impl/graph.html" title="Szenegraph" /></li>
+				<li><file src="/files/webgl-dof/impl/dofScene.html" title="DOF-Szene" /></li>
+			</ul>
+			<h2>Dokumentation</h2>
+			<ul>
+				<li><file src="/files/webgl-dof/dof.pdf" title="DOF-Ausarbeitung" /></li>
+				<li><file src="/files/webgl-dof/dof.pptx" title="DOF-Präsentation" /></li>
+			</ul>
+		</replace>
+	</include>
+</article>
