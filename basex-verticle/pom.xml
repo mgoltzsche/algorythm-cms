@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.basex</groupId>
 			<artifactId>basex</artifactId>
-			<version>8.1</version>
+			<version>8.2.3</version>
 		</dependency>
 		<!-- XQJ -->
 		<dependency>
@@ -74,6 +74,12 @@
 			<groupId>javax.xml.xquery</groupId>
 			<artifactId>xqj-api</artifactId>
 			<version>1.0</version>
+		</dependency>
+		<!-- Apache XML resolver (catalog resolver) -->
+		<dependency>
+			<groupId>xml-resolver</groupId>
+			<artifactId>xml-resolver</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<!--Vertx provided dependencies -->
 		<dependency>

@@ -2,9 +2,6 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 		title="Travel Ant">
-	<include href="/templates/project-template.xml">
-		<replace placeholder="title">Travel Ant - der Ameisenalgorithmus</replace>
-		<replace placeholder="content">
 			<img src="/files/travel-ant/travel-ant.png" title="Travel Ant Screenshot" align="right" />
 			<p>
 				Das <a href="http://de.wikipedia.org/wiki/Problem_des_Handlungsreisenden" title="Problem des Handlungsreisenden in der deutschen Wikipedia">Problem des Handlungsreisenden</a> <i>(engl. Traveling Salesman Problem (TSP))</i> ist ein kombinatorisches Optimierungsproblem.
@@ -186,6 +183,4 @@ end-procedure
 				<li><file src="/files/travel-ant/TravelAntUI.zip" title="Travel Ant Source" /></li>
 				<li><file src="/files/travel-ant/travel-ant-konzept.pdf" title="Travel Ant Konzept" /></li>
 			</ul>
-		</replace>
-	</include>
 </article>

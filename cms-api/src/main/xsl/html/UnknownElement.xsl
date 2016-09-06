@@ -7,7 +7,7 @@
 
 	<xsl:template match="*">
 		<div class="error missing-template">
-			<xsl:text>No template for &lt;</xsl:text>
+			<xsl:text>ERROR: Missing template for &lt;</xsl:text>
 			<xsl:value-of select="name()" />
 			<xsl:for-each select="@*">
 				<xsl:value-of select="concat(' ', name(), '=', '&quot;', ., '&quot;')"/>
@@ -30,5 +30,6 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</div>
+		<xsl:apply-templates />
 	</xsl:template>
 </xsl:stylesheet>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.algorythm.cms</groupId>
+	<artifactId>cms-xml-api</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>Algorythm CMS data</name>
+	<url>http://algorythm.de</url>
+
+	<parent>
+		<artifactId>cms-parent</artifactId>
+		<groupId>de.algorythm.cms</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<build>
+		<finalName>test.zip</finalName>
+		<extensions>
+			<!--<handler>
+				<groupId>org.xwiki.commons</groupId>
+				<artifactId>xwiki-commons-tool-expath-handlers</artifactId>
+				<version>7.1-milestone-1</version>
+			</handler>-->
+		</extensions>
+		<plugins>
+			<!--<plugin>
+				<groupId>org.xwiki.commons</groupId>
+				<artifactId>xwiki-commons-tool-expath-plugin</artifactId>
+				<version>7.1-milestone-1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>expath</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>-->
+			
+			<!--<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptor>file:${project.basedir}/src/assembly/expath.xml</descriptor>
+					<finalName>${project.artifactId}-${project.version}</finalName>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>-->
+			
+			<plugin>
+				<groupId>ro.kuberam.maven.plugins</groupId>
+				<artifactId>kuberam-expath-plugin</artifactId>
+				<version>0.4.2</version>
+				<executions>
+					<execution>
+						<id>create-xar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>make-xar</goal>
+						</goals>
+						<configuration>
+							<descriptor>src/main/components/expath-pkg.xml</descriptor>
+							<finalName>${project.artifactId}-${project.version}</finalName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+        
+			<plugin>
+				<artifactId>maven-components-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

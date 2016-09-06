@@ -1,7 +1,8 @@
 <site xmlns="http://cms.algorythm.de/common/Site"
+		theme="cms:default-theme"
+		default-renderer="cms:xslt-transform-cms-content"
 		title="algorythm.de"
-		theme="cms:render-html"
-		renderer="cms:generate">
+		renderer="cms:generate-start-page">
 	<page id="projects" src="contents/projects.xml" nav-hide="true">
 		<page id="algorythm-cms" src="/contents/projects/algorythm-cms.xml" />
 		<page id="goolap" src="/contents/projects/goolap.xml" />

@@ -5,7 +5,6 @@
 	xmlns:p="http://cms.algorythm.de/common/Pages"
 	exclude-result-prefixes="c p">
 	<xsl:output method="html"/>
-	<xsl:param name="page.path" />
 	
 	<xsl:template match="c:nav">
 		<xsl:variable name="parent" select="if (@parent) then @parent else '.'" />

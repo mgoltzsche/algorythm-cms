@@ -1,15 +1,30 @@
 package de.algorythm.evaluation.basex;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 
-import net.sf.saxon.TransformerFactoryImpl;
+import javax.xml.transform.TransformerFactory;
+
+import org.apache.xml.resolver.tools.CatalogResolver;
 import org.basex.api.client.LocalSession;
 import org.basex.api.client.Query;
 import org.basex.api.client.Session;
 import org.basex.core.Context;
-import org.basex.core.cmd.*;
-import org.basex.util.options.BooleanOption;
+import org.basex.core.cmd.Add;
+import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.Flush;
+import org.basex.core.cmd.InfoStorage;
+import org.basex.core.cmd.RepoList;
+import org.basex.core.cmd.XQuery;
+import org.basex.io.IOContent;
+import org.basex.io.serial.SerializerOptions;
+import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
+import org.basex.query.value.Value;
 import org.junit.Test;
 
 public class TestBaseX {
@@ -19,25 +34,34 @@ public class TestBaseX {
 	@Test
 	public void test() throws Exception {
 		//System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
-
+		//System.setProperty("javax.xml.transform.TransformerFactory", "de.algorythm.evaluation.basex.MyTransformerFactory");
+		
+		System.setProperty("org.basex.CHOP", "false"); // preserves white spaces
+		System.setProperty("org.basex.DTD", "true");
+		System.setProperty("org.basex.CATFILE", "/home/max/BaseXRepo/catalog.xml");
+		System.setProperty("org.basex.DEBUG", "true");
+		System.setProperty("http://saxon.sf.net/feature/uriResolverClass", "org.apache.xml.resolver.tools.CatalogResolver");
 		OutputStream out = System.out;
 		Context context = new Context();
-		System.setProperty("org.basex.CHOP", "false"); // preserves white spaces
+		
 		//context.options.set(new BooleanOption("CHOP"), false);
 		//context.repo.pkgDict().get();
-
 
 		try (Session session = new LocalSession(context, out)) {// new ClientSession(host, port, username, password)
 			InputStream in = new ByteArrayInputStream("<x>database entry</x>".getBytes(StandardCharsets.UTF_8));
 			
+			session.execute("SET CATFILE /home/max/BaseXRepo/catalog.xml");
+			session.execute("SET DTD true");
+			
 			createDatabase(session, in);
-			saveXml(session, "example-entry1.xml", "<y>1st entry from DB</y>");
-			saveXml(session, "example-entry2.xml", "<y>2nd entry from DB</y>");
-			saveXml(session, "category/example-cat.xml", "<y>Category</y>");
+			saveXml(session, "example-entry1", "<y>1st entry from DB</y>");
+			saveXml(session, "example-entry2", "<y>2nd entry from DB</y>");
+			saveXml(session, "category/example-cat.xml", "<!DOCTYPE category PUBLIC \"-//algorythm//Category\" \"http://algorythm.de/category.dtd\"><x>Category</x>");
 			saveXml(session, "doc.xml", "<doc title='My article'><p>This is a <b>test</b>!</p></doc>");
 			query1(session);
 			query2(session);
 			query3(session);
+			query4(context);
 			queryWithExternalVariable(session);
 			queryDocumentFromExternalFile(session);
 			queryDocumentFromDB(session);
@@ -49,16 +73,23 @@ public class TestBaseX {
 			delete(session);
 			session.execute(new InfoStorage());
 			updateDocument(session);
+			session.execute(new Flush());
 			xslTransform(session);
 			installCustomXQueryModule(session);
 			callCustomXQueryModule(session);
 			installCustomPackage(session);
 			session.execute(new RepoList());
 			session.execute(new InfoStorage());
+			showRepoNamespaces(context);
 			callCustomPackageXQuery(session);
 			showXsltProcessor(session);
-			callCustomPackageXSLT(session);
+			callCustomPackageXSLT(session); // Doesn't work
+			callFnTransform(context);
+			callFnTransformUsingImport(session);
 			session.close();
+			
+			TransformerFactory f = TransformerFactory.newInstance();
+			f.setURIResolver(new CatalogResolver()); // TODO: Custom resolver that consults CatalogResolver if URI contains protocol else delegates to default basex resolver (is there one?) 
 		} finally {
 			context.close();
 		}
@@ -96,9 +127,27 @@ public class TestBaseX {
 
 	private void query3(Session session) throws IOException {
 		System.out.println("QUERY 3");
+		long start = System.nanoTime();
 		session.execute(new XQuery(QUERY));
+		double end = (System.nanoTime() - start) / 1000000.0;
 		System.out.println(session.info());
+		System.out.println(String.format("Query executed in %.2f ms", end));
 	}
+	
+	private void query4(Context context) throws QueryException {
+		System.out.println("QUERY 4 DIRECTLY WITH CONTEXT");
+		long start = System.nanoTime();
+	    // Create a query processor
+	    try(QueryProcessor proc = new QueryProcessor(QUERY, context)) {
+	      // Execute the query
+	      Value result = proc.value();
+
+	      // Print result as string.
+	      System.out.println(result);
+	    }
+	    double end = (System.nanoTime() - start) / 1000000.0;
+	    System.out.println(String.format("Query executed in %.2f ms", end));
+	  }
 
 	private void queryWithExternalVariable(Session session) throws IOException {
 		System.out.println("QUERY WITH EXTERNAL VARIABLE");
@@ -153,6 +202,7 @@ public class TestBaseX {
 	}
 
 	private void xslTransform(Session session) throws Exception {
+		System.out.println("XSLT");
 		String xslFilePath = "/example-files/example-transformation.xsl";
 
 		String path = getClass().getResource(xslFilePath).toURI().getPath();
@@ -186,6 +236,16 @@ public class TestBaseX {
 		session.execute("REPO INSTALL " + getClass().getResource("/functx-1.0.xar"));
 	}
 
+	private void showRepoNamespaces(Context context) throws Exception {
+		for (byte[] name : context.repo.nsDict()) {
+			System.out.println("NS: " + new String(name));
+			Iterator<byte[]> tokenIter = context.repo.nsDict().get(name).iterator();
+			while(tokenIter.hasNext()) {
+				System.out.println("    " + new String(tokenIter.next()));
+			}
+		}
+	}
+	
 	private void callCustomPackageXQuery(Session session) throws Exception {
 		System.out.println("CALL CUSTOM PACKAGE XQUERY");
 		xquery(session, "import module namespace m = 'http://example.org/hello';\n" +
@@ -208,9 +268,50 @@ public class TestBaseX {
 			"let $xml := <doc>hello <b>world</b> with XSLT from package</doc>\n" +
 			"return m:asText($xml)");*/
 		xquery(session, "let $xml := <doc>hello <b>world</b> with XSLT</doc>\n" +
-				"let $style := <xsl:stylesheet version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:functx=\"http://www.functx.com\"><xsl:import href=\"http-www.functx.com-1.0/functx/functx.xsl\" /><xsl:template match=\"*\"><entry>XPath: <xsl:value-of select=\"functx:dynamic-path(.)\" /></entry></xsl:template></xsl:stylesheet>\n" +
+				"let $style := <xsl:stylesheet version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" "
+				+ "xmlns:functx=\"http://www.functx.com\" "
+				+ "xmlns:exmpl=\"http://example.org/hello\">"
+				+ "<xsl:import href=\"http://www.functx.com/functx.xsl\" />"
+				+ "<xsl:import href=\"http://example.org/hello-module.xsl\" />"
+				+ "<xsl:template match=\"*\"><doc><h><xsl:value-of select=\"exmpl:path('universe')\" /></h> <xsl:value-of select=\"text()\"/><xsl:apply-templates select=\"*\"/></doc></xsl:template>"
+				+ "<xsl:template match=\"b\"><entry>XPath: <xsl:value-of select=\"functx:dynamic-path(/, 'doc/b')\" /></entry></xsl:template>"
+				//+ "<xsl:template match=\"*\"><docs><xsl:copy-of select=\"document('mydatabase/example-entry1.xml')\"/></docs></xsl:template>"
+				+ "</xsl:stylesheet>\n" +
 				"return xslt:transform($xml, $style)");
-		// (XSLT Libraries can be installed via expath-pkg only)
+	}
+
+	private void callFnTransform(Context context) throws Exception {
+		System.out.println("CALL FN:TRANSFORM");
+		
+		String xquery = "declare variable $user external := \"Anonymous\";\n"
+				+ "let $xml := <doc>hello <b>world</b> with XSLT</doc>\n"
+				+ "let $style := <xsl:stylesheet version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\">"
+				+ "<xsl:template match=\"*\"><result>{$user}</result></xsl:template>"
+				+ "</xsl:stylesheet>\n"
+				+ "return fn:transform(map{'source-node': $xml, 'stylesheet-node': $style})";
+		
+		try(QueryProcessor proc = new QueryProcessor(xquery, context)) {
+			proc.bind("user", "John");
+			proc.compile();
+			Value result = proc.value();
+			System.out.println(new IOContent(result.serialize(SerializerOptions.get(false)).finish()).string());
+			proc.bind("user", "Mustermann");
+			result = proc.value();
+			System.out.println(new IOContent(result.serialize(SerializerOptions.get(false)).finish()).string());
+		}
+	}
+	
+	private void callFnTransformUsingImport(Session session) throws Exception {
+		System.out.println("CALL FN:TRANSFORM USING IMPORT");
+		
+		xquery(session, "let $xml := <doc>hello <b>world</b> with XSLT</doc>\n" +
+				"let $style := <xsl:stylesheet version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" "
+				+ "xmlns:functx=\"http://www.functx.com\">"
+				+ "<xsl:import href=\"http://www.functx.com/functx.xsl\" />"
+				+ "<xsl:template match=\"*\"><doc><xsl:value-of select=\"text()\"/><xsl:apply-templates select=\"*\"/></doc></xsl:template>"
+				+ "<xsl:template match=\"b\"><entry>XPath: <xsl:value-of select=\"functx:dynamic-path(/, 'doc/b')\" /></entry></xsl:template>"
+				+ "</xsl:stylesheet>\n" +
+				"return fn:transform(map{'source-node': $xml, 'stylesheet-node': $style})");
 	}
 
 	private void xquery(Session session, String xquery) throws IOException {

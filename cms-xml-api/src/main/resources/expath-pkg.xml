@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://expath.org/ns/pkg"
+         name="http://www.example.com"
+         abbrev="exmpl"
+         version="${project.version}"
+         spec="1.0">
+   <title>Example library</title>
+   <author id="mgoltzsche">Max Goltzsche</author>
+   <website>http://algorythm.de</website>
+   <license>Apache License</license>
+   <copyright>true</copyright>
+   <type>library</type>
+   <status>stable</status>
+   <dependency processor="http://exist-db.org/" semver-min="2.2"/>
+   <target>testlib</target>
+    <tag>cms</tag>
+    <tag>library</tag>
+    <tag>webapp</tag>
+    <tag>xquery</tag>
+    <category id="libs">Libraries</category>
+    <category id="xquery">XQuery extensions</category>
+    <category id="xslt">XSLT extensions</category>
+   
+   <xslt>
+      <import-uri>http://algorythm.de/cms/example/Hello/functx.xsl</import-uri>
+      <file>xsl/test-module.xsl</file>
+   </xslt>
+   
+   <xquery>
+      <namespace>http://algorythm.de/cms/example/Hello</namespace>
+      <file>xq/test-module.xqm</file>
+   </xquery>
+   
+   <!--<fileSets>
+        
+        <fileSet>
+            <directory>${basedir}/target/${project.artifactId}-${project.version}-bin</directory>
+            <includes>
+                <include>LICENSE</include>
+                <include>README</include>
+                <include>${project.artifactId}-${project.version}.jar</include>
+            </includes>
+        </fileSet>
+        
+        <fileSet>
+            <directory>${basedir}/target/${project.artifactId}-${project.version}-bin/lib</directory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+        </fileSet>
+    </fileSets>-->
+</package>

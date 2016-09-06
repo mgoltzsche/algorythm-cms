@@ -2,32 +2,27 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 		title="Defender">
-	<include href="/templates/project-template.xml">
-		<replace placeholder="title">Defender</replace>
-		<replace placeholder="content">
-			<img src="/files/defender3d/defender_screenshot.png" title="Screenshot aus der Defender 3D-Implementierung" />
-			<p>
-				In dem 1980 erschienenen Arcade-Shooter fliegt der Spieler ein Raumschiff über einen Planeten und muss Aliens davon abhalten, Kolonisten am unteren Rand des Spielfeldes zu entführen.
-				Schafft es ein Alienraumschiff einen Kolonisten an den oberen Rand des Spielfeldes zu entführen, so kommt dieser als Mutant zurück, um den Spieler zu vernichten.
-				Es gilt die Entführer zu zerstören, die herunterfallenden Kolonisten aufzufangen und zurück auf die Planetenoberfläche zu bringen.
-				Das Spiel ist gewonnen, wenn alle Aliens zerstört wurden. Hat der Spieler alle Leben verbraucht, so ist das Spiel verloren. 
-			</p>
-			<p>
-				Im Rahmen des Kurses "Game Engine Architecture" von Prof. Dr. Henrik Tramberend im Studiengang Medieninformatik Master an der <a href="http://www.beuth-hochschule.de" title="Hochschulseite">Beuth Hochschule für Technik Berlin</a> wurde Defender mit Hilfe der <a href="http://unity3d.com/">Unity3D Engine</a> in C# erneut implementiert - dieses Mal in 3D.
-				Die Neuimplementierung enthält jedoch lediglich ein Level und drei Gegnertypen.
-				Zusätzlich zum klassischen Spielmodus wurden zwei Multiplayer-Modi hinzugefügt: Coop und Deathmatch.
-			</p>
-			<h2>Downloads</h2>
-			<ul>
-				<li><file src="/files/defender3d/build/defender-final-linux.tar.bz2" title="Defender für Linux" /></li>
-				<li><file src="/files/defender3d/build/defender-final-osx.zip" title="Defender für Mac" /></li>
-				<li><file src="/files/defender3d/build/defender-final-windows.zip" title="Defender für Windows" /></li>
-				<li><file src="/files/defender3d/build/defender-source.tar.bz2" title="Defender Source Code" /></li>
-			</ul>
-			<h2>Dokumentation</h2>
-			<ul>
-				<li><file src="/files/defender3d/docu/defender3d.html" title="Defender-Projektdokumentation" /></li>
-			</ul>
-		</replace>
-	</include>
+	<img src="/files/defender3d/defender_screenshot.png" title="Screenshot aus der Defender 3D-Implementierung" />
+	<p>
+		In dem 1980 erschienenen Arcade-Shooter fliegt der Spieler ein Raumschiff über einen Planeten und muss Aliens davon abhalten, Kolonisten am unteren Rand des Spielfeldes zu entführen.
+		Schafft es ein Alienraumschiff einen Kolonisten an den oberen Rand des Spielfeldes zu entführen, so kommt dieser als Mutant zurück, um den Spieler zu vernichten.
+		Es gilt die Entführer zu zerstören, die herunterfallenden Kolonisten aufzufangen und zurück auf die Planetenoberfläche zu bringen.
+		Das Spiel ist gewonnen, wenn alle Aliens zerstört wurden. Hat der Spieler alle Leben verbraucht, so ist das Spiel verloren. 
+	</p>
+	<p>
+		Im Rahmen des Kurses "Game Engine Architecture" von Prof. Dr. Henrik Tramberend im Studiengang Medieninformatik Master an der <a href="http://www.beuth-hochschule.de" title="Hochschulseite">Beuth Hochschule für Technik Berlin</a> wurde Defender mit Hilfe der <a href="http://unity3d.com/">Unity3D Engine</a> in C# erneut implementiert - dieses Mal in 3D.
+		Die Neuimplementierung enthält jedoch lediglich ein Level und drei Gegnertypen.
+		Zusätzlich zum klassischen Spielmodus wurden zwei Multiplayer-Modi hinzugefügt: Coop und Deathmatch.
+	</p>
+	<h2>Downloads</h2>
+	<ul>
+		<li><file src="/files/defender3d/build/defender-final-linux.tar.bz2" title="Defender für Linux" /></li>
+		<li><file src="/files/defender3d/build/defender-final-osx.zip" title="Defender für Mac" /></li>
+		<li><file src="/files/defender3d/build/defender-final-windows.zip" title="Defender für Windows" /></li>
+		<li><file src="/files/defender3d/build/defender-source.tar.bz2" title="Defender Source Code" /></li>
+	</ul>
+	<h2>Dokumentation</h2>
+	<ul>
+		<li><file src="/files/defender3d/docu/defender3d.html" title="Defender-Projektdokumentation" /></li>
+	</ul>
 </article>

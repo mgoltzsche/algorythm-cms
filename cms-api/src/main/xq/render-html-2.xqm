@@ -3,8 +3,7 @@ declare namespace s = "http://cms.algorythm.de/common/Site";
 declare default element namespace "http://www.w3.org/1999/xhtml";
 
 declare function cms:default-theme($site as node(), $page as node(), $urlPrefix as xs:string) as node() {
-  let $content := cms:page-content($page)
-  let $title := cms:page-title($page, $content)
+  let $title := cms:page-title($page)
   let $pageNav := cms:html-subnavigation($page, $urlPrefix)
   return <html>
     <head>
@@ -21,14 +20,14 @@ declare function cms:default-theme($site as node(), $page as node(), $urlPrefix 
       </nav>
       {$pageNav}
       <div>
-        {$content}
+        {cms:render-page-content($site, $page)}
       </div>
     </body>
   </html>
 };
 
 (: example method for function-lookup in renderer content attribute :)
-declare function cms:generate($page as node()) as node() {
+declare function cms:generate-start-page($page as node()) as node() {
   <p>some generated content</p>
 };
 
@@ -69,22 +68,40 @@ declare function cms:html-subnavigation($page as node(), $urlPrefix as xs:string
   else ()
 };
 
-declare function cms:page-title($page as node()) as xs:string {
-  cms:page-title($page, cms:page-content($page))
+declare function cms:page-title($page as node(), $content as node()) as xs:string {
+  if ($page/@title/string())
+    then $page/@title/string()
+    else ($content/@title/string(), $page/@id/string())[1]
 };
 
-declare function cms:page-title($page as node(), $content as node()) as xs:string {
-  ($content/@title/string(), $page/@title/string())[1]
+declare function cms:page-title($page as node()) as xs:string {
+  if ($page/@title)
+    then $page/@title/string()
+    else (cms:page-content($page)/@title/string(), $page/@id/string())[1]
+};
+
+declare function cms:render-page-content($site as node(), $page as node()) as node() {
+  let $renderer := if ($page/@renderer)
+    then (fn:function-lookup(xs:QName($page/@renderer/string()), 1), 'renderer: '||$page/@renderer/string())[1]
+    else if ($site/@default-renderer)
+      then (fn:function-lookup(xs:QName($site/@default-renderer/string()), 1), 'default-renderer: '||$site/@default-renderer/string())[1]
+      else cms:xslt-transform-cms-content#1
+  return $renderer($page)
+};
+
+declare function cms:xslt-transform-cms-content($page as node()) as node() {
+  map:get(fn:transform(map{
+    'stylesheet-location': 'http://cms.algorythm.de/cms-api/html/SimpleComponents.xsl',
+    'source-node': cms:page-content($page)
+  }), QName('', 'output'))
 };
 
 declare function cms:page-content($page as node()) as node() {
-  if ($page/@renderer)
-    then fn:function-lookup(xs:QName($page/@renderer/string()), 1)($page)
-    else if ($page/@src)
+  if ($page/@src)
       then doc('testdb/' || $page/@src/string())/*
       else if ($page/s:content)
-        then $page/s:content/*
-        else <p>{$page/@title/string()}</p>
+        then $page/s:content
+        else <undefined-content />
 };
 
 declare function cms:page($sitemap as node(), $pageID as xs:string*) as node()* {
@@ -138,7 +155,7 @@ function cms:render-html-page($path as xs:string) {
   let $sitemap := doc('testdb/cms-site.xml')
   let $site := $sitemap/s:site
   let $theme := if ($site/@theme/string())
-    then fn:function-lookup(xs:QName($site/@theme/string()), 3)
+    then (fn:function-lookup(xs:QName($site/@theme/string()), 3), 'theme: '||$site/@theme/string())[1]
     else cms:default-theme#3
   let $pathSegments := fn:tokenize($path, '/')
   let $page := cms:page($sitemap, $pathSegments[last()])

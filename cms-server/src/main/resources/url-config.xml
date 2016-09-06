@@ -1,12 +1,10 @@
 <configuration xmlns="http://algorythm.de/common/URLRules">
 	<rule key="welcome" pattern="/welcome">
 		XQUERY
-		declare option output:method "html";
 		doc('mydatabase/doc.xml')
 	</rule>
 	<rule key="page" pattern="/{path}">
 		XQUERY
-		declare option output:method "html";
 		doc('mydatabase/page')
 	</rule>
 </configuration>

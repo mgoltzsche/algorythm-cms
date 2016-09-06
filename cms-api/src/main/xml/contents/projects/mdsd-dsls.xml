@@ -2,115 +2,110 @@
 <!DOCTYPE xml>
 <article xmlns="http://cms.algorythm.de/common/CMS"
 		title="MDSD und DSLs">
-	<include href="/templates/project-template.xml">
-		<replace placeholder="title">MDSD und DSLs</replace>
-		<replace placeholder="content">
-			<img src="/files/mdsd-dsls/ModelLanguage-example.png" title="Letter-Entität mit DAO in der 'ModelLanguage'" align="right" />
-			<img src="/files/mdsd-dsls/ControllerLanguage-example.png" title="Beispielcode der 'ControllerLanguage'" align="right" />
-			<p>
-				Dem <a href="http://www.clean-code-developer.de/Roter-Grad.ashx#Don%C2%B4t_Repeat_Yourself_DRY_0">DRY-Prinzip</a> entsprechend gilt es Redundanzen in der Softwareentwicklung zu vermeiden und Architekturen einheitlich zu gestalten, um die Übersicht und Wartbarkeit zu gewährleisten und Zeit und Nerven der Entwickler zu schonen.
-				Dennoch ist es auch in modernen Programmiersprachen wie Java oft nicht ohne Weiteres möglich alle Redundanzen zu vermeiden.
-				Dies gilt besonders bei programmiersprachenübergreifenden Aufgaben wie dem Schreiben von Java-Hüllklassen für nativen oder JavaScript-Code aber auch für den Entwurf von <a href="http://de.wikipedia.org/wiki/Transferobjekt">Datentransferobjekten (DTO)</a> zu einem Entitätstyp.
-				Soll eine Anwendung außerdem auf verschiedene Plattformen portiert oder sehr viele ähnliche Anwendungsfälle entworfen werden, so wird die selbe Funktionalität häufig mehrfach geschrieben.
-				Die aus diesen Aufgaben hervorgehenden Redundanzen führen schnell zu Inkonsistenzen und sind fehleranfällig.
-				<a href="http://de.wikipedia.org/wiki/Modellgetriebene_Softwareentwicklung" title="Modellgetriebene Softwareentwicklung in der deutschen Wikipedia">Modellgetriebene Softwareentwicklung</a> mit <a href="http://de.wikipedia.org/wiki/Dom%C3%A4nenspezifische_Sprache" title="Domänenspezifische Sprache in der deutschen Wikipedia">Domänenspezifischen Sprachen (DSL)</a> verspricht Abhilfe für diese Probleme - aber zu welchem Preis?
-				In meiner Bachelorarbeit, "Evaluierung der Modellgetriebenen Softwareentwicklung mit Xtext", ging ich dieser Frage am Beispiel des Xtext-Frameworks nach.
-				Dabei entwickelte ich mehrere DSLs zur Modellierung von Create-Read-Update-Delete (CRUD)-Anwendungen und Transformationen dieser in Java EE EJBs, JPA-Entities und JSF-Ansichten.
-				Meine Erkenntnisse aus dieser Arbeit werden im Folgenden zusammengefasst.
-			</p>
-			<h2>Modellgetriebene Softwareentwicklung (MDSD)</h2>
-			<p>
-				Um einmal entworfene Anwendungen auf viele Plattformen migrieren und auf tiefgreifende Technologieveränderungen reagieren zu können, ist in der MDSD ist das Modell der Code.
-				Zu diesem Zweck wird das Modell in einer möglichst plattformunabhängigen DSL beschrieben.
-				Mit Hilfe von Modell-zu-Modell- (M2M) und Modell-zu-Text/Code-Transformationen (M2T) wird schließlich in einem ein- oder mehrstufigen Verfahren aus dem Modell der Code für eine konkrete Plattform erzeugt.
-				Mehrstufige Transformationen sind komplexer, aber bieten dafür mehr Anpassungsmöglichkeiten und sind plattformunabhängiger.
-				Im Gegensatz dazu sind einstufige Transformationen weniger komplex, aber meist plattformabhängiger.
-			</p>
-			<p>
-				Die Anpassung von Generat lässt sich meist nicht vermeiden. Dadurch entstehen Probleme:
-				Es muss einerseits sichergestellt werden, dass bei erneuter Transformation die manuellen Anpassungen nicht überschrieben werden.
-				Andererseits müssen auch Anpassungen im Modell mit dem manuell erzeugten Code funktionieren.
-				Das Generation Gap Pattern löst dieses Problem durch durch Vererbung manueller Anpassungen bzw. nicht-generierter Artefakte von generierten Artefakten.
-				Generierte Artefakte sollten außerdem nicht in einem <a href="http://de.wikipedia.org/wiki/Concurrent_Versions_System" title="Concurrent Versions System in der deutschen Wikipedia">CVS</a> versioniert werden. Dies lässt sich durch Verwendung eines separaten Quellverzeichnisses realisieren. 
-			</p>
-			<h2>Domänenspezifische Sprache (DSL)</h2>
-			<p>
-				Die meisten Entwickler arbeiten täglich mit DSLs.
-				Im Gegensatz zu einer <a href="http://de.wikipedia.org/wiki/General_Purpose_Language" title="General Purpose Language in der deutschen Wikipedia">General Purpose Language (GPL)</a> wie Java, einer Programmiersprache zur Entwicklung allgemeiner Anwendungen, ist eine DSL auf eine bestimmte Domäne zugeschnitten.
-				Elemente dieser Domäne können damit sehr kompakt und ohne Redundanzen beschrieben werden.
-				Allgemeine Anwendungen außerhalb der Domäne lassen sich damit jedoch nicht oder nur sehr umständlich realisieren.
-				Domänen lassen sich häufig auch in mehrere Teildomänen und entsprechende DSLs unterteilen.
-			</p>
-			<p>
-				Es ist zwischen internen und externen DSLs zu unterscheiden.
-				Eine interne DSL wird eingebettet in eine sogenannte Hostsprache entworfen.
-				Sie ist daher nur eine Programmbibliothek, deren Methoden jedoch so geschrieben sind, dass sie mit den Ausdrucksmöglichkeiten der Hostsprache möglichst deklarativ und übersichtlich aufgerufen werden können.
-				Dies wird typischer Weise u.A. mit Hilfe von <a href="http://de.wikipedia.org/wiki/Fluent_Interface" title="Fluent interface in der deutschen Wikipedia">Fluent Interfaces</a> und <a href="http://en.wikipedia.org/wiki/Method_chaining" title="Method Chaining in der englischen Wikipedia">Method Chaining</a> realisiert.
-				Besonders sinnvoll ist dies mit Hostsprachen wie Ruby oder Groovy, in denen beispielsweise Klammern weggelassen werden können.
-				Interne DSLs lassen sich zwar leicht entwerfen und profitieren von den bestehenden Werkzeugen der Hostsprache, sind aber an die Plattform(en) und Syntax ihrer Hostsprache gebunden.
-				Externe DSLs dagegen unterliegen diesen Beschränkungen nicht. Die maßgeschneiderten Werkzeuge müssen jedoch erst aufwändig entwickelt und von den Benutzern erlernt werden.
-				Als Beispiele für interne DSLs seien <a href="https://www.chef.io/" title="Chef-Webseite">chef</a> (Hostsprache: Ruby) und <a href="http://www.gradle.org/" title="Gradle-Webseite">Gradle</a> (Hostsprache: Groovy) genannt.
-			</p>
-			<p>
-				Neben internen und externen DSL existieren zwei weitere Unterteilungen: Sogenannte horizontale und vertikale sowie textuelle und grafische DSLs.
-				Horizontale DSLs sind technologieorientiert und werden zur Beschreibung bestimmter Bereiche einer Anwendungsarchitektur wie beispielsweise von Entitäten und DTOs verwendet.
-				Vertikale DSLs dagegen dienen der Beschreibung von Konfigurationsdateien oder Geschäftsregeln durch Benutzer und enthalten meist ausschließlich Begriffe der Domäne.
-				Ein Beispiel für eine sehr bekannte textuelle DSL ist <a href="http://de.wikipedia.org/wiki/Cascading_Style_Sheets" title="Cascading Style Sheets in der deutschen Wikipedia">CSS</a>.
-				Die <a href="http://de.wikipedia.org/wiki/Unified_Modeling_Language" title="Unified Modeling Language in der deutschen Wikipedia">UML</a> ist eine ebenfalls sehr bekannte grafische DSL.
-			</p>
-			<h2>Das Xtext Language Development Framework</h2>
-			<p>
-				<a href="http://www.eclipse.org/Xtext/">Xtext</a> ist ein auf dem Eclipse Modeling Framework (EMF) basierendes Language Development Framework.
-				Mit Xtext lassen sich sowohl externe textuelle DSLs als auch umfangreiche GPLs entwickeln. Für den Einsatz in der MDSD ist es gut geeignet.
-				Unter Eingabe einer EBNF-artigen Grammatik, aus der auch das Metamodell abgeleitet werden kann, generiert Xtext eine vollständige sprachspezifische IDE.
-				Die Verwendung von Ecore als Metamodell erlaubt die Integration von Xtext-DSLs mit vielen anderen Technologien.
-				Nahezu jedes Detail der generierten Sprache und IDE kann dank des Generation Gap Patterns und <a href="https://github.com/google/guice">Google Guice</a> manuell angepasst werden.
-				Das Xtext-Projekt umfasst bereits die zwei DSLs <a href="http://wiki.eclipse.org/Xbase">Xbase</a> und <a href="http://www.eclipse.org/xtend/">Xtend</a> sowie das JVM-Typsystem, die in eigenen DSLs verwendet werden können.
-			</p>
-			<p>
-				<b>Xbase</b> ist eine Basissprache, die grundlegende imperative Programmierausdrücke definiert und einen Generator für Java-Code mitbringt.
-				Xbase ist jedoch stark plattformabhängig von und besitzt starke Ähnlichkeit zu Java.
-				Es kann sogar mit bidirektionaler Abhängigkeit zu Java-Code verwendet werden.
-				Des Weiteren ist Xbase durch die Groovy-Syntax geprägt und lässt sich dadurch kompakter schreiben als Java-Code.
-				Xbase-basierte DSL-Modelle werden grundsätzlich in zwei Stufen zu Java-Code transformiert:
-				Zunächst wird aus dem eigenen Modell das JVM-Modell abgeleitet und dieses schließlich zu Java-Code transformiert.
-				Bei der Ableitung des JVM-Modells ist es bereits möglich Generatoren für Methodenkörper im finalen Java-Code zu registrieren, wodurch die Entwicklung deutlich vereinfacht wird.
-			</p>
-			<p>
-				<b>Xtend</b> ist eine vollwertige GPL und erweitert Xbase um alle Java-Konzepte und einiges mehr wie Rich-Strings und Dispatch-Methods.
-				Durch diese zusätzlichen Konzepte eignet sich Xtext besonders zur Entwicklung von Modelltransformationen und Textgeneratoren.
-				Xtext selbst ist zum Teil in Xtend geschrieben, wie es im Compilerbau üblich ist. 
-				Mittlerweile ist Xtend sogar ein eigenständiges Eclipse-Plugin.
-				Seit Xtend über <a href="http://blog.efftinge.de/2012/10/introducing-active-annotations.html">Active Annotations</a> verfügt, können durch die Bindung von Code-Generatoren an Xtend-Annotationen mit wenig Aufwand Xtend-interne DSLs implementiert werden.
-				Dies ist eine einfache Möglichkeit das DRY-Prinzip sogar beispielsweise bei der Erzeugung von Gettern und Settern einzuhalten und Code dadurch sauberer zu gestalten, ohne eine eigene externe DSL dafür entwerfen zu müssen.
-			</p>
-			<h2>Fazit</h2>
-			<p>
-				In der MDSD ist das <b>Modell Zentrum jeglicher Änderung</b>.
-				Alle Redundanzen können mit einer DSL beseitigt werden und es gibt keine Inkonsistenz zwischen der Dokumentation und dem Code.
-				Die Reinheit der Architektur ist durch die einheitliche Code-Generierung garantiert.
-			</p>
-			<p>
-				Die <b>Softwarequalität</b> ist von der Präzision der Definition der Sprachsemantik und von der Generatorimplementierung abhängig.
-				DSL, Generatoren und Generat müssen getestet werden, um hohes Qualitätsmaß erreichen zu können.
-				Test-Stubs können jedoch ebenfalls generiert werden.
-			</p>
-			<p>
-				<b>Xtext ist besonders geeignet</b> zur Entwicklung von Java-basierten DSLs.
-			</p>
-			<p>
-				<b>Dennoch sehr aufwändig</b> gestaltet sich die eigene Entwicklung externer DSLs für die MDSD.
-				Bis eine DSL und ihre Generatoren für eine bestimmte Art von Produkt richtig ausgereift sind, bedarf es vieler Entwicklungsiterationen.
-				Die Entwicklung von Produkten mit einer halbfertigen DSL wird durch das Auftreten neuer Anforderungen in der DSL und der eingeschränkten Möglichkeiten der DSL-Benutzer tendenziell verzögert.
-				Erst eine richtig ausgereifte DSL mit einem für eine bestimmte Plattform ausgereiften Generator spart Zeit und Kraft.
-			</p>
-			<p>
-				Die <b>MDSD ist sinnvoll, wenn</b> man mehrere Produkte der gleichen <b>Softwarefamilie</b> entwickelt, das Softwareprodukt besonders <b>viele ähnliche Anwendungsfälle</b> enthält oder besonders <b>aufwändig zu entwickeln</b> ist und seine Architektur über einen langen Zeitraum vielen <b>technologischen Veränderungen standhalten</b> muss.
-			</p>
-			<p>
-				<b>Xtends Active Annotations</b> ermöglichen die einfache Integration von Code-Generatoren.
-				Xtend kann dadurch auch die Arbeit an kleinen Projekten beschleunigen und als Alternative zu AOP-Implementierungen wie AspectJ oder Interceptors in Java EE verwendet werden. 
-			</p>
-		</replace>
-	</include>
+	<img src="/files/mdsd-dsls/ModelLanguage-example.png" title="Letter-Entität mit DAO in der 'ModelLanguage'" align="right" />
+	<img src="/files/mdsd-dsls/ControllerLanguage-example.png" title="Beispielcode der 'ControllerLanguage'" align="right" />
+	<p>
+		Dem <a href="http://www.clean-code-developer.de/Roter-Grad.ashx#Don%C2%B4t_Repeat_Yourself_DRY_0">DRY-Prinzip</a> entsprechend gilt es Redundanzen in der Softwareentwicklung zu vermeiden und Architekturen einheitlich zu gestalten, um die Übersicht und Wartbarkeit zu gewährleisten und Zeit und Nerven der Entwickler zu schonen.
+		Dennoch ist es auch in modernen Programmiersprachen wie Java oft nicht ohne Weiteres möglich alle Redundanzen zu vermeiden.
+		Dies gilt besonders bei programmiersprachenübergreifenden Aufgaben wie dem Schreiben von Java-Hüllklassen für nativen oder JavaScript-Code aber auch für den Entwurf von <a href="http://de.wikipedia.org/wiki/Transferobjekt">Datentransferobjekten (DTO)</a> zu einem Entitätstyp.
+		Soll eine Anwendung außerdem auf verschiedene Plattformen portiert oder sehr viele ähnliche Anwendungsfälle entworfen werden, so wird die selbe Funktionalität häufig mehrfach geschrieben.
+		Die aus diesen Aufgaben hervorgehenden Redundanzen führen schnell zu Inkonsistenzen und sind fehleranfällig.
+		<a href="http://de.wikipedia.org/wiki/Modellgetriebene_Softwareentwicklung" title="Modellgetriebene Softwareentwicklung in der deutschen Wikipedia">Modellgetriebene Softwareentwicklung</a> mit <a href="http://de.wikipedia.org/wiki/Dom%C3%A4nenspezifische_Sprache" title="Domänenspezifische Sprache in der deutschen Wikipedia">Domänenspezifischen Sprachen (DSL)</a> verspricht Abhilfe für diese Probleme - aber zu welchem Preis?
+		In meiner Bachelorarbeit, "Evaluierung der Modellgetriebenen Softwareentwicklung mit Xtext", ging ich dieser Frage am Beispiel des Xtext-Frameworks nach.
+		Dabei entwickelte ich mehrere DSLs zur Modellierung von Create-Read-Update-Delete (CRUD)-Anwendungen und Transformationen dieser in Java EE EJBs, JPA-Entities und JSF-Ansichten.
+		Meine Erkenntnisse aus dieser Arbeit werden im Folgenden zusammengefasst.
+	</p>
+	<h2>Modellgetriebene Softwareentwicklung (MDSD)</h2>
+	<p>
+		Um einmal entworfene Anwendungen auf viele Plattformen migrieren und auf tiefgreifende Technologieveränderungen reagieren zu können, ist in der MDSD ist das Modell der Code.
+		Zu diesem Zweck wird das Modell in einer möglichst plattformunabhängigen DSL beschrieben.
+		Mit Hilfe von Modell-zu-Modell- (M2M) und Modell-zu-Text/Code-Transformationen (M2T) wird schließlich in einem ein- oder mehrstufigen Verfahren aus dem Modell der Code für eine konkrete Plattform erzeugt.
+		Mehrstufige Transformationen sind komplexer, aber bieten dafür mehr Anpassungsmöglichkeiten und sind plattformunabhängiger.
+		Im Gegensatz dazu sind einstufige Transformationen weniger komplex, aber meist plattformabhängiger.
+	</p>
+	<p>
+		Die Anpassung von Generat lässt sich meist nicht vermeiden. Dadurch entstehen Probleme:
+		Es muss einerseits sichergestellt werden, dass bei erneuter Transformation die manuellen Anpassungen nicht überschrieben werden.
+		Andererseits müssen auch Anpassungen im Modell mit dem manuell erzeugten Code funktionieren.
+		Das Generation Gap Pattern löst dieses Problem durch durch Vererbung manueller Anpassungen bzw. nicht-generierter Artefakte von generierten Artefakten.
+		Generierte Artefakte sollten außerdem nicht in einem <a href="http://de.wikipedia.org/wiki/Concurrent_Versions_System" title="Concurrent Versions System in der deutschen Wikipedia">CVS</a> versioniert werden. Dies lässt sich durch Verwendung eines separaten Quellverzeichnisses realisieren. 
+	</p>
+	<h2>Domänenspezifische Sprache (DSL)</h2>
+	<p>
+		Die meisten Entwickler arbeiten täglich mit DSLs.
+		Im Gegensatz zu einer <a href="http://de.wikipedia.org/wiki/General_Purpose_Language" title="General Purpose Language in der deutschen Wikipedia">General Purpose Language (GPL)</a> wie Java, einer Programmiersprache zur Entwicklung allgemeiner Anwendungen, ist eine DSL auf eine bestimmte Domäne zugeschnitten.
+		Elemente dieser Domäne können damit sehr kompakt und ohne Redundanzen beschrieben werden.
+		Allgemeine Anwendungen außerhalb der Domäne lassen sich damit jedoch nicht oder nur sehr umständlich realisieren.
+		Domänen lassen sich häufig auch in mehrere Teildomänen und entsprechende DSLs unterteilen.
+	</p>
+	<p>
+		Es ist zwischen internen und externen DSLs zu unterscheiden.
+		Eine interne DSL wird eingebettet in eine sogenannte Hostsprache entworfen.
+		Sie ist daher nur eine Programmbibliothek, deren Methoden jedoch so geschrieben sind, dass sie mit den Ausdrucksmöglichkeiten der Hostsprache möglichst deklarativ und übersichtlich aufgerufen werden können.
+		Dies wird typischer Weise u.A. mit Hilfe von <a href="http://de.wikipedia.org/wiki/Fluent_Interface" title="Fluent interface in der deutschen Wikipedia">Fluent Interfaces</a> und <a href="http://en.wikipedia.org/wiki/Method_chaining" title="Method Chaining in der englischen Wikipedia">Method Chaining</a> realisiert.
+		Besonders sinnvoll ist dies mit Hostsprachen wie Ruby oder Groovy, in denen beispielsweise Klammern weggelassen werden können.
+		Interne DSLs lassen sich zwar leicht entwerfen und profitieren von den bestehenden Werkzeugen der Hostsprache, sind aber an die Plattform(en) und Syntax ihrer Hostsprache gebunden.
+		Externe DSLs dagegen unterliegen diesen Beschränkungen nicht. Die maßgeschneiderten Werkzeuge müssen jedoch erst aufwändig entwickelt und von den Benutzern erlernt werden.
+		Als Beispiele für interne DSLs seien <a href="https://www.chef.io/" title="Chef-Webseite">chef</a> (Hostsprache: Ruby) und <a href="http://www.gradle.org/" title="Gradle-Webseite">Gradle</a> (Hostsprache: Groovy) genannt.
+	</p>
+	<p>
+		Neben internen und externen DSL existieren zwei weitere Unterteilungen: Sogenannte horizontale und vertikale sowie textuelle und grafische DSLs.
+		Horizontale DSLs sind technologieorientiert und werden zur Beschreibung bestimmter Bereiche einer Anwendungsarchitektur wie beispielsweise von Entitäten und DTOs verwendet.
+		Vertikale DSLs dagegen dienen der Beschreibung von Konfigurationsdateien oder Geschäftsregeln durch Benutzer und enthalten meist ausschließlich Begriffe der Domäne.
+		Ein Beispiel für eine sehr bekannte textuelle DSL ist <a href="http://de.wikipedia.org/wiki/Cascading_Style_Sheets" title="Cascading Style Sheets in der deutschen Wikipedia">CSS</a>.
+		Die <a href="http://de.wikipedia.org/wiki/Unified_Modeling_Language" title="Unified Modeling Language in der deutschen Wikipedia">UML</a> ist eine ebenfalls sehr bekannte grafische DSL.
+	</p>
+	<h2>Das Xtext Language Development Framework</h2>
+	<p>
+		<a href="http://www.eclipse.org/Xtext/">Xtext</a> ist ein auf dem Eclipse Modeling Framework (EMF) basierendes Language Development Framework.
+		Mit Xtext lassen sich sowohl externe textuelle DSLs als auch umfangreiche GPLs entwickeln. Für den Einsatz in der MDSD ist es gut geeignet.
+		Unter Eingabe einer EBNF-artigen Grammatik, aus der auch das Metamodell abgeleitet werden kann, generiert Xtext eine vollständige sprachspezifische IDE.
+		Die Verwendung von Ecore als Metamodell erlaubt die Integration von Xtext-DSLs mit vielen anderen Technologien.
+		Nahezu jedes Detail der generierten Sprache und IDE kann dank des Generation Gap Patterns und <a href="https://github.com/google/guice">Google Guice</a> manuell angepasst werden.
+		Das Xtext-Projekt umfasst bereits die zwei DSLs <a href="http://wiki.eclipse.org/Xbase">Xbase</a> und <a href="http://www.eclipse.org/xtend/">Xtend</a> sowie das JVM-Typsystem, die in eigenen DSLs verwendet werden können.
+	</p>
+	<p>
+		<b>Xbase</b> ist eine Basissprache, die grundlegende imperative Programmierausdrücke definiert und einen Generator für Java-Code mitbringt.
+		Xbase ist jedoch stark plattformabhängig von und besitzt starke Ähnlichkeit zu Java.
+		Es kann sogar mit bidirektionaler Abhängigkeit zu Java-Code verwendet werden.
+		Des Weiteren ist Xbase durch die Groovy-Syntax geprägt und lässt sich dadurch kompakter schreiben als Java-Code.
+		Xbase-basierte DSL-Modelle werden grundsätzlich in zwei Stufen zu Java-Code transformiert:
+		Zunächst wird aus dem eigenen Modell das JVM-Modell abgeleitet und dieses schließlich zu Java-Code transformiert.
+		Bei der Ableitung des JVM-Modells ist es bereits möglich Generatoren für Methodenkörper im finalen Java-Code zu registrieren, wodurch die Entwicklung deutlich vereinfacht wird.
+	</p>
+	<p>
+		<b>Xtend</b> ist eine vollwertige GPL und erweitert Xbase um alle Java-Konzepte und einiges mehr wie Rich-Strings und Dispatch-Methods.
+		Durch diese zusätzlichen Konzepte eignet sich Xtext besonders zur Entwicklung von Modelltransformationen und Textgeneratoren.
+		Xtext selbst ist zum Teil in Xtend geschrieben, wie es im Compilerbau üblich ist. 
+		Mittlerweile ist Xtend sogar ein eigenständiges Eclipse-Plugin.
+		Seit Xtend über <a href="http://blog.efftinge.de/2012/10/introducing-active-annotations.html">Active Annotations</a> verfügt, können durch die Bindung von Code-Generatoren an Xtend-Annotationen mit wenig Aufwand Xtend-interne DSLs implementiert werden.
+		Dies ist eine einfache Möglichkeit das DRY-Prinzip sogar beispielsweise bei der Erzeugung von Gettern und Settern einzuhalten und Code dadurch sauberer zu gestalten, ohne eine eigene externe DSL dafür entwerfen zu müssen.
+	</p>
+	<h2>Fazit</h2>
+	<p>
+		In der MDSD ist das <b>Modell Zentrum jeglicher Änderung</b>.
+		Alle Redundanzen können mit einer DSL beseitigt werden und es gibt keine Inkonsistenz zwischen der Dokumentation und dem Code.
+		Die Reinheit der Architektur ist durch die einheitliche Code-Generierung garantiert.
+	</p>
+	<p>
+		Die <b>Softwarequalität</b> ist von der Präzision der Definition der Sprachsemantik und von der Generatorimplementierung abhängig.
+		DSL, Generatoren und Generat müssen getestet werden, um hohes Qualitätsmaß erreichen zu können.
+		Test-Stubs können jedoch ebenfalls generiert werden.
+	</p>
+	<p>
+		<b>Xtext ist besonders geeignet</b> zur Entwicklung von Java-basierten DSLs.
+	</p>
+	<p>
+		<b>Dennoch sehr aufwändig</b> gestaltet sich die eigene Entwicklung externer DSLs für die MDSD.
+		Bis eine DSL und ihre Generatoren für eine bestimmte Art von Produkt richtig ausgereift sind, bedarf es vieler Entwicklungsiterationen.
+		Die Entwicklung von Produkten mit einer halbfertigen DSL wird durch das Auftreten neuer Anforderungen in der DSL und der eingeschränkten Möglichkeiten der DSL-Benutzer tendenziell verzögert.
+		Erst eine richtig ausgereifte DSL mit einem für eine bestimmte Plattform ausgereiften Generator spart Zeit und Kraft.
+	</p>
+	<p>
+		Die <b>MDSD ist sinnvoll, wenn</b> man mehrere Produkte der gleichen <b>Softwarefamilie</b> entwickelt, das Softwareprodukt besonders <b>viele ähnliche Anwendungsfälle</b> enthält oder besonders <b>aufwändig zu entwickeln</b> ist und seine Architektur über einen langen Zeitraum vielen <b>technologischen Veränderungen standhalten</b> muss.
+	</p>
+	<p>
+		<b>Xtends Active Annotations</b> ermöglichen die einfache Integration von Code-Generatoren.
+		Xtend kann dadurch auch die Arbeit an kleinen Projekten beschleunigen und als Alternative zu AOP-Implementierungen wie AspectJ oder Interceptors in Java EE verwendet werden. 
+	</p>
 </article>
