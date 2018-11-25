@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>de.algorythm.xar.example</groupId>
+	<artifactId>xar-example</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>xar</packaging>
+	<name>XAR package</name>
+
+	<build>
+		<sourceDirectory>src/main/xml</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>de.algorythm.cms</groupId>
+				<artifactId>xar-maven-plugin</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<extensions>true</extensions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<distributionManagement>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://repository.algorythm.de/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+</project>
